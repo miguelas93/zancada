@@ -196,7 +196,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
     <button class="btn ghost" id="goalBtn" style="color:var(--cobalto)">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--alerta)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.2 · 29 oct 2026</p>
+    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.2.1 · 29 oct 2026</p>
   </div>
   <nav class="tabs" aria-label="Pestañas">
     <button data-go="home" aria-label="Inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3Z"/></svg></button>
@@ -592,8 +592,8 @@ function slideButton(el, done) {
   const max = () => el.clientWidth - knob.offsetWidth - 8;
   const draw = (p, anim) => { knob.style.transition = anim ? 'transform .25s' : 'none'; fill.style.transition = anim ? 'width .25s' : 'none'; knob.style.transform = `translateX(${p}px)`; fill.style.width = (p + knob.offsetWidth + 4) + 'px'; };
   el.addEventListener('pointerdown', (e) => { on = true; x0 = e.clientX; el.setPointerCapture(e.pointerId); draw(0, false); });
-  el.addEventListener('pointermove', (e) => { if (!on) return; const m = max(), raw = Math.max(0, e.clientX - x0); pos = Math.min(m, raw * 0.72); draw(pos, false); });
-  const end = () => { if (!on) return; on = false; if (pos >= max() * 0.92) { draw(max(), true); setTimeout(() => { draw(0, false); done(); }, 120); } else draw(0, true); pos = 0; };
+  el.addEventListener('pointermove', (e) => { if (!on) return; const m = max(), raw = Math.max(0, e.clientX - x0); pos = Math.min(m, raw); draw(pos, false); });
+  const end = () => { if (!on) return; on = false; if (pos >= max() * 0.7) { draw(max(), true); setTimeout(() => { draw(0, false); done(); }, 120); } else draw(0, true); pos = 0; };
   ['pointerup', 'pointercancel'].forEach((ev) => el.addEventListener(ev, end));
 }
 holdButton($('#unlockBtn'), 1000, () => $('#lockOverlay').style.display = 'none');
