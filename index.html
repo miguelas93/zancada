@@ -23,7 +23,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
-body{background:var(--papel);color:var(--noche);font-family:var(--body);font-size:15px;line-height:1.45;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+body{background:var(--papel);color:var(--noche);font-family:var(--body);font-size:15px;line-height:1.45;overscroll-behavior:none;overflow:hidden;-webkit-user-select:none;user-select:none}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;padding:0}
 .screen{display:none;position:fixed;inset:0;flex-direction:column;padding:calc(var(--sat) + 16px) 20px calc(var(--sab) + 16px);overflow:hidden}
 .screen.on{display:flex}
@@ -54,7 +54,7 @@ h1{font-size:30px}h2{font-size:18px}
 .tabs .go::after{display:none}
 .withtabs{padding-bottom:calc(var(--sab) + 110px)}
 svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.map{border-radius:24px;overflow:hidden;background:var(--cielo);position:relative}
+.map{border-radius:24px;overflow:hidden;background:var(--cielo);position:relative;isolation:isolate}
 .leaflet-container{font-family:var(--body);background:var(--cielo)}
 .leaflet-control-attribution{font-size:9px;opacity:.8}
 .leaflet-top.leaflet-left{display:none}
@@ -159,12 +159,12 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 <!-- PREPARACIÓN -->
 <section class="screen" id="prep" style="background:var(--cielo);padding:0">
   <div id="prepMap" style="position:absolute;inset:0"></div>
-  <div style="position:absolute;left:20px;right:20px;top:calc(var(--sat) + 16px);display:flex;justify-content:space-between;align-items:center;z-index:5">
+  <div style="position:absolute;left:20px;right:20px;top:calc(var(--sat) + 16px);display:flex;justify-content:space-between;align-items:center;z-index:1000">
     <button class="icon" data-go="home" aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <span class="pill"><span class="dot" id="gpsDot"></span><span id="gpsText">Buscando GPS…</span></span>
     <span style="width:44px"></span>
   </div>
-  <div style="position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 20px);z-index:5">
+  <div style="position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 20px);z-index:1000">
     <div class="card col center" style="border-radius:28px;gap:16px">
       <div><h1 style="font-size:26px">Carrera libre</h1><p style="margin:4px 0 0;color:var(--gris);font-weight:600">Sin objetivo. Corre lo que te pida el cuerpo.</p></div>
       <button class="btn" id="startBtn" disabled style="width:112px;height:112px;border-radius:56px;flex-direction:column;gap:2px;font-size:19px"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3.2;width:28px;height:28px"><path d="M6 5h12L6 19h12"/><circle cx="18" cy="19" r="2.2" fill="#FFD43B" stroke="none"/></svg>Empezar</button>
@@ -234,7 +234,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
   </div>
   <div class="map" style="height:230px;flex:none">
     <div id="sumMap" style="position:absolute;inset:0"></div>
-    <button id="replayBtn" aria-label="Ver la repetición" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:32px;background:var(--noche);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(14,20,64,.3);z-index:500"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg></button>
+    <button id="replayBtn" aria-label="Ver la repetición" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:32px;background:var(--noche);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(14,20,64,.3);z-index:1000"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg></button>
   </div>
   <div class="row" id="sStats"></div>
   <div class="card col" style="gap:10px"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Parciales</h2><span style="font-size:12px;font-weight:800;color:var(--gris)">Mejor km en limón</span></div><div class="splits" id="sSplits"></div></div>
@@ -244,12 +244,12 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 <!-- REPETICIÓN -->
 <section class="screen" id="replay" style="padding:0;background:var(--noche)">
   <div id="repMap" style="position:absolute;inset:0"></div>
-  <div style="position:absolute;left:20px;right:20px;top:calc(var(--sat) + 16px);display:flex;justify-content:space-between;align-items:center;z-index:500">
+  <div style="position:absolute;left:20px;right:20px;top:calc(var(--sat) + 16px);display:flex;justify-content:space-between;align-items:center;z-index:1000">
     <button class="icon" id="repClose" aria-label="Cerrar" style="background:var(--noche);color:#fff;box-shadow:0 4px 12px rgba(14,20,64,.3)"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="seg" style="background:var(--noche);box-shadow:none"><button class="on" data-layer="sat" style="color:#fff">Satélite</button><button data-layer="calles" style="color:rgba(255,255,255,.6)">Calles</button></div>
     <button class="icon" id="repSpeed" aria-label="Velocidad" style="background:var(--noche);color:#fff;box-shadow:0 4px 12px rgba(14,20,64,.3);font-family:var(--display);font-weight:600">2×</button>
   </div>
-  <div style="position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 20px);z-index:500" class="col">
+  <div style="position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 20px);z-index:1000" class="col">
     <div class="row">
       <div class="card center" style="background:var(--noche);color:#fff;box-shadow:none;padding:12px"><span class="lbl" style="color:#A3A9D6">km</span><div class="num" id="pDist" style="font-size:26px;margin-top:2px">0,00</div></div>
       <div class="card center" style="background:var(--noche);color:#fff;box-shadow:none;padding:12px"><span class="lbl" style="color:#A3A9D6">tiempo</span><div class="num" id="pTime" style="font-size:26px;margin-top:2px">00:00</div></div>
@@ -297,7 +297,7 @@ function haversine(a, b) {
 
 // ---------- mapas ----------
 const SAT = () => L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imágenes © Esri, Maxar, Earthstar Geographics' });
-const CALLES = () => L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '© OpenStreetMap, © CARTO' });
+const CALLES = () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
 const maps = {};
 function makeMap(id, layer) {
   if (maps[id]) return maps[id];
