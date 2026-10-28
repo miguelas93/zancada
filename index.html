@@ -81,12 +81,61 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 .seg button{flex:1;height:36px;padding:0 14px;border-radius:999px;font-weight:800;font-size:13px;color:var(--gris)}
 .seg button.on{background:var(--noche);color:#fff}
 .center{text-align:center;align-items:center}
+.slide{position:relative;height:64px;border-radius:32px;background:#fff;box-shadow:0 4px 0 var(--linea);overflow:hidden;touch-action:none}
+.slide .track{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-left:56px;font-family:var(--display);font-weight:600;font-size:17px;color:var(--gris)}
+.slide .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--alerta);opacity:.18}
+.slide .knob{position:absolute;left:4px;top:4px;width:56px;height:56px;border-radius:28px;background:var(--alerta);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(14,20,64,.25)}
+#run.night .slide{background:#1A2160;box-shadow:none}#run.night .slide .track{color:#A3A9D6}
+.opt{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.14);border:2px solid transparent;border-radius:20px;padding:14px 16px;text-align:left;color:#fff;width:100%}
+.opt.on{background:#fff;color:var(--noche);border-color:var(--limon)}
+.opt b{font-family:var(--display);font-weight:600;font-size:17px;display:block}
+.opt small{font-size:13px;font-weight:600;opacity:.75}
+.opt .em{font-size:28px;flex:none}
+.dots{display:flex;gap:6px;justify-content:center}.dots i{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.35)}.dots i.on{background:var(--limon)}
+.inp{width:100%;height:56px;border-radius:18px;border:0;background:#fff;color:var(--noche);font:inherit;font-weight:800;font-size:18px;padding:0 18px;text-align:center}
+.inp:focus{outline:3px solid var(--limon)}
+.modal{position:fixed;inset:0;background:rgba(14,20,64,.6);z-index:2000;display:none;align-items:flex-end;padding:20px}
+.modal.on{display:flex}
+.modal .card{width:100%;border-radius:28px;padding:22px 20px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
+<div class="modal" id="shortModal"><div class="card col" style="gap:12px">
+  <h2 style="font-size:22px">Carrera muy corta</h2>
+  <p style="margin:0;font-weight:600;color:var(--gris)" id="shortText">Has recorrido menos de 50 m. ¿La guardo igualmente?</p>
+  <button class="btn" id="shortSave">Guardar igualmente</button>
+  <button class="btn ghost" id="shortDrop" style="color:var(--alerta)">Descartar</button>
+</div></div>
+
+<!-- BIENVENIDA -->
+<section class="screen" id="welcome" style="background:var(--cobalto);color:#fff;gap:18px">
+  <div class="dots" id="wDots"><i class="on"></i><i></i><i></i></div>
+  <div class="grow"></div>
+  <div class="center col" style="gap:8px">
+    <svg viewBox="0 0 120 130" width="150" height="162" aria-hidden="true"><path d="M60 14 C 92 14, 104 44, 100 72 C 96 98, 80 112, 60 112 C 40 112, 24 98, 20 72 C 16 44, 28 14, 60 14 Z" fill="#FFD43B"/><path d="M22 52 C 40 42, 80 42, 98 52" stroke="#2F45FF" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="46" cy="70" r="6" fill="#0E1440"/><circle cx="74" cy="70" r="6" fill="#0E1440"/><circle cx="48" cy="68" r="2" fill="#fff"/><circle cx="76" cy="68" r="2" fill="#fff"/><path d="M48 86 Q 60 96 72 86" stroke="#0E1440" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    <div id="wStep0" class="col" style="gap:8px">
+      <h1 style="font-size:32px">¡Hola! Soy Zanca.</h1>
+      <p style="margin:0;font-weight:600;font-size:17px;opacity:.9">Voy a seguir tus carreras, a celebrar cuando te superes y a darte la lata cuando lleves días sin salir. ¿Cómo te llamas?</p>
+      <input class="inp" id="wName" placeholder="Tu nombre" maxlength="20" autocomplete="given-name" style="margin-top:8px">
+    </div>
+    <div id="wStep1" class="col" style="gap:10px;display:none;width:100%">
+      <h1 style="font-size:28px" id="wAsk">¿Cuál es tu objetivo?</h1>
+      <p style="margin:0 0 6px;font-weight:600;opacity:.9">Lo usaré para tu objetivo semanal. Puedes cambiarlo en Perfil.</p>
+      <button class="opt" data-goal="2"><span class="em">🌱</span><span><b>Empezar a correr</b><small>2 carreras a la semana</small></span></button>
+      <button class="opt on" data-goal="3"><span class="em">🔥</span><span><b>Mantener la constancia</b><small>3 carreras a la semana</small></span></button>
+      <button class="opt" data-goal="4"><span class="em">🏅</span><span><b>Mejorar mis marcas</b><small>4 carreras a la semana</small></span></button>
+    </div>
+    <div id="wStep2" class="col" style="gap:8px;display:none">
+      <h1 style="font-size:28px" id="wDone">¡Perfecto!</h1>
+      <p style="margin:0;font-weight:600;font-size:17px;opacity:.9" id="wDoneText">Cada semana que cumplas el objetivo suma una semana de racha. La primera carrera es la que más cuenta.</p>
+    </div>
+  </div>
+  <div class="grow"></div>
+  <button class="btn y" id="wNext">Encantada</button>
+</section>
 
 <!-- INICIO -->
 <section class="screen scroll withtabs on" id="home">
@@ -144,9 +193,10 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
       <label style="display:flex;justify-content:space-between;align-items:center;font-weight:800">Modo noche al correr<select id="setNight" style="font:inherit;font-weight:700;border:0;background:var(--papel);border-radius:10px;padding:6px 10px"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
       <label style="display:flex;justify-content:space-between;align-items:center;font-weight:800">Mapa<select id="setMap" style="font:inherit;font-weight:700;border:0;background:var(--papel);border-radius:10px;padding:6px 10px"><option value="sat">Satélite</option><option value="calles">Calles</option></select></label>
     </div>
+    <button class="btn ghost" id="goalBtn" style="color:var(--cobalto)">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--alerta)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.1 · 28 oct 2026</p>
+    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.2 · 29 oct 2026</p>
   </div>
   <nav class="tabs" aria-label="Pestañas">
     <button data-go="home" aria-label="Inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3Z"/></svg></button>
@@ -202,7 +252,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
   </div>
   <div id="pausePanel" class="col" style="display:none">
     <button class="btn" id="resumeBtn">Seguir</button>
-    <button class="btn hold" id="finishBtn"><i></i><span style="position:relative">Mantén pulsado para terminar</span></button>
+    <div class="slide" id="finishSlide" aria-label="Desliza para terminar"><div class="fill"></div><div class="track">Desliza para terminar →</div><div class="knob"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
   </div>
   <div id="lockOverlay" style="display:none;position:absolute;inset:0;background:rgba(14,20,64,.92);color:#fff;z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:40px">
     <span class="num" id="lockDist" style="font-size:72px">0,00</span><span style="font-weight:700;opacity:.8">km · pantalla bloqueada</span>
@@ -272,9 +322,11 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 'use strict';
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
-const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1';
+const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1', PROF = 'zancada.profile.v1';
 const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat' }, load(SET, {}));
 let runs = load(KEY, []);
+const profile = Object.assign({ name: '', goal: 3, done: false }, load(PROF, {}));
+const GOAL_OF = () => Math.max(1, Number(profile.goal) || 3);
 
 function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -283,7 +335,7 @@ function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.c
 // ---------- formato ----------
 const fmtKm = (m) => (m / 1000).toFixed(2).replace('.', ',');
 const fmtTime = (s) => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h ? h + ':' : '') + String(m).padStart(h ? 2 : 2, '0') + ':' + String(x).padStart(2, '0'); };
-const fmtPace = (secPerKm) => { if (!isFinite(secPerKm) || secPerKm <= 0 || secPerKm > 30 * 60) return '–:––'; const m = Math.floor(secPerKm / 60), s = Math.round(secPerKm % 60); return m + ':' + String(s).padStart(2, '0'); };
+const fmtPace = (secPerKm) => { if (!isFinite(secPerKm) || secPerKm <= 0 || secPerKm > 40 * 60) return '–:––'; const m = Math.floor(secPerKm / 60), s = Math.round(secPerKm % 60); return m + ':' + String(s).padStart(2, '0'); };
 const fmtDate = (ts) => new Date(ts).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + new Date(ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 const runName = (ts) => { const h = new Date(ts).getHours(); return h < 12 ? 'Carrera de la mañana' : h < 20 ? 'Carrera de la tarde' : 'Carrera nocturna'; };
 
@@ -324,30 +376,57 @@ function go(id) {
   setTimeout(() => Object.values(maps).forEach((m) => m.invalidateSize()), 60);
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
+// Deslizar entre pantallas: Inicio ↔ Historial ↔ Perfil; hacia la derecha vuelve atrás en Preparación y Resumen.
+const TABS = ['home', 'history', 'profile'];
+let sw = null;
+document.addEventListener('touchstart', (e) => { const cur = $('.screen.on')?.id; if (e.touches.length !== 1 || !['home', 'history', 'profile', 'prep', 'summary'].includes(cur) || e.target.closest('input,.slide,#sumMap')) { sw = null; return; } sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
+document.addEventListener('touchend', (e) => {
+  if (!sw) return; const dx = e.changedTouches[0].clientX - sw.x, dy = e.changedTouches[0].clientY - sw.y, dt = Date.now() - sw.t; sw = null;
+  if (Math.abs(dx) < 60 || Math.abs(dx) < 1.6 * Math.abs(dy) || dt > 700) return;
+  const cur = $('.screen.on')?.id; if (!cur) return;
+  const i = TABS.indexOf(cur);
+  if (i >= 0) { const nx = TABS[i + (dx < 0 ? 1 : -1)]; if (nx) go(nx); return; }
+  if (dx > 0 && (cur === 'prep' || cur === 'summary')) go('home');
+}, { passive: true });
 
 // ---------- semana y racha ----------
 function weekStart(d) { d = new Date(d); const day = (d.getDay() + 6) % 7; d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - day); return d.getTime(); }
-const GOAL = 3;
 function weekStats() {
   const ws = weekStart(Date.now());
   const thisWeek = runs.filter((r) => r.start >= ws);
   const daysDone = new Set(thisWeek.map((r) => (new Date(r.start).getDay() + 6) % 7));
   let streak = 0, cursor = ws;
-  const ok = (from) => runs.filter((r) => r.start >= from && r.start < from + 7 * 864e5).length >= GOAL;
+  const ok = (from) => runs.filter((r) => r.start >= from && r.start < from + 7 * 864e5).length >= GOAL_OF();
   if (ok(cursor)) streak++;
   cursor -= 7 * 864e5;
   while (ok(cursor)) { streak++; cursor -= 7 * 864e5; }
   return { count: thisWeek.length, daysDone, streak, today: (new Date().getDay() + 6) % 7 };
 }
 
+// ---------- bienvenida ----------
+let wStep = 0;
+function openWelcome() { wStep = 0; $('#wName').value = profile.name; $$('#welcome [data-goal]').forEach((b) => b.classList.toggle('on', Number(b.dataset.goal) === GOAL_OF())); showWStep(); go('welcome'); }
+function showWStep() {
+  [0, 1, 2].forEach((i) => { $('#wStep' + i).style.display = i === wStep ? '' : 'none'; $('#wDots i:nth-child(' + (i + 1) + ')').classList.toggle('on', i === wStep); });
+  const n = profile.name.trim();
+  if (wStep === 1) $('#wAsk').textContent = n ? `${n}, ¿cuál es tu objetivo?` : '¿Cuál es tu objetivo?';
+  if (wStep === 2) { $('#wDone').textContent = n ? `¡Perfecto, ${n}!` : '¡Perfecto!'; $('#wDoneText').textContent = `${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana de racha. La primera carrera es la que más cuenta.`; }
+  $('#wNext').textContent = wStep === 0 ? 'Encantada' : wStep === 1 ? 'Ese es mi objetivo' : '¡Vamos a correr!';
+}
+$('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 2) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); go('home'); };
+$('#wName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#wNext').click(); });
+$$('#welcome [data-goal]').forEach((b) => b.onclick = () => { profile.goal = Number(b.dataset.goal); $$('#welcome [data-goal]').forEach((x) => x.classList.toggle('on', x === b)); });
+$('#goalBtn').onclick = openWelcome;
+
 // ---------- inicio ----------
 function renderHome() {
   const w = weekStats();
   $('#streak').textContent = w.streak + (w.streak === 1 ? ' semana' : ' semanas');
   $('#days').innerHTML = 'LMXJVSD'.split('').map((l, i) => `<span class="${w.daysDone.has(i) ? 'd' : i === w.today ? 't' : ''}">${l}</span>`).join('');
-  const left = Math.max(0, GOAL - w.count);
-  $('#weekText').textContent = `${Math.min(w.count, GOAL)} de ${GOAL} carreras · objetivo semanal`;
-  $('#homeBubble').textContent = runs.length === 0 ? '¡Hola! Soy Zanca. Pulsa el botón azul y salimos a correr.' : left === 0 ? '¡Semana cumplida! Lo que corras ahora es propina.' : `Te falta${left === 1 ? '' : 'n'} ${left} carrera${left === 1 ? '' : 's'} para cerrar la semana.`;
+  const left = Math.max(0, GOAL_OF() - w.count);
+  $('#weekText').textContent = `${Math.min(w.count, GOAL_OF())} de ${GOAL_OF()} carreras · objetivo semanal`;
+  const nm = profile.name ? ', ' + profile.name : '';
+  $('#homeBubble').textContent = runs.length === 0 ? `¡Hola${nm}! Soy Zanca. Pulsa el botón azul y salimos a correr.` : left === 0 ? '¡Semana cumplida! Lo que corras ahora es propina.' : `Te falta${left === 1 ? '' : 'n'} ${left} carrera${left === 1 ? '' : 's'} para cerrar la semana.`;
   const last = runs[0];
   const box = $('#lastRun');
   if (!last) { box.innerHTML = `<div class="card center" style="color:var(--gris);font-weight:700;padding:28px">Aún no hay carreras. La primera es la que más cuenta.</div>`; return; }
@@ -414,7 +493,7 @@ function demoRun() {
 // ---------- preparación ----------
 let watchId = null, prepMap, prepMarker, lastFix = null;
 function startPrep() {
-  prepMap = makeMap('prepMap', 'calles');
+  prepMap = makeMap('prepMap', 'calles'); prepMap.dragging.disable(); prepMap.touchZoom.disable(); prepMap.doubleClickZoom.disable();
   $('#startBtn').disabled = true; $('#gpsDot').className = 'dot'; $('#gpsText').textContent = 'Buscando GPS…';
   if (!('geolocation' in navigator)) { $('#prepHint').textContent = 'Este navegador no tiene GPS disponible.'; return; }
   if (!window.isSecureContext) { $('#prepHint').textContent = 'El GPS solo funciona en una web con https.'; return; }
@@ -443,18 +522,19 @@ function onGeoError(err) {
 
 // ---------- carrera ----------
 const run = { active: false, paused: false, points: [], dist: 0, start: 0, pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], wake: null, timer: null, map: null, line: null, marker: null };
-$('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 900); speak('Tres, dos, uno. ¡Vamos!'); };
+$('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
   Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity });
   const night = settings.night === 'on' || (settings.night === 'auto' && (new Date().getHours() >= 20 || new Date().getHours() < 7 || matchMedia('(prefers-color-scheme: dark)').matches));
   $('#run').classList.toggle('night', night);
   $('#pausePanel').style.display = 'none'; $('#pauseBtn').style.display = ''; $('#runState').textContent = 'Carrera libre';
+  ['#rDist', '#lockDist'].forEach((q) => $(q).textContent = '0,00'); $('#rTime').textContent = '00:00'; ['#rPace', '#rAvg', '#rBest'].forEach((q) => $(q).textContent = '–:––');
   go('run');
   run.map = makeMap('runMap', 'calles'); run.map.setZoom(16);
   if (run.line) run.map.removeLayer(run.line); if (run.marker) run.map.removeLayer(run.marker);
   run.line = L.polyline([], ROUTE_STYLE).addTo(run.map); run.marker = null;
   if (lastFix) runFix(lastFix);
-  clearInterval(run.timer); run.timer = setInterval(tick, 500);
+  clearInterval(run.timer); tick(); run.timer = setInterval(tick, 500);
   requestWake();
 }
 async function requestWake() { try { run.wake = await navigator.wakeLock?.request('screen'); } catch (e) {} }
@@ -488,24 +568,34 @@ function runFix(f) {
 function currentPace() {
   const pts = run.points; if (pts.length < 2) return NaN;
   const last = pts[pts.length - 1]; let i = pts.length - 2, d = 0;
-  while (i > 0 && last.t - pts[i].t < 25000) { d += haversine(pts[i], pts[i + 1]); i--; }
+  while (i > 0 && last.t - pts[i].t < 30000) { d += haversine(pts[i], pts[i + 1]); i--; }
   d += haversine(pts[i], pts[i + 1]);
   const dt = (last.t - pts[i].t) / 1000;
-  if (Date.now() - run.start - run.pausedMs - last.t > 12000) return NaN;
-  return d > 5 ? dt / (d / 1000) : NaN;
+  if (Date.now() - run.start - run.pausedMs - last.t > 15000) return NaN;
+  return d >= 4 ? dt / (d / 1000) : NaN;
 }
 function tick() {
   const el = elapsed();
   $('#rDist').textContent = fmtKm(run.dist); $('#lockDist').textContent = fmtKm(run.dist);
   $('#rTime').textContent = fmtTime(el);
-  $('#rPace').textContent = run.paused ? fmtPace(el / (run.dist / 1000)) : fmtPace(currentPace());
+  const cp = currentPace(); $('#rPace').textContent = run.paused || !isFinite(cp) ? (run.dist > 20 ? fmtPace(el / (run.dist / 1000)) : '–:––') : fmtPace(cp);
   $('#rAvg').textContent = run.dist > 50 ? fmtPace(el / (run.dist / 1000)) : '–:––';
   $('#rBest').textContent = isFinite(run.best) ? fmtPace(run.best) : '–:––';
   if (lastFix) $('#runAcc').textContent = '· ' + Math.round(lastFix.acc) + ' m';
 }
 $('#pauseBtn').onclick = () => { run.paused = true; run.pauseAt = Date.now(); $('#pauseBtn').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = 'En pausa'; speak('Pausa'); };
 $('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.paused = false; $('#pauseBtn').style.display = ''; $('#pausePanel').style.display = 'none'; $('#runState').textContent = 'Carrera libre'; speak('Seguimos'); };
-holdButton($('#finishBtn'), 1500, finishRun);
+slideButton($('#finishSlide'), finishRun);
+function slideButton(el, done) {
+  const knob = el.querySelector('.knob'), fill = el.querySelector('.fill');
+  let x0 = 0, on = false, pos = 0;
+  const max = () => el.clientWidth - knob.offsetWidth - 8;
+  const draw = (p, anim) => { knob.style.transition = anim ? 'transform .25s' : 'none'; fill.style.transition = anim ? 'width .25s' : 'none'; knob.style.transform = `translateX(${p}px)`; fill.style.width = (p + knob.offsetWidth + 4) + 'px'; };
+  el.addEventListener('pointerdown', (e) => { on = true; x0 = e.clientX; el.setPointerCapture(e.pointerId); draw(0, false); });
+  el.addEventListener('pointermove', (e) => { if (!on) return; const m = max(), raw = Math.max(0, e.clientX - x0); pos = Math.min(m, raw * 0.72); draw(pos, false); });
+  const end = () => { if (!on) return; on = false; if (pos >= max() * 0.92) { draw(max(), true); setTimeout(() => { draw(0, false); done(); }, 120); } else draw(0, true); pos = 0; };
+  ['pointerup', 'pointercancel'].forEach((ev) => el.addEventListener(ev, end));
+}
 holdButton($('#unlockBtn'), 1000, () => $('#lockOverlay').style.display = 'none');
 $('#lockBtn').onclick = () => $('#lockOverlay').style.display = 'flex';
 function holdButton(btn, ms, done) {
@@ -518,17 +608,21 @@ function finishRun() {
   if (run.paused) run.pausedMs += Date.now() - run.pauseAt;
   run.active = false; clearInterval(run.timer); try { run.wake?.release(); } catch (e) {}
   if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-  if (run.points.length < 2 || run.dist < 20) { toast('Carrera demasiado corta, no se guarda'); go('home'); return; }
+  if (run.points.length < 2) { toast('Sin recorrido: no hay nada que guardar'); go('home'); return; }
+  if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }
+  run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
   runs.unshift(r); save(KEY, runs);
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = '¡' + fmtKm(r.dist) + ' km!';
-  $('#cText').textContent = runs.length === 1 ? 'Tu primera carrera con Zancada' : r.dist > best ? 'Tu carrera más larga hasta ahora' : w.count >= GOAL ? '¡Semana cumplida!' : 'Carrera guardada. Zanca está orgullosa.';
-  $('#cXp').textContent = '+' + xpFor(r); $('#cWeek').textContent = `${Math.min(w.count, GOAL)} de ${GOAL}`; $('#cStreak').textContent = w.streak + ' sem';
+  $('#cText').textContent = runs.length === 1 ? 'Tu primera carrera con Zancada' : r.dist > best ? 'Tu carrera más larga hasta ahora' : w.count >= GOAL_OF() ? '¡Semana cumplida!' : 'Carrera guardada. Zanca está orgullosa.';
+  $('#cXp').textContent = '+' + xpFor(r); $('#cWeek').textContent = `${Math.min(w.count, GOAL_OF())} de ${GOAL_OF()}`; $('#cStreak').textContent = w.streak + ' sem';
   $('#toSummary').onclick = () => openSummary(r.id);
   speak('Carrera terminada. ' + fmtKm(r.dist).replace(',', ' coma ') + ' kilómetros.');
   go('cele');
 }
+$('#shortSave').onclick = () => { $('#shortModal').classList.remove('on'); run.forceSave = true; finishRun(); };
+$('#shortDrop').onclick = () => { $('#shortModal').classList.remove('on'); toast('Carrera descartada'); go('home'); };
 function finalizeRun(r) {
   const pts = r.points; let dist = 0; const splits = []; let lastKm = 0, prevT = 0;
   for (let i = 1; i < pts.length; i++) {
@@ -614,7 +708,7 @@ $('#scrub').oninput = (e) => { rep.pos = e.target.value / 1000; rep.playing = fa
 $('#repClose').onclick = () => { cancelAnimationFrame(rep.raf); openSummary(current.id); };
 
 // ---------- arranque ----------
-renderHome();
+if (profile.done) renderHome(); else openWelcome();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
 </script>
