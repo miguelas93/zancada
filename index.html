@@ -196,7 +196,7 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
     <button class="btn ghost" id="goalBtn" style="color:var(--cobalto)">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--alerta)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.2.1 · 29 oct 2026</p>
+    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.2.2 · 29 oct 2026</p>
   </div>
   <nav class="tabs" aria-label="Pestañas">
     <button data-go="home" aria-label="Inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3Z"/></svg></button>
@@ -588,13 +588,18 @@ $('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.
 slideButton($('#finishSlide'), finishRun);
 function slideButton(el, done) {
   const knob = el.querySelector('.knob'), fill = el.querySelector('.fill');
-  let x0 = 0, on = false, pos = 0;
+  let x0 = 0, on = false, pos = 0, t0 = 0, fired = false;
   const max = () => el.clientWidth - knob.offsetWidth - 8;
   const draw = (p, anim) => { knob.style.transition = anim ? 'transform .25s' : 'none'; fill.style.transition = anim ? 'width .25s' : 'none'; knob.style.transform = `translateX(${p}px)`; fill.style.width = (p + knob.offsetWidth + 4) + 'px'; };
-  el.addEventListener('pointerdown', (e) => { on = true; x0 = e.clientX; el.setPointerCapture(e.pointerId); draw(0, false); });
-  el.addEventListener('pointermove', (e) => { if (!on) return; const m = max(), raw = Math.max(0, e.clientX - x0); pos = Math.min(m, raw); draw(pos, false); });
-  const end = () => { if (!on) return; on = false; if (pos >= max() * 0.7) { draw(max(), true); setTimeout(() => { draw(0, false); done(); }, 120); } else draw(0, true); pos = 0; };
-  ['pointerup', 'pointercancel'].forEach((ev) => el.addEventListener(ev, end));
+  const fire = () => { if (fired) return; fired = true; on = false; draw(max(), true); setTimeout(() => { draw(0, false); fired = false; done(); }, 120); };
+  const start = (x) => { on = true; x0 = x; pos = 0; t0 = performance.now(); draw(0, false); };
+  const move = (x) => { if (!on || fired) return; pos = Math.min(max(), Math.max(0, x - x0)); draw(pos, false); if (pos >= max() * 0.55) fire(); };
+  const end = () => { if (!on || fired) return; on = false; const v = pos / Math.max(1, performance.now() - t0); if (pos >= max() * 0.45 || (v > 0.6 && pos > 40)) fire(); else draw(0, true); pos = 0; };
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); start(e.touches[0].clientX); }, { passive: false });
+  el.addEventListener('touchmove', (e) => { e.preventDefault(); move(e.touches[0].clientX); }, { passive: false });
+  el.addEventListener('touchend', (e) => { e.preventDefault(); end(); }, { passive: false });
+  el.addEventListener('touchcancel', end);
+  el.addEventListener('mousedown', (e) => { e.preventDefault(); start(e.clientX); const mm = (ev) => move(ev.clientX), mu = () => { end(); window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); }; window.addEventListener('mousemove', mm); window.addEventListener('mouseup', mu); });
 }
 holdButton($('#unlockBtn'), 1000, () => $('#lockOverlay').style.display = 'none');
 $('#lockBtn').onclick = () => $('#lockOverlay').style.display = 'flex';
