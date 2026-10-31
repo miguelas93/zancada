@@ -150,6 +150,7 @@ fun ProfileScreen() {
             SelRow("Autopausa al pararte", listOf("1" to "Sí", "0" to "No"), s.autopause) { v -> Repo.settings { it.copy(autopause = v) } }
         }
         ShoesCard(app)
+        WidgetCard()
         SosCard()
         HcCard()
         // Tus datos
