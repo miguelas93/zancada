@@ -632,7 +632,8 @@ function startRun() {
   clearInterval(run.timer); tick(); run.timer = setInterval(tick, 500);
   requestWake();
 }
-async function requestWake() { try { run.wake = await navigator.wakeLock?.request('screen'); } catch (e) {} }
+const KeepAwake = window.Capacitor?.Plugins?.KeepAwake; // solo existe dentro del APK
+async function requestWake() { try { if (KeepAwake) await KeepAwake.keepAwake(); else run.wake = await navigator.wakeLock?.request('screen'); } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && run.active) requestWake(); });
 function elapsed() { return (Date.now() - run.start - run.pausedMs - (run.paused ? Date.now() - run.pauseAt : 0)) / 1000; }
 function runFix(f) {
@@ -706,7 +707,7 @@ function holdButton(btn, ms, done) {
 }
 function finishRun() {
   if (run.paused) run.pausedMs += Date.now() - run.pauseAt;
-  run.active = false; clearInterval(run.timer); try { run.wake?.release(); } catch (e) {}
+  run.active = false; clearInterval(run.timer); try { run.wake?.release(); KeepAwake?.allowSleep(); } catch (e) {}
   if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
   if (run.points.length < 2) { toast('Sin recorrido: no hay nada que guardar'); go('home'); return; }
   if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }

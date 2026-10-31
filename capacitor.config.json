@@ -1,0 +1,7 @@
+{
+  "appId": "com.zancada.beta",
+  "appName": "Zancada",
+  "webDir": "www",
+  "backgroundColor": "#0B0C0B",
+  "android": { "allowMixedContent": false }
+}
