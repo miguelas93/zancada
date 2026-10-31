@@ -198,6 +198,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <span class="lbl">Objetivo semanal</span>
     <h1 style="font-size:32px" id="wAsk">¿Cuántas veces a la semana?</h1>
     <p class="sub" style="margin:0 0 6px">Lo verás en Inicio. Puedes cambiarlo en Perfil.</p>
+    <div class="chips" id="wLevel" style="margin:0 0 4px"><button class="chipb on" data-lvl="cero">Empiezo de cero</button><button class="chipb" data-lvl="corro">Ya corro</button></div>
     <button class="opt" data-goal="2"><span class="n">2</span><span><b>Empezar a correr</b><small>2 carreras a la semana</small></span></button>
     <button class="opt on" data-goal="3"><span class="n">3</span><span><b>Mantener la constancia</b><small>3 carreras a la semana</small></span></button>
     <button class="opt" data-goal="4"><span class="n">4</span><span><b>Mejorar mis marcas</b><small>4 carreras a la semana</small></span></button>
@@ -258,6 +259,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="col" style="gap:8px"><div class="monthbars" id="monthBars"></div><div class="between sub" style="font-size:11px" id="monthAxis"></div></div>
     <div class="stats" id="monthStats"></div>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weeksBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
+    <div id="months" class="card col" style="gap:10px;padding:18px 20px;display:none"><div class="between"><h2>Por meses</h2><span class="sub" style="font-size:12px" id="monthsSub"></span></div><div id="monthsList" class="col" style="gap:8px"></div></div>
     <div id="monthGoal" class="card col" style="gap:10px;padding:16px 20px;display:none"></div>
     <div id="paces" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus ritmos</h2><span class="sub" style="font-size:12px" id="pacesSub"></span></div><div class="stats" id="pacesPred"></div><div class="stats" id="pacesTrain"></div></div>
     <div id="records" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus récords</h2><span class="sub" style="font-size:12px">toca uno para ver la carrera</span></div><div id="recGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
@@ -319,7 +321,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.23 · récord en la imagen · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.24 · por meses · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -681,6 +683,7 @@ function showWStep() {
 }
 $('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 3) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); go('home'); };
 $('#wName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#wNext').click(); });
+$$('#wLevel [data-lvl]').forEach((b) => b.onclick = () => { $$('#wLevel [data-lvl]').forEach((x) => x.classList.toggle('on', x === b)); settings.startSeen = b.dataset.lvl === 'corro' ? '1' : '0'; save(SET, settings); });
 $$('#welcome [data-goal]').forEach((b) => b.onclick = () => { profile.goal = Number(b.dataset.goal); $$('#welcome [data-goal]').forEach((x) => x.classList.toggle('on', x === b)); });
 $('#goalBtn').onclick = openWelcome;
 
@@ -783,7 +786,7 @@ function renderHistory() {
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
-  renderMonthGoal(dist, now, days); renderRecords(); renderPaces();
+  renderMonthGoal(dist, now, days); renderRecords(); renderPaces(); renderMonths();
   const best = runs.length ? Math.max(...runs.map((r) => r.dist)) : 0;
   const HF = { all: () => true, plan: (r) => r.session, route: (r) => r.route, long: (r) => r.dist >= 8000, note: (r) => r.note || r.feel };
   const shown = runs.filter(HF[histFilter] || HF.all);
@@ -848,6 +851,14 @@ function renderPaces() {
   $('#pacesSub').textContent = srcTxt;
   $('#pacesPred').innerHTML = [['5 km', pred(5000)], ['10 km', pred(10000)], ['Media', pred(21097)]].map(([l, v]) => `<div><span class="lbl">${l}</span><span class="num" style="font-size:22px">${v}</span></div>`).join('');
   $('#pacesTrain').innerHTML = [['Suave', 'suave'], ['Largo', 'largo'], ['Tempo', 'tempo'], ['Series', 'series']].map(([l, k]) => `<div><span class="lbl">${l}</span><span><span class="num" style="font-size:18px">${targetPace(k)}</span><span class="unit" style="font-size:11px">/km</span></span></div>`).join('');
+}
+// Totales por mes (últimos 6 con carreras), como el "este año" de Strava, con barra proporcional al mes más largo.
+function renderMonths() {
+  const box = $('#months'), by = {}; runs.forEach((r) => { const d = new Date(r.start), k = d.getFullYear() * 100 + d.getMonth(); (by[k] = by[k] || { k, km: 0, n: 0, dur: 0 }); by[k].km += r.dist / 1000; by[k].n++; by[k].dur += r.dur; });
+  const ms = Object.values(by).sort((a, b) => b.k - a.k).slice(0, 6); box.style.display = ms.length >= 2 ? '' : 'none'; if (ms.length < 2) return;
+  const mx = Math.max(...ms.map((m) => m.km)), yr = new Date().getFullYear();
+  $('#monthsSub').textContent = `${ms.reduce((a, m) => a + m.n, 0)} carreras · ${Math.round(ms.reduce((a, m) => a + m.km, 0))} km`;
+  $('#monthsList').innerHTML = ms.map((m) => { const d = new Date(Math.floor(m.k / 100), m.k % 100, 1), name = d.toLocaleDateString('es-ES', { month: 'long' }) + (d.getFullYear() !== yr ? ' ' + d.getFullYear() : ''); return `<div class="col" style="gap:4px"><div class="between" style="font-size:13px"><span style="font-weight:600">${name[0].toUpperCase() + name.slice(1)}</span><span class="sub">${m.n} carrera${m.n === 1 ? '' : 's'} · ${fmtTime(m.dur)}</span></div><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${Math.max(3, m.km / mx * 100)}%"></i></div><span class="num" style="font-size:14px;width:58px;text-align:right">${m.km.toFixed(1).replace('.', ',')} km</span></div></div>`; }).join('');
 }
 function renderRecords() {
   const box = $('#records'), recs = personalRecords(); box.style.display = recs.length ? '' : 'none'; if (!recs.length) return;
