@@ -2,14 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permisos mínimos (ver SECURITY.md): ubicación mientras corres, el servicio que la mantiene
-         con la pantalla apagada, la notificación que lo hace visible y la vibración de cada km.
-         Sin ubicación "todo el tiempo", sin internet en esta fase, sin contactos, cámara ni archivos. -->
+         con la pantalla apagada, la notificación que lo hace visible, la vibración de cada km,
+         internet (mapas, tiempo, rutas, Zeta) y los avisos del plan (que se reprograman al reiniciar).
+         Sin ubicación "todo el tiempo", sin contactos, cámara ni acceso a tus archivos. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
     <application
@@ -36,5 +39,24 @@
             android:name=".RunService"
             android:exported="false"
             android:foregroundServiceType="location" />
+
+        <!-- Avisos del plan: los lanza AlarmManager; nadie de fuera puede enviarlos. -->
+        <receiver android:name=".ReminderReceiver" android:exported="false" />
+        <!-- Al reiniciar el móvil o actualizar la app, se vuelven a programar los avisos. -->
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Compartir imágenes, GPX, CSV y copias: solo la carpeta temporal "share" de la app. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

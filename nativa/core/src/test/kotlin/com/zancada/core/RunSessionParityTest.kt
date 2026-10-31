@@ -16,11 +16,11 @@ class RunSessionParityTest {
     private val T0 = java.time.Instant.parse("2026-10-20T08:00:00Z").toEpochMilli()
 
     /** Reproduce el guion de tests/run-tests.mjs con un reloj falso. */
-    internal fun replay(track: JsonObject, restartEvery: Int = 0): Pair<RunSession.Result, RunSession> {
+    internal fun replay(track: JsonObject, restartEvery: Int = 0, mode: RunSession.Mode = RunSession.Mode.WEB, minStep: Double = 8.0): Pair<RunSession.Result, RunSession> {
         val fixes = track["fixes"]!!.jsonArray.map { it.jsonObject }
         val events = track["events"]!!.jsonArray.map { it.jsonObject }.toMutableList()
         val end = track["end"]!!.jsonPrimitive.long
-        var s = RunSession(autopause = true)
+        var s = RunSession(autopause = true, mode = mode, minStep = minStep)
         fun fixOf(o: JsonObject, ts: Long) = Fix(o["lat"]!!.jsonPrimitive.double, o["lon"]!!.jsonPrimitive.double, o["acc"]!!.jsonPrimitive.double, o["alt"]?.jsonPrimitive?.doubleOrNull, ts)
         // Preparación: la página lleva 1,5 s abierta; primera lectura con hora T0; 0,5 s después, «Empezar»; cuenta atrás de 3 s.
         var clock = T0 + 1500
@@ -42,7 +42,7 @@ class RunSessionParityTest {
             // Simula que Android mata la app: se guarda la foto en texto y una sesión nueva sigue desde ahí.
             if (restartEvery > 0 && idx > 0 && idx % restartEvery == 0) {
                 val text = SnapshotJson.encode(s.snapshot())
-                s = RunSession(autopause = true).also { it.restore(SnapshotJson.decode(text)) }
+                s = RunSession(autopause = true, mode = mode, minStep = minStep).also { it.restore(SnapshotJson.decode(text)) }
             }
             s.onFix(fixOf(f, runStart + f["t"]!!.jsonPrimitive.long), runStart + now)
         }

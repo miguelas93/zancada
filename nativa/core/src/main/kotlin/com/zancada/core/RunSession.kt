@@ -10,7 +10,17 @@ import kotlin.math.min
  * de la web, y se comprueba contra las mismas carreras de prueba (ver RunSessionParityTest).
  * No sabe nada de Android: el reloj ([now]) se lo pasa quien la usa.
  */
-class RunSession(private val autopause: Boolean = true) {
+class RunSession(private val autopause: Boolean = true, val mode: Mode = Mode.FIXED, private val minStep: Double = 8.0) {
+    /**
+     * WEB = igual que la beta (para las pruebas de paridad).
+     * FIXED = con los fallos de la beta corregidos:
+     *  - el ruido del GPS ya no infla la distancia: solo se suma un tramo cuando te has movido [minStep] m
+     *    desde el último punto contado (los pequeños vaivenes del GPS se anulan en vez de sumarse);
+     *  - el desnivel se calcula con la altura suavizada (el ruido del altímetro ya no suma metros);
+     *  - terminar estando en pausa ya no descuenta la pausa dos veces.
+     */
+    enum class Mode { WEB, FIXED }
+    private var lastMoveT = 0L
     var active = false; private set
     var paused = false; private set
     var autoPaused = false; private set
@@ -32,11 +42,13 @@ class RunSession(private val autopause: Boolean = true) {
     var onKm: ((km: Int, split: Double) -> Unit)? = null
     var onPause: ((auto: Boolean) -> Unit)? = null
     var onResume: (() -> Unit)? = null
+    /** Cada punto que se añade (para la guía, la navegación y el mapa). */
+    var onPoint: ((Point) -> Unit)? = null
 
     fun begin(now: Long) {
         active = true; paused = false; autoPaused = false; start = now; pausedMs = 0; pauseAt = 0
         dist = 0.0; lastKm = 0; points.clear(); liveSplits.clear(); liveSplitTimes.clear(); bestKm = Double.POSITIVE_INFINITY
-        gap = false; clk = null
+        gap = false; clk = null; lastMoveT = 0L; moveRef = null; pending = null
         lastFix?.let { runFix(it, now) }   // la última lectura de la preparación es el primer punto
         tick(now)
     }
@@ -64,20 +76,42 @@ class RunSession(private val autopause: Boolean = true) {
             val dt = (p.t - prev.t) / 1000.0
             if (dt <= 0.2) return
             if (d / dt > 8) return       // salto imposible para un corredor
-            if (d < 2) return            // ruido estando quieto
-            dist += d
-            while (dist >= (lastKm + 1) * 1000.0) {
-                lastKm++
-                val tAtKm = p.t / 1000.0 - (dist - lastKm * 1000.0) / (d / dt)
-                val prevT = liveSplitTimes.lastOrNull() ?: 0.0
-                val split = tAtKm - prevT
-                liveSplits.add(Split(lastKm, split)); liveSplitTimes.add(tAtKm)
-                bestKm = min(bestKm, split)
-                onKm?.invoke(lastKm, split)
-            }
+            if (mode == Mode.FIXED) {
+                // Para la autopausa cuenta cualquier movimiento de 2 m o más (como la web);
+                // para la distancia, solo los tramos de minStep m.
+                val mr = moveRef
+                if (mr == null || haversine(mr.first, mr.second, p.lat, p.lon) >= 2) { lastMoveT = p.t; moveRef = p.lat to p.lon }
+                if (d < minStep) { if (d >= 2) pending = p; return }
+            } else if (d < 2) return            // ruido estando quieto
+            addDist(p, d, dt)
         }
-        points.add(p)
+        points.add(p); pending = null
+        onPoint?.invoke(p)
+        if (mode == Mode.FIXED && (prev == null || p.gap)) { lastMoveT = p.t; moveRef = p.lat to p.lon }
     }
+
+    private fun addDist(p: Point, d: Double, dt: Double) {
+        dist += d
+        while (dist >= (lastKm + 1) * 1000.0) {
+            lastKm++
+            val tAtKm = p.t / 1000.0 - (dist - lastKm * 1000.0) / (d / dt)
+            val prevT = liveSplitTimes.lastOrNull() ?: 0.0
+            val split = tAtKm - prevT
+            liveSplits.add(Split(lastKm, split)); liveSplitTimes.add(tAtKm)
+            bestKm = min(bestKm, split)
+            onKm?.invoke(lastKm, split)
+        }
+    }
+
+    /** Modo FIXED: el último tramo corto (menos de minStep m) se cuenta al parar o terminar, para no perderlo. */
+    private var pending: Point? = null
+    private fun flushPending() {
+        val p = pending ?: return; pending = null
+        val prev = points.lastOrNull() ?: return
+        val dt = (p.t - prev.t) / 1000.0; if (dt <= 0) return
+        addDist(p, haversine(prev.lat, prev.lon, p.lat, p.lon), dt); points.add(p); onPoint?.invoke(p)
+    }
+    private var moveRef: Pair<Double, Double>? = null
 
     /** Cada medio segundo (y al empezar). */
     fun tick(now: Long) { if (active) checkAutoPause(now) }
@@ -97,13 +131,15 @@ class RunSession(private val autopause: Boolean = true) {
 
     fun pause(now: Long, auto: Boolean = false) {
         if (paused) return
+        if (mode == Mode.FIXED) flushPending()
         paused = true; autoPaused = auto; pauseAt = now; pausePos = lastFix
         onPause?.invoke(auto)
     }
 
     fun resume(now: Long) {
         if (!paused) return
-        pausedMs += now - pauseAt; paused = false; autoPaused = false; gap = true
+        // Tras una autopausa la app se reanuda porque ya estás corriendo: en modo FIXED esos metros sí cuentan.
+        pausedMs += now - pauseAt; gap = !(mode == Mode.FIXED && autoPaused); paused = false; autoPaused = false
         onResume?.invoke()
     }
 
@@ -112,7 +148,8 @@ class RunSession(private val autopause: Boolean = true) {
         val lf = lastFix
         if (!paused) {
             val last = points.lastOrNull()
-            if (last != null && dist > 30 && lf != null && now - lf.arrival < 6000 && lf.acc <= 30 && (now - start - pausedMs) - last.t > 10000) pause(now, true)
+            val lastT = if (mode == Mode.FIXED) max(lastMoveT, last?.t ?: 0L) else last?.t ?: 0L
+            if (last != null && dist > 30 && lf != null && now - lf.arrival < 6000 && lf.acc <= 30 && (now - start - pausedMs) - lastT > 10000) pause(now, true)
         } else if (autoPaused) {
             val pp = pausePos
             if (pp != null && lf != null && lf.acc <= 40 && haversine(pp.lat, pp.lon, lf.lat, lf.lon) > 12) resume(now)
@@ -134,6 +171,7 @@ class RunSession(private val autopause: Boolean = true) {
         dist = s.dist; lastKm = s.lastKm; points.clear(); points.addAll(s.points.map { it.copy() })
         liveSplits.clear(); liveSplits.addAll(s.liveSplits); liveSplitTimes.clear(); liveSplitTimes.addAll(s.liveSplitTimes)
         bestKm = s.bestKm; gap = s.gap; clk = s.clk; lastFix = s.lastFix; pausePos = s.pausePos
+        lastMoveT = points.lastOrNull()?.t ?: 0L; moveRef = points.lastOrNull()?.let { it.lat to it.lon }
     }
 
     sealed interface Result {
@@ -144,12 +182,16 @@ class RunSession(private val autopause: Boolean = true) {
 
     /** Terminar. [forceShort] = guardar aunque sean menos de 50 m. */
     fun finish(now: Long, forceShort: Boolean = false): Result {
+        // La web (modo WEB) suma la pausa antes de medir y la descuenta dos veces si terminas en pausa.
+        if (mode == Mode.FIXED && !paused) flushPending()
+        val fixedEnd = elapsed(now)
         if (paused) pausedMs += now - pauseAt
         active = false
-        // Igual que la web: si terminas en pausa, elapsed() descuenta la pausa dos veces (anotado en tests/README.md).
-        val endT = elapsed(now)
+        val endT = if (mode == Mode.FIXED) fixedEnd else elapsed(now)
+        // Si la carrera era muy corta y se pregunta si guardarla, el segundo finish no debe sumar la pausa otra vez.
+        if (paused && mode == Mode.FIXED) { paused = false; autoPaused = false }
         if (points.size < 2) return Result.Empty
         if (dist < 50 && !forceShort) return Result.TooShort(dist)
-        return Result.Saved(finalizeRun("r$start", start, runName(start), points.map { it.copy() }, endT))
+        return Result.Saved(finalizeRun("r$start", start, runName(start), points.map { it.copy() }, endT, if (mode == Mode.FIXED) ::elevGainSmooth else ::elevGain))
     }
 }

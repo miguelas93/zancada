@@ -10,10 +10,6 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Looper
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
-import android.speech.tts.TextToSpeech
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
@@ -23,24 +19,20 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.zancada.core.Fix
-import com.zancada.core.RunSession
-import com.zancada.core.fmtKm
-import com.zancada.core.fmtPace
-import com.zancada.core.fmtTime
+import com.zancada.core.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.Locale
-import kotlin.math.floor
+import java.io.File
 
 /**
  * Servicio en primer plano que graba la carrera: sigue recibiendo el GPS con la pantalla apagada
- * o con otra app delante (lo que la versión web no podía), con una notificación siempre visible.
- * Toda la lógica de qué puntos valen está en :core (RunSession), probada contra la web.
+ * o con otra app delante, con una notificación siempre visible. Aquí vive todo lo de la carrera en marcha
+ * (medir, guía por tramos, navegación por la ruta, fantasma, avisos de voz), así funciona igual con el móvil bloqueado.
+ * La lógica está en :core (RunSession y LiveRun), probada contra la web.
  */
-class RunService : LifecycleService(), TextToSpeech.OnInitListener {
+class RunService : LifecycleService() {
     companion object {
         const val PREP = "prep"; const val START = "start"; const val PAUSE = "pause"; const val RESUME = "resume"
         const val FINISH = "finish"; const val SAVE_SHORT = "save_short"; const val DISCARD = "discard"; const val STOP = "stop"
@@ -49,18 +41,19 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
         private const val CHANNEL = "run"; private const val NOTIF_ID = 1
         fun send(ctx: Context, action: String) {
             val i = Intent(ctx, RunService::class.java).setAction(action)
-            if (action == PREP || action == RECOVER) ctx.startForegroundService(i) else ctx.startService(i)
+            if (action == PREP || action == RECOVER || action == START) ctx.startForegroundService(i) else ctx.startService(i)
         }
     }
 
-    private val session = RunSession(autopause = true)
+    private var session = RunSession()
+    private var live: LiveRun? = null
     private val fused by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private var ticker: Job? = null
-    private var tts: TextToSpeech? = null
-    private var ttsReady = false
     private var listening = false
-    private val live by lazy { LiveStore(this) }
+    private val store by lazy { LiveStore(this) }
+    private val cfgFile by lazy { File(filesDir, "live.cfg.json") }
     private var ticks = 0
+    private var foreground = false
 
     private val callback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -76,15 +69,7 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
 
     override fun onCreate() {
         super.onCreate()
-        tts = TextToSpeech(this, this)
-        session.onKm = { km, split -> say("Kilómetro $km. ${floor(split / 60).toInt()} ${Math.round(split % 60)}."); buzz() }
-        session.onPause = { auto -> say(if (auto) "Pausa automática" else "Pausa") }
-        session.onResume = { say("Seguimos") }
-    }
-
-    override fun onInit(status: Int) {
-        ttsReady = status == TextToSpeech.SUCCESS
-        if (ttsReady) tts?.language = Locale.forLanguageTag("es-ES")
+        Repo.init(this); Voice.init(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -92,12 +77,8 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
         // Android puede volver a arrancar el servicio sin orden (intent nulo) tras cerrarlo; o la pantalla pide RECOVER.
         if (!session.active && (intent == null || intent.action == RECOVER)) recover()
         when (intent?.action) {
-            PREP -> { goForeground("Buscando GPS…"); startLocation(); RunBus.state.value = RunUi(phase = Phase.PREP) }
-            START -> if (!session.active) {
-                session.begin(System.currentTimeMillis())
-                say("¡Vamos!")
-                startTicker(); persist()
-            }
+            PREP -> if (!session.active) { goForeground("Buscando GPS…"); startLocation(); RunBus.state.value = RunUi(phase = Phase.PREP, acc = session.lastFix?.acc, fix = session.lastFix?.let { LatLon(it.lat, it.lon) }) }
+            START -> if (!session.active) start()
             PAUSE -> { session.pause(System.currentTimeMillis()); persist(); publish() }
             RESUME -> { session.resume(System.currentTimeMillis()); persist(); publish() }
             FINISH -> finishRun(force = false)
@@ -105,17 +86,45 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
             // Se pidió recuperar pero no había nada (o ya se borró): cerrar limpio. Android exige mostrar la notificación igualmente.
             RECOVER -> if (!session.active) { goForeground("Zancada"); shutdown() }
             null -> if (!session.active) stopSelf()
-            DISCARD, STOP -> { live.clear(); RunBus.state.value = RunUi(); shutdown() }
+            DISCARD, STOP -> { if (!session.active || intent.action == DISCARD) { clearLive(); RunBus.state.value = RunUi(); shutdown() } }
         }
         // Con carrera en marcha, si Android mata el servicio le pedimos que lo vuelva a arrancar.
         return if (session.active) START_STICKY else START_NOT_STICKY
+    }
+
+    private fun newSession() = RunSession(autopause = Repo.data.value.settings.autopause == "1")
+
+    private fun wire(cfg: RunConfig, startPos: LatLon?) {
+        val app = Repo.app()
+        val ghost = cfg.route?.let { app.bestOnRoute(it.id) }
+        val lv = LiveRun(app, cfg.sess, cfg.route, ghost, startPos, speak = { Voice.say(it, buzz = true) }, toast = { RunBus.toast.value = System.currentTimeMillis() to it })
+        live = lv
+        session.onKm = { km, split -> lv.onKm(km, split, session, System.currentTimeMillis()) }
+        session.onPause = { auto -> Voice.say(if (auto) "Pausa automática" else "Pausa", buzz = true) }
+        session.onResume = { Voice.say("Seguimos", buzz = true) }
+        session.onPoint = { p -> lv.onPoint(session, p, System.currentTimeMillis()); RunBus.track.value = RunBus.track.value + LatLon(p.lat, p.lon) }
+    }
+
+    private fun start() {
+        val cfg = RunBus.config
+        val prevFix = session.lastFix
+        session = newSession()
+        prevFix?.let { session.onFix(it.copy(arrival = 0), it.arrival) }
+        goForeground("Grabando tu carrera")
+        startLocation()
+        runCatching { cfgFile.writeText(Store.json.encodeToString(RunConfig.serializer(), cfg)) }
+        RunBus.track.value = emptyList(); RunBus.cele.value = null
+        wire(cfg, prevFix?.let { LatLon(it.lat, it.lon) })
+        session.begin(System.currentTimeMillis())
+        startTicker(); persist(); publish()
     }
 
     private fun startTicker() {
         ticker?.cancel()
         ticker = lifecycleScope.launch {
             while (isActive) {
-                session.tick(System.currentTimeMillis()); publish()
+                val now = System.currentTimeMillis()
+                session.tick(now); live?.tick(session, now); publish()
                 if (++ticks % 10 == 0) persist()   // cada 5 s
                 delay(500)
             }
@@ -123,35 +132,50 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
     }
 
     /** Guarda la foto de la carrera en curso. Si falla (disco lleno…), la carrera sigue en memoria. */
-    private fun persist() { if (session.active) try { live.save(session.snapshot()) } catch (e: Exception) { } }
+    private fun persist() { if (session.active) runCatching { store.save(session.snapshot()) } }
+    private fun clearLive() { store.clear(); cfgFile.delete() }
 
     /** Retoma la carrera guardada, si la hay. El tramo sin GPS mientras estuvo cerrada se une en línea recta. */
     private fun recover() {
-        val snap = live.load() ?: return
+        val snap = store.load() ?: return
         try { goForeground("Recuperando tu carrera…") } catch (e: Exception) {
             // Android no deja arrancar el GPS desde segundo plano: se recupera al abrir la app.
             stopSelf(); return
         }
+        val cfg = runCatching { Store.json.decodeFromString(RunConfig.serializer(), cfgFile.readText()) }.getOrDefault(RunConfig())
+        RunBus.config = cfg
+        session = newSession()
         session.restore(snap)
-        startLocation()
-        startTicker()
-        say("Carrera recuperada")
+        wire(cfg, null)
+        RunBus.track.value = session.points.map { LatLon(it.lat, it.lon) }
+        startLocation(); startTicker()
+        Voice.say("Carrera recuperada")
         publish()
     }
 
     private fun finishRun(force: Boolean) {
         val now = System.currentTimeMillis()
-        val res = if (force) session.finish(now, forceShort = true) else session.finish(now)
+        val res = session.finish(now, forceShort = force)
         ticker?.cancel()
         when (res) {
-            is RunSession.Result.Empty -> { live.clear(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
+            is RunSession.Result.Empty -> { clearLive(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
             is RunSession.Result.TooShort -> RunBus.state.value = RunBus.state.value.copy(tooShort = res.meters)   // la pantalla pregunta
             is RunSession.Result.Saved -> {
-                RunStore(this).add(res.run)
-                live.clear()   // solo después de guardarla de verdad
-                val r = res.run
-                say("Carrera terminada. ${fmtKm(r.dist).replace(",", " coma ")} kilómetros. Ritmo ${fmtPace(r.dur / (r.dist / 1000)).replace(":", " ")}.")
-                RunBus.state.value = RunUi(phase = Phase.DONE, result = r)
+                val cfg = RunBus.config
+                val w = Repo.wxFresh()?.let { RunWx(it.t.toInt(), it.wind.toInt(), if (it.now) 1 else 0) }
+                val cele = Repo.mutate {
+                    val prevBest = runs.maxOfOrNull { it.dist } ?: 0.0
+                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w)
+                    val nb = addRun(r)
+                    val wk = weekStats()
+                    Voice.say(finishSpeech(r, nb))
+                    Cele(r, nb, celeText(r, nb, prevBest), "${wk.count} de ${goalOf()}")
+                }
+                Repo.saveNow()
+                clearLive()   // solo después de guardarla de verdad
+                Reminders.sync(this)
+                RunBus.cele.value = cele
+                RunBus.state.value = RunUi(phase = Phase.DONE)
                 if (listening) { fused.removeLocationUpdates(callback); listening = false }
                 lifecycleScope.launch { delay(6000); shutdown() }   // deja terminar la frase de voz
             }
@@ -162,13 +186,15 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
         val now = System.currentTimeMillis()
         val el = if (session.active) session.elapsed(now) else 0.0
         val cur = RunBus.state.value
+        val lv = live
         RunBus.state.value = cur.copy(
             phase = if (session.active) Phase.RUNNING else cur.phase,
-            acc = session.lastFix?.acc,
+            acc = session.lastFix?.acc, fix = session.lastFix?.let { LatLon(it.lat, it.lon) },
             dist = session.dist, elapsed = el,
             pace = session.currentPace(now),
             avg = if (session.dist > 50) el / (session.dist / 1000) else Double.NaN,
             bestKm = session.bestKm, paused = session.paused, autoPaused = session.autoPaused,
+            live = lv?.state ?: cur.live, lockLine = lv?.lockLine() ?: "",
         )
         if (session.active) updateNotification("${fmtKm(session.dist)} km · ${fmtTime(el)}${if (session.paused) " · en pausa" else ""}")
         else session.lastFix?.let { updateNotification("GPS listo · ±${Math.round(it.acc)} m") }
@@ -188,27 +214,23 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
         val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE)
         return NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_zancada).setColor(0xFFD4FF3A.toInt())
-            .setContentTitle("Zancada está grabando tu carrera").setContentText(text)
+            .setContentTitle(if (session.active) "Zancada está grabando tu carrera" else "Zancada · preparando la carrera").setContentText(text)
             .setContentIntent(open).setOngoing(true).setOnlyAlertOnce(true).setSilent(true).build()
     }
 
     private fun goForeground(text: String) {
         ServiceCompat.startForeground(this, NOTIF_ID, notification(text), if (Build.VERSION.SDK_INT >= 29) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else 0)
+        foreground = true
     }
 
     private fun updateNotification(text: String) {
+        if (!foreground) return
         try { getSystemService(NotificationManager::class.java).notify(NOTIF_ID, notification(text)) } catch (e: SecurityException) { }
-    }
-
-    private fun say(text: String) { if (ttsReady) tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "z") }
-
-    private fun buzz() {
-        val v = if (Build.VERSION.SDK_INT >= 31) getSystemService(VibratorManager::class.java).defaultVibrator else getSystemService(Vibrator::class.java)
-        try { v?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 80, 60, 80), -1)) } catch (e: Exception) { }
     }
 
     private fun shutdown() {
         if (listening) { fused.removeLocationUpdates(callback); listening = false }
+        foreground = false
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -216,7 +238,6 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
     override fun onDestroy() {
         ticker?.cancel()
         if (listening) fused.removeLocationUpdates(callback)
-        tts?.shutdown()
         super.onDestroy()
     }
 }

@@ -1,10 +1,14 @@
 package com.zancada.core
 
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlin.math.abs
 
 /**
- * Leer la copia que hace la app actual (Perfil → «Exportar copia», archivo zancada-copia-AAAA-MM-DD.json)
- * y decidir qué carreras faltan en la nativa. Mismas reglas que «Importar copia» de la web:
+ * Leer la copia que hace la web (Perfil → «Exportar copia», archivo zancada-copia-AAAA-MM-DD.json)
+ * y decidir qué carreras faltan. Mismas reglas que «Importar copia» de la web:
  * una carrera ya existe si tiene el mismo id o empezó a menos de 1 minuto de otra.
  */
 object BackupImport {
@@ -12,32 +16,15 @@ object BackupImport {
 
     class NotABackup(msg: String) : IllegalArgumentException(msg)
 
-    /** Las carreras de la copia. Las que vengan rotas se saltan (no tumban la importación). */
-    fun parse(text: String): Pair<List<Run>, Int> {
-        val o = try { MiniJson.parse(text) as? Map<*, *> } catch (e: Exception) { null }
+    fun root(text: String): JsonObject {
+        val o = try { Store.json.parseToJsonElement(text) as? JsonObject } catch (e: Exception) { null }
             ?: throw NotABackup("El archivo no es una copia de Zancada")
-        if (o["app"] != "zancada") throw NotABackup("El archivo no es una copia de Zancada")
-        val list = o[RUNS] as? List<*> ?: return emptyList<Run>() to 0
-        var bad = 0
-        val runs = list.mapNotNull { m -> (m as? Map<*, *>)?.let { runCatching { runOf(it) }.getOrNull() } ?: run { bad++; null } }
-        return runs to bad
+        if ((o["app"] as? JsonPrimitive)?.contentOrNull != "zancada") throw NotABackup("El archivo no es una copia de Zancada")
+        return o
     }
 
-    fun runOf(m: Map<*, *>): Run {
-        fun num(k: String, mm: Map<*, *> = m) = (mm[k] as Number).toDouble()
-        val start = (m["start"] as Number).toLong()
-        val dist = num("dist"); val dur = num("dur")
-        require(dist.isFinite() && dist > 0 && dur.isFinite() && dur > 0) { "carrera sin distancia o tiempo" }
-        val pts = (m["points"] as? List<*> ?: emptyList<Any>()).map { it as Map<*, *> }.map { p ->
-            Point(num("lat", p), num("lon", p), (p["t"] as Number).toLong(), (p["a"] as? Number)?.let { jsRound(it.toDouble()).toInt() }, p["gap"] == true, (p["d"] as? Number)?.toDouble() ?: 0.0)
-        }
-        val splits = (m["splits"] as? List<*> ?: emptyList<Any>()).map { it as Map<*, *> }.map { s -> Split((s["km"] as Number).toInt(), num("split", s), s["partial"] == true) }
-        return Run(
-            id = (m["id"] as? String)?.takeIf { it.isNotBlank() } ?: "r$start", start = start,
-            name = safeText(m["name"] as? String ?: runName(start)).ifEmpty { runName(start) },
-            points = pts, dist = dist, dur = dur, splits = splits, gain = (m["gain"] as? Number)?.toInt(), manual = m["manual"] == true,
-        )
-    }
+    /** Las carreras de la copia. Las que vengan rotas se saltan (no tumban la importación). */
+    fun parse(text: String): Pair<List<Run>, Int> = Store.decodeRuns(root(text)[RUNS] as? JsonArray)
 
     /** De [incoming], las que no están ya en [existing] (ni repetidas dentro de la propia copia). */
     fun pickNew(existing: List<Run>, incoming: List<Run>): List<Run> {
@@ -50,6 +37,3 @@ object BackupImport {
         return out
     }
 }
-
-/** Igual que safeText de la web: quita < y >, recorta espacios y largo. */
-fun safeText(t: String?, n: Int = 60) = (t ?: "").replace(Regex("[<>]"), "").trim().take(n)
