@@ -319,7 +319,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.22 · récords en el resumen · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.23 · récord en la imagen · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1898,9 +1898,13 @@ async function shareImage(r) {
   const ok = (r.splits || []).filter((s) => !s.partial), best = ok.length ? fmtPace(Math.min(...ok.map((s) => s.split))) : null;
   const cells = [['Tiempo', fmtTime(r.dur)], ['Ritmo', fmtPace(r.dur / (r.dist / 1000)) + ' /km'], ['Mejor km', best ? best + ' /km' : '—']];
   cells.forEach(([l, v], i) => { const cx = 90 + i * 310; x.fillStyle = 'rgba(244,245,240,.5)'; x.font = `600 24px ${body}`; x.fillText(l.toUpperCase(), cx, 1190); x.fillStyle = i === 1 ? VOLT : '#F4F5F0'; x.font = `700 62px ${disp}`; x.fillText(v, cx, 1260); });
+  // Píldora de récord (si lo hubo) y comparación con la anterior, como en el resumen
+  const recs = personalRecords().filter((q) => q.r && q.r.id === r.id).map((q) => q.label.toUpperCase());
+  if (recs.length) { const label = 'RÉCORD · ' + recs.join(' · '); x.font = `700 26px ${body}`; const w = x.measureText(label).width + 48; x.fillStyle = VOLT; x.beginPath(); if (x.roundRect) x.roundRect(90, 228, w, 54, 27); else x.rect(90, 228, w, 54); x.fill(); x.fillStyle = INK; x.fillText(label, 114, 265); }
+  const cmp = compareRun(r); if (cmp) { x.fillStyle = 'rgba(244,245,240,.6)'; x.font = `500 26px ${body}`; x.fillText(cmp.replace(/ \(.*\)\.?$/, '').replace(/\.$/, ''), 90, 1320); }
   const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
   const file = new File([blob], `zancada-${new Date(r.start).toISOString().slice(0, 10)}.png`, { type: 'image/png' });
-  const text = `He corrido ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))} /km) con Zancada 🏃`;
+  const text = `He corrido ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))} /km) con Zancada 🏃${recs.length ? ' · récord personal: ' + recs.join(', ').toLowerCase() : ''}`;
   if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   toast('Imagen guardada en descargas', 3000);
