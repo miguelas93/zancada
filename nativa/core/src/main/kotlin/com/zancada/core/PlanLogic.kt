@@ -17,12 +17,15 @@ val LEVELS = linkedMapOf("inicio" to Level(8.0, 30.0, 4 to 7), "medio" to Level(
 val DAY_L = listOf("L", "M", "X", "J", "V", "S", "D")
 val DAY_N = listOf("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
 
+@kotlinx.serialization.Serializable
 data class Struct(val warm: Int, val reps: Int, val on: Int, val off: Int, val cool: Int)
 
 /** Un tramo de la guía por voz: por metros ([m]) o por tiempo ([sec]). */
+@kotlinx.serialization.Serializable
 data class Seg(val label: String, val say: String, val kind: String, val m: Double? = null, val sec: Int? = null)
 
 /** Una sesión: del plan, de "tramos" o un objetivo de carrera libre. */
+@kotlinx.serialization.Serializable
 data class Sess(
     val key: String, val type: String, val title: String, val desc: String, val m: Double,
     val struct: Struct? = null, val segs: List<Seg>? = null,

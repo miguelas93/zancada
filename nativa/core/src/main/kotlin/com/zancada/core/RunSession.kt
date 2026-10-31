@@ -42,6 +42,8 @@ class RunSession(private val autopause: Boolean = true, val mode: Mode = Mode.FI
     var onKm: ((km: Int, split: Double) -> Unit)? = null
     var onPause: ((auto: Boolean) -> Unit)? = null
     var onResume: (() -> Unit)? = null
+    /** Cada punto que se añade (para la guía, la navegación y el mapa). */
+    var onPoint: ((Point) -> Unit)? = null
 
     fun begin(now: Long) {
         active = true; paused = false; autoPaused = false; start = now; pausedMs = 0; pauseAt = 0
@@ -84,6 +86,7 @@ class RunSession(private val autopause: Boolean = true, val mode: Mode = Mode.FI
             addDist(p, d, dt)
         }
         points.add(p); pending = null
+        onPoint?.invoke(p)
         if (mode == Mode.FIXED && (prev == null || p.gap)) { lastMoveT = p.t; moveRef = p.lat to p.lon }
     }
 
@@ -106,7 +109,7 @@ class RunSession(private val autopause: Boolean = true, val mode: Mode = Mode.FI
         val p = pending ?: return; pending = null
         val prev = points.lastOrNull() ?: return
         val dt = (p.t - prev.t) / 1000.0; if (dt <= 0) return
-        addDist(p, haversine(prev.lat, prev.lon, p.lat, p.lon), dt); points.add(p)
+        addDist(p, haversine(prev.lat, prev.lon, p.lat, p.lon), dt); points.add(p); onPoint?.invoke(p)
     }
     private var moveRef: Pair<Double, Double>? = null
 
@@ -185,6 +188,8 @@ class RunSession(private val autopause: Boolean = true, val mode: Mode = Mode.FI
         if (paused) pausedMs += now - pauseAt
         active = false
         val endT = if (mode == Mode.FIXED) fixedEnd else elapsed(now)
+        // Si la carrera era muy corta y se pregunta si guardarla, el segundo finish no debe sumar la pausa otra vez.
+        if (paused && mode == Mode.FIXED) { paused = false; autoPaused = false }
         if (points.size < 2) return Result.Empty
         if (dist < 50 && !forceShort) return Result.TooShort(dist)
         return Result.Saved(finalizeRun("r$start", start, runName(start), points.map { it.copy() }, endT, if (mode == Mode.FIXED) ::elevGainSmooth else ::elevGain))

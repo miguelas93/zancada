@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("org.jetbrains.kotlin.plugin.compose")
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -14,7 +15,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
-        versionName = "0.1." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
+        versionName = "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
     }
     buildTypes {
         debug { isMinifyEnabled = false }
@@ -23,7 +24,15 @@ android {
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
     lint { abortOnError = true; checkDependencies = true; warningsAsErrors = false }
+    // Las rutas recomendadas son el mismo archivo que usa la web (../routes-data.js): se copian al compilar, sin duplicarlas.
+    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/zassets"))
 }
+
+val copyRoutes by tasks.registering(Copy::class) {
+    from(rootProject.file("../routes-data.js"))
+    into(layout.buildDirectory.dir("generated/zassets"))
+}
+tasks.named("preBuild") { dependsOn(copyRoutes) }
 
 dependencies {
     implementation(project(":core"))
@@ -38,4 +47,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-service:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    // Mapas: OpenStreetMap (calles) y Esri (satélite), sin clave ni cuenta.
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 }
