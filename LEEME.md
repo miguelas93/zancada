@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.21 (31 oct 2026)
+- Inicio muestra el clima de ahora y qué ropa llevar (misma fuente que Preparar), en cuanto la app conoce tu posición.
+- Tarjeta "¿Empiezas de cero?" en Inicio (si llevas menos de 3 carreras y no tienes plan): te lleva directo al "Corre 1 min · anda 1,5 ×8" guiado por voz. Se puede quitar con "Ya corro".
+- En los tramos por tiempo, la voz avisa "Diez segundos" antes de cada cambio.
+
 ## Novedades 0.20 (31 oct 2026)
 - Tramos por tiempo: la guía puede avanzar con el reloj en vez de con los metros. Nuevas plantillas "Corre 1 min · anda 1,5 ×8" y "Corre 3 min · anda 1,5 ×5" para empezar a correr (estilo De cero a 5 km), y "Fartlek 10 × 1 min". En "A mi gusto" puedes elegir metros o minutos.
 - La tarjeta de guía muestra el tiempo que queda del tramo y la voz avisa en cada cambio ("Corre, 1 min", "Anda 1,5 min").

@@ -222,8 +222,9 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 <section class="screen scroll withtabs on" id="home">
   <div class="col" style="gap:20px">
     <div class="between">
-      <div><div class="sub" id="homeDate"></div><h1 id="homeHello">Hola</h1></div>
+      <div><div class="sub" id="homeDate"></div><h1 id="homeHello">Hola</h1><div class="sub" id="homeWx" style="display:none;font-size:12px;margin-top:4px;white-space:pre-line;line-height:1.4"></div></div>
     </div>
+    <div id="startCard"></div>
     <div class="card dark col" style="gap:18px" id="weekCard">
       <div class="between"><span class="lbl">Esta semana</span><span class="sub" id="weekGoal"></span></div>
       <div class="between" style="align-items:flex-end">
@@ -318,7 +319,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.20 · corre y anda · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.21 · clima en inicio · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -689,7 +690,7 @@ function renderHome() {
   const d = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#homeDate').textContent = d[0].toUpperCase() + d.slice(1);
   $('#homeHello').textContent = profile.name ? `Hola, ${profile.name}` : 'Hola';
-  renderPlanCard(); renderRecap(); renderNear();
+  renderPlanCard(); renderRecap(); renderNear(); renderHomeWx(); renderStartCard();
   const week = runs.filter((r) => r.start >= ws), km = week.reduce((a, r) => a + r.dist, 0), dur = week.reduce((a, r) => a + r.dur, 0);
   const perDay = [0, 0, 0, 0, 0, 0, 0]; week.forEach((r) => { perDay[(new Date(r.start).getDay() + 6) % 7] += r.dist; });
   const maxDay = Math.max(5000, ...perDay);
@@ -713,9 +714,18 @@ function renderHome() {
 }
 // Ruta recomendada más cercana, solo si ya diste permiso de ubicación (no pedimos nada al abrir Inicio).
 const near = { at: 0, pos: null, asked: false };
+// Clima en Inicio (misma fuente que Preparar) y tarjeta "¿Empiezas de cero?" que lleva al corre/anda guiado.
+async function renderHomeWx() { const pos = near.pos || lastFix || rt.here, el = $('#homeWx'); if (!pos) return; const w = await loadWeather(pos.lat, pos.lon); if (!w) return; el.style.display = ''; el.textContent = wxText(w).replace(/\.$/, ''); }
+function renderStartCard() {
+  const box = $('#startCard'), show = runs.length < 3 && !plan && settings.startSeen !== '1'; box.innerHTML = '';
+  if (!show) return;
+  box.innerHTML = `<div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><span class="lbl">¿Empiezas de cero?</span><button class="sub" id="startNo" style="font-size:12px;text-decoration:underline">Ya corro</button></div><b style="font-size:19px;font-weight:600;line-height:1.15">Corre 1 min · anda 1,5 min · 8 veces</b><span class="sub" style="font-size:13px">29 minutos guiados por voz: la forma más segura de empezar. Cuando te salga fácil, pasa a "Corre 3 min".</span><button class="btn" id="startGo" style="height:46px;font-size:15px">Probar hoy</button></div>`;
+  $('#startGo').onclick = () => { prepMode = 'tramos'; settings.tramos = 'anda1'; save(SET, settings); prep.tramos = tramosSession('anda1'); go('prep'); };
+  $('#startNo').onclick = () => { settings.startSeen = '1'; save(SET, settings); renderStartCard(); };
+}
 function renderNear() {
   const box = $('#nearCard'), pos = near.pos || lastFix || rt.here;
-  if (!pos) { box.innerHTML = ''; if (!near.asked && navigator.permissions && 'geolocation' in navigator) { near.asked = true; navigator.permissions.query({ name: 'geolocation' }).then((st) => { if (st.state === 'granted') navigator.geolocation.getCurrentPosition((p) => { near.pos = { lat: p.coords.latitude, lon: p.coords.longitude }; near.at = Date.now(); if ($('#home').classList.contains('on')) renderNear(); }, () => {}, { maximumAge: 600000, timeout: 8000 }); }).catch(() => {}); } return; }
+  if (!pos) { box.innerHTML = ''; if (!near.asked && navigator.permissions && 'geolocation' in navigator) { near.asked = true; navigator.permissions.query({ name: 'geolocation' }).then((st) => { if (st.state === 'granted') navigator.geolocation.getCurrentPosition((p) => { near.pos = { lat: p.coords.latitude, lon: p.coords.longitude }; near.at = Date.now(); if ($('#home').classList.contains('on')) { renderNear(); renderHomeWx(); } }, () => {}, { maximumAge: 600000, timeout: 8000 }); }).catch(() => {}); } return; }
   const list = ZR.map((r) => ({ r, d: haversine(pos, r.start) })).filter((x) => x.d < 3000).sort((a, b) => a.d - b.d);
   if (!list.length) { box.innerHTML = ''; return; }
   const { r, d } = list[0], times = runs.filter((x) => x.route?.id === r.id).length;
@@ -1213,6 +1223,7 @@ function updateGuide() {
   if (i >= g.length) { if (run.guideIdx !== 'done') { run.guideIdx = 'done'; const isGoal = run.session?.goal; $('#gLabel').textContent = isGoal ? 'Objetivo cumplido' : 'Sesión completada'; $('#gLabel').className = 'num'; $('#gStep').textContent = 'lo que corras ahora suma'; $('#gLeft').textContent = '0'; $('#gTrack').style.width = '100%'; speak(isGoal ? 'Objetivo cumplido. Lo que corras ahora suma.' : 'Sesión completada. Enhorabuena.'); } return; }
   const seg = g[i], left = Math.max(0, acc + len(seg) - pos);
   if (run.guideIdx !== i) { run.guideIdx = i; $('#gLabel').textContent = seg.label; $('#gLabel').className = 'num ' + seg.kind; $('#gStep').textContent = `paso ${i + 1} de ${g.length}`; if (run.dist > 0 || i > 0 || timed) speak(seg.say); }
+  if (timed && left <= 10 && left > 0 && i < g.length - 1 && run.warnIdx !== i) { run.warnIdx = i; speak('Diez segundos.'); }
   $('#gLeft').textContent = timed ? fmtTime(left) : left >= 1000 ? fmtKmS(left) + ' k' : String(Math.round(left / 10) * 10); $('#gUnit').textContent = timed ? '' : 'm';
   $('#gTrack').style.width = ((len(seg) - left) / len(seg) * 100) + '%';
 }
