@@ -17,8 +17,19 @@ android {
         versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
         versionName = "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
     }
+    // Firma fija (la misma clave que la beta, Secret ZANCADA_KEYSTORE_B64) para que cada APK nuevo
+    // se instale ENCIMA del anterior sin borrar la app. Sin el secreto (en local) se usa la clave de depuración normal.
+    val zKeystore = System.getenv("ZANCADA_KEYSTORE")?.let { file(it) }?.takeIf { it.exists() }
+    signingConfigs {
+        if (zKeystore != null) create("zancada") {
+            storeFile = zKeystore; storePassword = "android"; keyAlias = "androiddebugkey"; keyPassword = "android"
+        }
+    }
     buildTypes {
-        debug { isMinifyEnabled = false }
+        debug {
+            isMinifyEnabled = false
+            if (zKeystore != null) signingConfig = signingConfigs.getByName("zancada")
+        }
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
