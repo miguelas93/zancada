@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.29 (31 oct 2026)
+- Perfil › "Zancada beta": "Invitar a un amigo" (comparte web y APK) y "Avisar de un fallo" (abre un aviso en GitHub con la versión y el móvil ya rellenados), más el enlace a las novedades.
+
 ## Novedades 0.28 (31 oct 2026)
 - Rutas › Mis recorridos: "Importar una ruta GPX" (de un amigo, Wikiloc, Komoot…): se guarda con su trazado, km y desnivel, y se puede correr con guía como cualquier otra.
 - Arreglo: los "Bucles desde aquí" volvían a salir sin desnivel por un choque de nombres en el código; ya lo calculan bien.
