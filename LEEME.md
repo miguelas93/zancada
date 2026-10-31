@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.45 (31 oct 2026)
+
+- **Inicio más claro**: la tarjeta de tu última carrera lleva título y ya no enseña un mapa vacío cuando la carrera se añadió a mano o se importó sin recorrido.
+
 ## Novedades 0.44 (31 oct 2026)
 
 - **Ritmo en el mapa**: en el resumen de una carrera, el botón "Color por ritmo" pinta el recorrido por tramos de unos 150 m, de verde lima (rápido) a rojo (lento), con leyenda. La elección se recuerda.
