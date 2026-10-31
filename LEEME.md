@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.27 (31 oct 2026)
+- Historial: buscador por nombre, ruta, sesión, objetivo o notas (aparece a partir de 6 carreras), combinable con los filtros.
+
 ## Novedades 0.26 (31 oct 2026)
 - Resumen: botón "Volver a correr este recorrido": abre Preparar con ese trazado (o la ruta recomendada que corriste) y te compara en directo con tu mejor tiempo.
 - Perfil › "Vibrar en los avisos": el móvil vibra con cada aviso de voz (km, tramos, giros), útil con la voz apagada o con música.
