@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.23 (31 oct 2026)
+- La imagen para compartir lleva una etiqueta "RÉCORD · …" cuando la carrera batió alguno y, abajo, la comparación con tu última carrera parecida. El texto que acompaña a la imagen también menciona el récord.
+
 ## Novedades 0.22 (31 oct 2026)
 - Resumen de la carrera: si has batido un récord (mejor km, 5 km, 10 km, más larga, más desnivel) lo dice arriba del todo, y compara el ritmo con tu última carrera parecida (misma ruta o distancia similar): "27 s/km más rápido que el 28 oct".
 
