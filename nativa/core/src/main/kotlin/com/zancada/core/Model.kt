@@ -69,6 +69,9 @@ data class Run(
     val ghost: GhostRef? = null,
     /** Cadencia media (pasos por minuto), con el sensor de pasos del móvil. Solo la nativa. */
     val cad: Int? = null,
+    /** Pulso medio y máximo (pulsómetro Bluetooth). Solo la nativa. */
+    val hr: Int? = null,
+    val hrMax: Int? = null,
 )
 
 @Serializable
@@ -102,6 +105,9 @@ data class Settings(
     val sosEvery: Int? = null,
     /** Guardar las carreras en Health Connect (solo la nativa). */
     val hc: String? = null,
+    /** Pulsómetro Bluetooth elegido (solo la nativa). */
+    val hrAddr: String? = null,
+    val hrName: String? = null,
 )
 
 @Serializable

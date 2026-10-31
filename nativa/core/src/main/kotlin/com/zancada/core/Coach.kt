@@ -34,7 +34,7 @@ fun App.coachCtx(): String {
         if (week.isNotEmpty()) lines.add("Esta semana: $week.")
         p.lastReview?.let { lines.add("Última revisión del plan: " + it.text) }
     }
-    val last = runs.take(6).joinToString("; ") { r -> "${es.numeric(r.start)}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${pace(r.paceSec())}/km)${r.session?.let { ", " + it.title } ?: ""}${r.feel?.let { ", sensación $it/5" } ?: ""}${if (!webCompat && r.cad != null) ", cadencia ${r.cad} ppm" else ""}" }
+    val last = runs.take(6).joinToString("; ") { r -> "${es.numeric(r.start)}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${pace(r.paceSec())}/km)${r.session?.let { ", " + it.title } ?: ""}${r.feel?.let { ", sensación $it/5" } ?: ""}${if (!webCompat && r.cad != null) ", cadencia ${r.cad} ppm" else ""}${if (!webCompat && r.hr != null) ", pulso medio ${r.hr} (máx ${r.hrMax})" else ""}" }
     lines.add("Últimas carreras: " + last.ifEmpty { "ninguna todavía" } + ".")
     val recs = personalRecords().filter { it.run != null }.joinToString(", ") { "${it.label}: ${it.value}" }
     if (recs.isNotEmpty()) lines.add("Récords: $recs.")
