@@ -316,7 +316,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.13 · ruta cerca y detección de ruta · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.14 · rutas en el mapa · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -324,7 +324,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 <!-- RUTAS -->
 <section class="screen scroll withtabs" id="routes">
   <div class="col" style="gap:14px">
-    <h1>Rutas</h1>
+    <div class="between"><h1>Rutas</h1><div class="seg" id="routesView" style="padding:3px"><button class="on" data-view="list" style="height:32px;padding:0 12px">Lista</button><button data-view="map" style="height:32px;padding:0 12px">Mapa</button></div></div>
     <div class="chips" id="routesChips" style="margin:0 -20px;padding:0 20px">
       <button class="chipb on" data-mode="rec">Recomendadas</button><button class="chipb" data-mode="mine">Mis recorridos</button><button class="chipb" data-mode="sug">Bucle desde aquí</button>
     </div>
@@ -333,6 +333,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <div class="chips fl" id="routesDist"><button class="chipb on" data-dist="all">Todas</button><button class="chipb" data-dist="s">&lt; 4 km</button><button class="chipb" data-dist="m">4 – 8 km</button><button class="chipb" data-dist="l">&gt; 8 km</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
     </div>
     <div class="chips fl" id="routesKm" style="display:none"><button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button></div>
+    <div id="routesMapWrap" class="map" style="display:none;height:58vh;border-radius:24px;flex:none"><div id="routesMap" style="position:absolute;inset:0"></div><p class="sub" id="routesMapHint" style="position:absolute;left:12px;right:12px;bottom:10px;margin:0;z-index:1000;background:var(--surface);border-radius:12px;padding:8px 12px;font-size:12px;text-align:center">Toca un punto para ver la ruta</p></div>
     <div class="col" id="routesList" style="gap:10px"></div>
   </div>
   <nav class="tabs" data-tab="routes"></nav>
@@ -500,6 +501,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     </div>
     <div class="card dark col" id="sInsight" style="gap:8px;padding:20px 22px;display:none"><span class="lbl">Lectura de la carrera</span><p id="sInsightText" style="margin:0;font-size:15px;line-height:1.5"></p></div>
     <div class="card col" style="gap:12px;padding:20px 22px"><div class="between"><h2>¿Cómo fue?</h2><span class="sub" style="font-size:12px" id="sFeelLbl"></span></div><div class="feel" id="sFeel"><button data-feel="1">Muy duro</button><button data-feel="2">Duro</button><button data-feel="3">Normal</button><button data-feel="4">Bien</button><button data-feel="5">Volando</button></div><textarea class="note" id="sNote" placeholder="Notas: dónde, con quién, cómo te sentiste…"></textarea></div>
+    <div class="card col" id="sProfileCard" style="gap:8px;padding:18px 20px;display:none"><div class="between"><h2>Perfil</h2><span class="sub" id="sProfileSub"></span></div><div id="sProfile" style="color:var(--ink)"></div></div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
     <button class="btn ghost" id="gpxBtn">Exportar GPX (Strava, Garmin…)</button>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
@@ -1176,7 +1178,7 @@ function updateGuide() {
 // Rutas v2: lista con filtros y minimapas, ficha completa y trazados fijos (routes-data.js, calculados con BRouter sobre OpenStreetMap).
 // El enrutador externo (Valhalla) solo se usa para "Bucle desde aquí".
 const ROUTER = 'https://valhalla1.openstreetmap.de';
-const rt = { mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
+const rt = { view: 'list', mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
 let pickedRoute = null, detailRoute = null;
 function decodePoly6(str) {
   const out = []; let i = 0, lat = 0, lon = 0;
@@ -1277,10 +1279,22 @@ function renderRoutes() {
   if (rt.mode === 'mine') { rtList = withAway(myRoutes()); renderList(rtList, '<div class="card col" style="gap:6px"><b style="font-weight:600">Aún no tienes recorridos</b><span class="sub">Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.</span></div>'); return; }
   if (rt.mode === 'sug') { if (!rt.here) { renderList([], '<div class="card col" style="gap:6px"><b style="font-weight:600">Buscando tu posición…</b><span class="sub">Los bucles se calculan desde donde estás.</span></div>'); return; } loadSuggestions(); }
 }
+let routesMapLayers = [];
 function renderList(list, empty) {
-  $('#routesList').innerHTML = list.length ? list.map(routeCard).join('') : empty;
-  $$('#routesList [data-open]').forEach((b) => b.onclick = () => openRoute(list[Number(b.dataset.open)]));
+  const asMap = rt.view === 'map' && rt.mode !== 'sug';
+  $('#routesView').style.display = rt.mode === 'sug' ? 'none' : ''; $$('#routesView [data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === (asMap ? 'map' : 'list')));
+  $('#routesMapWrap').style.display = asMap ? '' : 'none'; $('#routesList').style.display = asMap ? 'none' : '';
+  if (!asMap) { $('#routesList').innerHTML = list.length ? list.map(routeCard).join('') : empty; $$('#routesList [data-open]').forEach((b) => b.onclick = () => openRoute(list[Number(b.dataset.open)])); return; }
+  const m = makeMap('routesMap', 'calles'); routesMapLayers.forEach((l) => m.removeLayer(l)); routesMapLayers = [];
+  const all = [];
+  list.forEach((r) => { if (!r.ll || r.ll.length < 2) return; const st = r.start ? [r.start.lat, r.start.lon] : r.ll[0]; all.push(st);
+    const line = L.polyline(r.ll, { color: INK, weight: 3, opacity: .55 }).addTo(m), mk = L.marker(st, { icon: L.divIcon({ className: '', html: `<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 6px;border-radius:15px;background:${INK};color:${VOLT};font:600 12px/1 ${getComputedStyle(document.body).fontFamily};white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35)"><span style="width:10px;height:10px;border-radius:5px;background:${VOLT}"></span>${String(r.km).replace('.', ',')} km</span>`, iconSize: [0, 30], iconAnchor: [15, 15] }), title: r.name }).addTo(m);
+    mk.on('click', () => openRoute(r)); line.on('click', () => openRoute(r)); mk.bindTooltip(r.name, { direction: 'top', offset: [0, -14] }); routesMapLayers.push(line, mk); });
+  if (rt.here) { routesMapLayers.push(L.marker([rt.here.lat, rt.here.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(m)); }
+  $('#routesMapHint').textContent = list.length ? `${list.length} ruta${list.length === 1 ? '' : 's'} · toca un punto para ver la ficha` : 'Nada con esos filtros';
+  setTimeout(() => { m.invalidateSize(); if (all.length) m.fitBounds(all, { padding: [40, 40], maxZoom: 14 }); }, 80);
 }
+$$('#routesView [data-view]').forEach((b) => b.onclick = () => { rt.view = b.dataset.view; renderRoutes(); });
 async function loadSuggestions() {
   const here = rt.here, key = `${here.lat.toFixed(3)},${here.lon.toFixed(3)},${rt.km},${rt.seed}`, token = ++rt.token;
   const more = `<button class="btn sec" style="height:48px;margin-top:4px" id="routesMore">Generar otros tres bucles</button>`;
@@ -1698,6 +1712,7 @@ function openSummary(id) {
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
   const maxS = Math.max(...r.splits.map((s) => s.split));
   $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : `<span class="sub" style="grid-column:1/-1">${r.manual ? 'Carrera añadida a mano: sin parciales.' : 'Menos de un kilómetro, sin parciales.'}</span>`;
+  { const ele = (r.points || []).filter((p) => p.a != null).map((p) => p.a); const okE = ele.length >= 10; $('#sProfileCard').style.display = okE ? '' : 'none'; if (okE) { $('#sProfile').innerHTML = profileSvg(ele); $('#sProfileSub').textContent = `${Math.min(...ele)} – ${Math.max(...ele)} m${r.gain != null ? ` · +${r.gain} m` : ''}`; } }
   const ins = runInsights(r); $('#sInsight').style.display = ins ? '' : 'none'; $('#sInsightText').textContent = ins || '';
   go('summary'); $('#summary').scrollTop = 0;
   const hasPts = r.points && r.points.length > 1; $('#replayBtn').style.display = hasPts ? '' : 'none'; $('#gpxBtn').style.display = hasPts ? '' : 'none'; $('#sumNoMap').style.display = hasPts ? 'none' : '';
