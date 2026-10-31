@@ -331,7 +331,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.46 · modo cinta · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.47 · zonas de esfuerzo · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -523,6 +523,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <div id="sPlan" class="sub" style="display:none;font-size:13px;border-top:1px solid var(--line);padding-top:12px;line-height:1.6"></div>
     </div>
     <div class="card dark col" id="sInsight" style="gap:8px;padding:20px 22px;display:none"><span class="lbl">Lectura de la carrera</span><p id="sInsightText" style="margin:0;font-size:15px;line-height:1.5"></p></div>
+    <div class="card col" id="sZones" style="gap:10px;padding:18px 20px;display:none"><div class="between"><h2>Tu esfuerzo</h2><span class="sub" style="font-size:12px" id="sZonesSub"></span></div><div id="sZonesBar" style="display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--line)"></div><div id="sZonesList" class="col" style="gap:6px"></div></div>
     <div class="card col" style="gap:12px;padding:20px 22px"><div class="between"><h2>¿Cómo fue?</h2><span class="sub" style="font-size:12px" id="sFeelLbl"></span></div><div class="feel" id="sFeel"><button data-feel="1">Muy duro</button><button data-feel="2">Duro</button><button data-feel="3">Normal</button><button data-feel="4">Bien</button><button data-feel="5">Volando</button></div><textarea class="note" id="sNote" placeholder="Notas: dónde, con quién, cómo te sentiste…"></textarea></div>
     <div class="card col" id="sProfileCard" style="gap:8px;padding:18px 20px;display:none"><div class="between"><h2>Perfil</h2><span class="sub" id="sProfileSub"></span></div><div id="sProfile" style="color:var(--ink)"></div></div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
@@ -2077,6 +2078,7 @@ function openSummary(id) {
   { const ele = (r.points || []).filter((p) => p.a != null).map((p) => p.a); const okE = ele.length >= 10; $('#sProfileCard').style.display = okE ? '' : 'none'; if (okE) { $('#sProfile').innerHTML = profileSvg(ele); $('#sProfileSub').textContent = `${Math.min(...ele)} – ${Math.max(...ele)} m${r.gain != null ? ` · +${r.gain} m` : ''}`; } }
   $('#againBtn').style.display = r.points?.length > 5 || (r.route && !r.route.id.startsWith('run-')) ? '' : 'none';
   const ins = runInsights(r); $('#sInsight').style.display = ins ? '' : 'none'; $('#sInsightText').textContent = ins || '';
+  renderZones(r);
   go('summary'); $('#summary').scrollTop = 0;
   const hasPts = r.points && r.points.length > 1; $('#replayBtn').style.display = hasPts ? '' : 'none'; $('#gpxBtn').style.display = hasPts ? '' : 'none'; $('#sumNoMap').style.display = hasPts ? 'none' : '';
   const m = makeMap('sumMap', settings.map); setLayer(m, settings.map);
@@ -2089,7 +2091,7 @@ function openSummary(id) {
 }
 // Trazado del resumen, con opción de colorearlo por ritmo cada ~150 m (Strava/Garmin): verde lima rápido, ámbar medio, rojo lento.
 function paceSegments(pts) {
-  const seg = [], add = (cur, t0, t1, dc) => { if (cur.length > 1 && dc > 20) seg.push({ ll: cur, pace: (t1 - t0) / 1000 / (dc / 1000) }); };
+  const seg = [], add = (cur, t0, t1, dc) => { if (cur.length > 1 && dc > 20) seg.push({ ll: cur, dist: dc, pace: (t1 - t0) / 1000 / (dc / 1000) }); };
   let cur = [[pts[0].lat, pts[0].lon]], t0 = pts[0].t, dc = 0;
   for (let i = 1; i < pts.length; i++) { const p = pts[i], q = pts[i - 1];
     if (p.gap) { add(cur, t0, q.t, dc); cur = [[p.lat, p.lon]]; t0 = p.t; dc = 0; continue; }
@@ -2097,6 +2099,17 @@ function paceSegments(pts) {
     if (dc >= 150) { add(cur, t0, p.t, dc); cur = [[p.lat, p.lon]]; t0 = p.t; dc = 0; } }
   add(cur, t0, pts[pts.length - 1].t, dc);
   return seg;
+}
+// Zonas de esfuerzo (Garmin/Strava): tiempo en cada zona según tu ritmo habitual (mediana de tus últimas 5 carreras).
+function renderZones(r) {
+  const box = $('#sZones'), seg = r.points?.length > 5 && r.points.every((p) => p.t != null) ? paceSegments(r.points) : [];
+  box.style.display = seg.length >= 3 ? '' : 'none'; if (seg.length < 3) return;
+  const P = userPace(), Z = [['Suave', '#7FB3FF', 1.04, 1e9], ['Moderado', '#D4FF3A', 0.96, 1.04], ['Fuerte', '#FFB020', 0.9, 0.96], ['Muy fuerte', '#FF4D4D', 0, 0.9]];
+  const t = Z.map(() => 0); seg.forEach((x) => { const k = x.pace / P, i = Z.findIndex((z) => k >= z[2] && k < z[3]); t[i < 0 ? 0 : i] += x.pace * x.dist / 1000; });
+  const tot = t.reduce((a, v) => a + v, 0) || 1, main = t.indexOf(Math.max(...t));
+  $("#sZonesSub").textContent = `ritmo habitual ${fmtPace(P)}/km`;
+  $('#sZonesBar').innerHTML = t.map((v, i) => v ? `<i style="width:${v / tot * 100}%;background:${Z[i][1]}"></i>` : '').join('');
+  $('#sZonesList').innerHTML = Z.map((z, i) => `<div class="between" style="font-size:14px"><span style="display:flex;align-items:center;gap:8px"><i style="width:10px;height:10px;border-radius:5px;background:${z[1]};display:inline-block"></i>${z[0]}${i === main ? ' <span class="sub" style="font-size:12px">· la mayor parte</span>' : ''}</span><span><b style="font-weight:600">${Math.round(t[i] / tot * 100)} %</b> <span class="sub">${fmtTime(t[i])}</span></span></div>`).join('');
 }
 function paceColor(f) {
   const C = [[212, 255, 58], [255, 176, 32], [255, 77, 77]], x = Math.max(0, Math.min(1, f)) * 2, i = Math.min(1, Math.floor(x)), k = x - i;

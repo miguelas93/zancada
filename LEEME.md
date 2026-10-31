@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.47 (31 oct 2026)
+
+- **Tu esfuerzo** en el resumen: qué parte de la carrera fuiste suave, moderado, fuerte o muy fuerte respecto a tu ritmo habitual, con barra y tiempos. Sirve para ver si un rodaje "suave" lo fue de verdad.
+
 ## Novedades 0.46 (31 oct 2026)
 
 - **Modo cinta**: en Preparar, "¿En cinta? Sin GPS" abre un cronómetro grande con voz cada 5 minutos y pausa. Al terminar, abre "Carrera a mano" con la fecha y el tiempo ya puestos; solo apuntas los km de la cinta.
