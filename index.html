@@ -1631,7 +1631,7 @@ function openSummary(id) {
   $('#sPlan').style.display = info.length ? '' : 'none'; $('#sPlan').innerHTML = info.map((x) => `<div>${x}</div>`).join('');
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
   const maxS = Math.max(...r.splits.map((s) => s.split));
-  $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : '<span class="sub" style="grid-column:1/-1">Menos de un kilómetro, sin parciales.</span>';
+  $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : `<span class="sub" style="grid-column:1/-1">${r.manual ? 'Carrera añadida a mano: sin parciales.' : 'Menos de un kilómetro, sin parciales.'}</span>`;
   const ins = runInsights(r); $('#sInsight').style.display = ins ? '' : 'none'; $('#sInsightText').textContent = ins || '';
   go('summary');
   const hasPts = r.points && r.points.length > 1; $('#replayBtn').style.display = hasPts ? '' : 'none'; $('#gpxBtn').style.display = hasPts ? '' : 'none'; $('#sumNoMap').style.display = hasPts ? 'none' : '';
