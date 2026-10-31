@@ -16,11 +16,11 @@ class RunSessionParityTest {
     private val T0 = java.time.Instant.parse("2026-10-20T08:00:00Z").toEpochMilli()
 
     /** Reproduce el guion de tests/run-tests.mjs con un reloj falso. */
-    private fun replay(track: JsonObject): Pair<RunSession.Result, RunSession> {
+    internal fun replay(track: JsonObject, restartEvery: Int = 0): Pair<RunSession.Result, RunSession> {
         val fixes = track["fixes"]!!.jsonArray.map { it.jsonObject }
         val events = track["events"]!!.jsonArray.map { it.jsonObject }.toMutableList()
         val end = track["end"]!!.jsonPrimitive.long
-        val s = RunSession(autopause = true)
+        var s = RunSession(autopause = true)
         fun fixOf(o: JsonObject, ts: Long) = Fix(o["lat"]!!.jsonPrimitive.double, o["lon"]!!.jsonPrimitive.double, o["acc"]!!.jsonPrimitive.double, o["alt"]?.jsonPrimitive?.doubleOrNull, ts)
         // Preparación: la página lleva 1,5 s abierta; primera lectura con hora T0; 0,5 s después, «Empezar»; cuenta atrás de 3 s.
         var clock = T0 + 1500
@@ -31,7 +31,7 @@ class RunSessionParityTest {
         var nextTick = runStart + 500
         var now = 0L
         fun advance(to: Long) { if (to > now) { while (nextTick <= runStart + to) { s.tick(nextTick); nextTick += 500 }; now = to } }
-        for (f in fixes) {
+        for ((idx, f) in fixes.withIndex()) {
             val arrive = f["arrive"]!!.jsonPrimitive.long
             while (events.isNotEmpty() && events[0]["at"]!!.jsonPrimitive.long <= arrive) {
                 val e = events.removeAt(0); val at = e["at"]!!.jsonPrimitive.long
@@ -39,6 +39,11 @@ class RunSessionParityTest {
                 if (e["ev"]!!.jsonPrimitive.content == "pause") s.pause(runStart + now) else s.resume(runStart + now)
             }
             advance(arrive)
+            // Simula que Android mata la app: se guarda la foto en texto y una sesión nueva sigue desde ahí.
+            if (restartEvery > 0 && idx > 0 && idx % restartEvery == 0) {
+                val text = SnapshotJson.encode(s.snapshot())
+                s = RunSession(autopause = true).also { it.restore(SnapshotJson.decode(text)) }
+            }
             s.onFix(fixOf(f, runStart + f["t"]!!.jsonPrimitive.long), runStart + now)
         }
         advance(end)
@@ -87,5 +92,20 @@ class RunSessionParityTest {
             } else println("${if (errors.size == before) "✓" else "✗"} ${name.padEnd(20)} no se guarda")
         }
         if (errors.isNotEmpty()) fail("La versión Kotlin no da lo mismo que la web:\n" + errors.joinToString("\n"))
+    }
+
+    /** Si Android cierra la app a mitad de carrera y se recupera desde el disco, el resultado debe ser idéntico. */
+    @Test
+    fun recuperarLaCarreraNoCambiaNada() {
+        val tracks = File(dir, "fixtures/tracks").listFiles { f -> f.name.endsWith(".json") }!!.sortedBy { it.name }
+        for (file in tracks) {
+            val track = Json.parseToJsonElement(file.readText()).jsonObject
+            val (want, _) = replay(track)
+            for (every in listOf(1, 7, 97)) {
+                val (got, _) = replay(track, restartEvery = every)
+                if (got != want) errors += "${file.nameWithoutExtension} (recuperando cada $every lecturas): esperaba $want, sale $got"
+            }
+        }
+        if (errors.isNotEmpty()) fail("Recuperar la carrera cambia el resultado:\n" + errors.joinToString("\n").take(3000))
     }
 }
