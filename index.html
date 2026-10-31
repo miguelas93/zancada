@@ -235,6 +235,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     </div>
     <div id="recapCard"></div>
     <div id="planCard"></div>
+    <div id="nearCard"></div>
     <button class="card between" data-go="prep" style="width:100%;text-align:left;padding:18px 18px 18px 22px">
       <div class="col" style="gap:6px"><span class="chip" style="align-self:flex-start">Carrera libre</span><span class="num" style="font-size:26px">Salir a correr</span><span class="sub" id="homeNudge">GPS, ritmo en directo y aviso de voz en cada km</span></div>
       <span class="icon big" style="background:var(--volt);color:var(--on-volt)"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></span>
@@ -315,7 +316,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.12 · entreno por tramos · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.13 · ruta cerca y detección de ruta · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -415,7 +416,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
   </div>
   <div class="sheet col" style="gap:16px">
     <div><div class="handle"></div><div class="seg" id="prepMode"><button class="on" data-pm="plan">Plan</button><button data-pm="libre">Libre</button><button data-pm="tramos">Tramos</button></div></div>
-    <div id="prepTramos" class="col" style="display:none;gap:8px"><div class="chips fl" id="tramosChips" style="margin:0 -20px;padding:0 20px"></div><form id="tramosForm" style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="tReps" type="number" min="1" max="30" inputmode="numeric" value="6" aria-label="Repeticiones" style="width:52px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">×<input id="tOn" type="number" min="100" max="5000" step="100" inputmode="numeric" value="400" aria-label="Metros fuertes" style="width:68px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m · rec.<input id="tOff" type="number" min="0" max="2000" step="50" inputmode="numeric" value="200" aria-label="Metros de recuperación" style="width:62px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m<button class="btn sec" type="submit" style="width:auto;height:38px;padding:0 12px;font-size:13px;margin-left:auto">A mi gusto</button></form></div>
+    <div id="prepTramos" class="col" style="display:none;gap:8px"><div class="chips fl" id="tramosChips" style="margin:0 -20px;padding:0 20px"></div><form id="tramosForm" style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="tReps" type="number" min="1" max="30" inputmode="numeric" value="6" aria-label="Repeticiones" style="width:52px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">×<input id="tOn" type="number" min="100" max="5000" step="100" inputmode="numeric" value="400" aria-label="Metros fuertes" style="width:68px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m · rec.<input id="tOff" type="number" min="0" max="2000" step="50" inputmode="numeric" value="200" aria-label="Metros de recuperación" style="width:62px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m<button class="btn sec" type="submit" style="width:auto;height:38px;padding:0 12px;font-size:13px;margin-left:auto">Usar</button></form></div>
     <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p><p class="sub" id="prepWx" style="display:none;margin:8px 0 0;font-size:13px;line-height:1.45;white-space:pre-line"></p></div>
     <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
@@ -683,7 +684,7 @@ function renderHome() {
   const d = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#homeDate').textContent = d[0].toUpperCase() + d.slice(1);
   $('#homeHello').textContent = profile.name ? `Hola, ${profile.name}` : 'Hola';
-  renderPlanCard(); renderRecap();
+  renderPlanCard(); renderRecap(); renderNear();
   const week = runs.filter((r) => r.start >= ws), km = week.reduce((a, r) => a + r.dist, 0), dur = week.reduce((a, r) => a + r.dur, 0);
   const perDay = [0, 0, 0, 0, 0, 0, 0]; week.forEach((r) => { perDay[(new Date(r.start).getDay() + 6) % 7] += r.dist; });
   const maxDay = Math.max(5000, ...perDay);
@@ -704,6 +705,17 @@ function renderHome() {
     <div class="between" style="padding:0 4px"><div><div style="font-weight:600;font-size:16px">${last.name}</div><div class="sub" style="font-size:12px">${fmtDate(last.start)}</div></div><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></div>
     <div class="stats" style="padding:0 4px 4px">${statCols(last, 24)}</div></button>`;
   $('#lastBtn').onclick = () => openSummary(last.id);
+}
+// Ruta recomendada más cercana, solo si ya diste permiso de ubicación (no pedimos nada al abrir Inicio).
+const near = { at: 0, pos: null, asked: false };
+function renderNear() {
+  const box = $('#nearCard'), pos = near.pos || lastFix || rt.here;
+  if (!pos) { box.innerHTML = ''; if (!near.asked && navigator.permissions && 'geolocation' in navigator) { near.asked = true; navigator.permissions.query({ name: 'geolocation' }).then((st) => { if (st.state === 'granted') navigator.geolocation.getCurrentPosition((p) => { near.pos = { lat: p.coords.latitude, lon: p.coords.longitude }; near.at = Date.now(); if ($('#home').classList.contains('on')) renderNear(); }, () => {}, { maximumAge: 600000, timeout: 8000 }); }).catch(() => {}); } return; }
+  const list = ZR.map((r) => ({ r, d: haversine(pos, r.start) })).filter((x) => x.d < 3000).sort((a, b) => a.d - b.d);
+  if (!list.length) { box.innerHTML = ''; return; }
+  const { r, d } = list[0], times = runs.filter((x) => x.route?.id === r.id).length;
+  box.innerHTML = `<button class="card between" id="nearBtn" style="width:100%;text-align:left;padding:14px 16px 14px 18px;gap:12px"><span class="rmini" style="width:64px;height:48px;flex:none">${routeSvg(r.ll)}</span><span style="flex:1;min-width:0"><span class="lbl">Ruta cerca · a ${fmtM(d)}</span><span style="display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</span><span class="sub" style="font-size:12px">${String(r.km).replace('.', ',')} km · ${r.surface}${times ? ` · la has corrido ${times === 1 ? 'una vez' : times + ' veces'}` : ''}</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted);flex:none"><path d="m9 18 6-6-6-6"/></svg></button>`;
+  $('#nearBtn').onclick = () => { if (!rt.here) rt.here = pos; openRoute(Object.assign({}, r)); };
 }
 // Resumen de la semana pasada, de lunes a miércoles (como el correo semanal de Strava, pero dentro de la app).
 function renderRecap() {
@@ -1499,6 +1511,20 @@ function startRun() {
   requestWake();
 }
 const KeepAwake = window.Capacitor?.Plugins?.KeepAwake; // solo existe dentro del APK
+// Si corriste libre pero el trazado coincide con una ruta recomendada o guardada, se etiqueta sola (así el fantasma funciona la próxima vez).
+function detectRoute(r) {
+  const pts = r.points; if (!pts || pts.length < 20 || r.dist < 800) return null;
+  const step = Math.max(1, Math.floor(pts.length / 60)), sample = pts.filter((_, i) => i % step === 0);
+  let best = null;
+  for (const route of ZR.concat(savedRoutes.map((x) => Object.assign({ src: 'saved' }, x)))) {
+    const ll = route.ll; if (!ll || ll.length < 2 || r.dist < route.km * 1000 * 0.6) continue;
+    let minLa = 90, maxLa = -90, minLo = 180, maxLo = -180; ll.forEach(([la, lo]) => { if (la < minLa) minLa = la; if (la > maxLa) maxLa = la; if (lo < minLo) minLo = lo; if (lo > maxLo) maxLo = lo; });
+    const pad = 0.001; if (sample.filter((p) => p.lat > minLa - pad && p.lat < maxLa + pad && p.lon > minLo - pad && p.lon < maxLo + pad).length < sample.length * 0.7) continue;
+    const near1 = sample.filter((p) => { for (let i = 0; i < ll.length; i += 2) if (haversine(p, { lat: ll[i][0], lon: ll[i][1] }) < 45) return true; return false; }).length / sample.length;
+    if (near1 >= 0.75 && (!best || near1 > best.score)) best = { id: route.id, name: route.name, score: near1 };
+  }
+  return best;
+}
 // Fantasma: al repetir una ruta, te comparas en directo con tu mejor carrera en ella (idea de adidas Running / Strava segments, en local).
 function bestOnRoute(id) {
   const cands = runs.filter((r) => r.points?.length > 5 && (r.route?.id === id || 'run-' + r.id === id));
@@ -1614,6 +1640,7 @@ function finishRun() {
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
   if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom };
   if (run.route) { r.route = { id: run.route.id, name: run.route.name }; if (run.ghostRef) r.ghost = { ref: run.ghostRef.id, refDur: run.ghostRef.dur }; }
+  else { const det = detectRoute(r); if (det) r.route = { id: det.id, name: det.name, auto: true }; }
   if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
   if (wx.data && Date.now() - wx.at < 4 * 3600e3) r.wx = { t: wx.data.t, wind: wx.data.wind, rain: wx.data.now ? 1 : 0 };
   const before = badges().filter((b) => b.when).map((b) => b.id);
@@ -1621,7 +1648,7 @@ function finishRun() {
   const newB = badges().filter((b) => b.when && !before.includes(b.id)); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
-  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.session && r.dist >= r.session.m * 0.9 ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
+  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.route?.auto ? `Has corrido ${r.route.name}: la próxima vez te comparo con este tiempo.` : r.session && r.dist >= r.session.m * 0.9 ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   const okS = r.splits.filter((x) => !x.partial), bestS = okS.length ? okS.reduce((a, x) => (x.split < a.split ? x : a)) : null;
@@ -1660,7 +1687,7 @@ function openSummary(id) {
   const info = [];
   if (plan) { const ps1 = planStatus(plan).flat().find((x) => x.run && x.run.id === r.id); if (ps1) info.push(`Plan · semana ${ps1.week + 1} · ${ps1.title} ${fmtKmS(ps1.m)} km · ${r.dist >= ps1.m * 0.9 ? 'cumplida' : 'parcial'}${ps1.moved ? ' (otro día)' : ''}`); }
   if (r.session?.custom) info.push(`Entreno por tramos: ${r.session.title}`);
-  if (r.route) info.push('Ruta: ' + r.route.name);
+  if (r.route) info.push('Ruta: ' + r.route.name + (r.route.auto ? ' (detectada por el trazado)' : ''));
   if (r.gain != null) info.push(`Desnivel: +${r.gain} m`);
   if (r.manual) info.push('Añadida a mano (cinta o reloj)');
   if (r.imported) info.push('Importada de un GPX');
