@@ -190,7 +190,7 @@ fun PlanCardUi(app: App) {
         is PlanCard.Week -> ZCard(dark = true, gap = 12.dp, onClick = { St.planView = null; Nav.go(PLAN) }) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl(p.head, Modifier.weight(1f)); Sub(p.doneTxt) }
             if (p.title != null) Column {
-                Chip(p.chip ?: "", modifier = Modifier.padding(bottom = 8.dp)); Num(p.title, 26.sp); p.desc?.let { Sub(it, modifier = Modifier.padding(top = 4.dp)) }
+                Chip(p.chip ?: "", modifier = Modifier.padding(bottom = 8.dp)); Num(p.title ?: "", 26.sp); p.desc?.let { Sub(it, modifier = Modifier.padding(top = 4.dp)) }
             } else if (p.chip == null && p.head.contains("semana")) Num("Semana cumplida", 24.sp)
             Track(p.pct)
             p.review?.let { Divider(); Sub(it, size = 12.sp) }
