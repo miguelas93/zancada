@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.39 (31 oct 2026)
+
+- **Compartir tu semana**: en Actividad, una imagen con los km de la semana, barras por día, salidas, tiempo, desnivel y ritmo medio, lista para enviar por Telegram o WhatsApp.
+
 ## Novedades 0.38 (31 oct 2026)
 
 - **Rutas con tu historial**: cada ruta recomendada que ya has corrido lleva una etiqueta con cuántas veces la has hecho y tu mejor tiempo completo.
