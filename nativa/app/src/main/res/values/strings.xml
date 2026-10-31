@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Zancada N</string>
-    <string name="widget_desc">Tus km de la semana y la próxima sesión del plan</string>
 </resources>
