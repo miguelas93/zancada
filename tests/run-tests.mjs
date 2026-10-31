@@ -8,7 +8,7 @@
 // Estos mismos ficheros servirán para comprobar que la app nativa en Kotlin calcula exactamente lo mismo.
 import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { startServer } from './tools/server.mjs';
@@ -135,7 +135,11 @@ console.log('2. Pantallas con datos');
 console.log('3. Copia de seguridad en el APK');
 {
   const before = failures;
-  const { ctx, page, errors } = await newPage({ ...BASE, 'zancada.runs.v1': savedRuns, 'zancada.shoes.v1': [{ id: 's1', name: 'Prueba', km0: 0, created: T0 }] }, true);
+  // Además de las carreras grabadas, una añadida a mano (cinta), que no tiene puntos.
+  const manual = { id: 'm' + (T0 - 2 * 864e5), start: T0 - 2 * 864e5, name: 'Cinta del gimnasio', points: [], dist: 6000, dur: 1980, splits: [], manual: true };
+  // Todas las simuladas empiezan a la misma hora: en la copia se reparten en días distintos, como en la vida real.
+  const backupRuns = [...savedRuns.map((r, i) => ({ ...r, id: 'r' + (r.start - (i + 3) * 864e5), start: r.start - (i + 3) * 864e5 })), manual];
+  const { ctx, page, errors } = await newPage({ ...BASE, 'zancada.runs.v1': backupRuns, 'zancada.shoes.v1': [{ id: 's1', name: 'Prueba', km0: 0, created: T0 }] }, true);
   await page.evaluate(() => { window.__z.go('profile'); document.querySelector('#backupBtn').click(); });
   await page.waitForFunction(() => window.__shared.some((x) => x.share), null, { timeout: 5000 }).catch(() => {});
   const sh = await page.evaluate(() => window.__shared);
@@ -145,7 +149,12 @@ console.log('3. Copia de seguridad en el APK');
     let data = null; try { data = JSON.parse(w.data); } catch (e) { fail('la copia no es JSON válido'); }
     if (data) {
       if (data.app !== 'zancada') fail('la copia no lleva la marca app=zancada');
-      if ((data['zancada.runs.v1'] || []).length !== savedRuns.length) fail(`la copia lleva ${(data['zancada.runs.v1'] || []).length} carreras, esperaba ${savedRuns.length}`);
+      if ((data['zancada.runs.v1'] || []).length !== backupRuns.length) fail(`la copia lleva ${(data['zancada.runs.v1'] || []).length} carreras, esperaba ${backupRuns.length}`);
+      // La app nativa importa esta misma copia en sus pruebas (nativa/core BackupImportTest).
+      const bfile = join(HERE, 'fixtures/backup/zancada-copia.json');
+      if (UPDATE) { mkdirSync(dirname(bfile), { recursive: true }); writeFileSync(bfile, w.data + '\n'); }
+      else if (!existsSync(bfile)) fail('falta tests/fixtures/backup/zancada-copia.json (ejecuta con --update)');
+      else if (JSON.stringify(Object.keys(JSON.parse(readFileSync(bfile, 'utf8'))).sort()) !== JSON.stringify(Object.keys(data).sort())) fail('la copia ha cambiado de formato: revisa la importación de la app nativa y vuelve a generar con --update');
       if (!(data['zancada.shoes.v1'] || []).length) fail('la copia no lleva las zapatillas');
       if (w.directory !== 'CACHE' || w.encoding !== 'utf8') fail('la copia se escribe en un sitio o formato inesperado');
       if (!(s2.files || [])[0]?.endsWith(w.path)) fail('el menú de compartir no recibe el archivo');

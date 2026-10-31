@@ -33,4 +33,6 @@ data class Run(
     val dur: Double,
     val splits: List<Split>,
     val gain: Int?,
+    /** Añadida a mano (cinta, reloj…): sin puntos de GPS. */
+    val manual: Boolean = false,
 )

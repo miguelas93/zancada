@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -23,7 +24,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +37,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.zancada.core.BackupImport
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+import kotlin.math.cos
+import kotlin.math.min
 import com.zancada.core.Run
 import com.zancada.core.fmtKm
 import com.zancada.core.fmtPace
@@ -49,6 +63,29 @@ val Muted = Color(0xFF9A9D95)
 
 class MainActivity : ComponentActivity() {
     private var afterPermission: (() -> Unit)? = null
+    private var onImported: (() -> Unit)? = null
+    var importMsg by mutableStateOf<String?>(null)
+
+    /** El selector de archivos de Android: no hace falta pedir permiso de almacenamiento. */
+    private val pickBackup = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@registerForActivityResult
+        importMsg = "Importando…"
+        lifecycleScope.launch {
+            importMsg = withContext(Dispatchers.IO) {
+                try {
+                    val stream = contentResolver.openInputStream(uri) ?: return@withContext "No he podido abrir el archivo"
+                    val bytes = stream.use { it.readNBytesCompat(60 shl 20) } ?: return@withContext "El archivo es demasiado grande para ser una copia de Zancada"
+                    val (added, had) = RunStore(this@MainActivity).importBackup(String(bytes, Charsets.UTF_8))
+                    when {
+                        added == 0 && had == 0 -> "La copia no tiene carreras"
+                        added == 0 -> "Ya tenías todas: $had carreras"
+                        else -> "Importadas $added carreras" + if (had > 0) " ($had ya estaban)" else ""
+                    }
+                } catch (e: BackupImport.NotABackup) { e.message } catch (e: Exception) { "No he podido leer la copia" }
+            }
+            onImported?.invoke()
+        }
+    }
     private val askPerms = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { res ->
         if (res[Manifest.permission.ACCESS_FINE_LOCATION] == true || res[Manifest.permission.ACCESS_COARSE_LOCATION] == true) afterPermission?.invoke()
         else RunBus.state.value = RunUi(gpsError = "Sin permiso de ubicación no puedo grabar la carrera.")
@@ -65,10 +102,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val store = RunStore(this)
+        // ¿Quedó una carrera a medias (Android cerró la app)? Se retoma sola.
+        if (RunBus.state.value.phase == Phase.IDLE && LiveStore(this).load() != null &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        ) RunService.send(this, RunService.RECOVER)
         setContent {
             val ui by RunBus.state.collectAsStateWithLifecycle()
             var runs by remember { mutableStateOf(store.load()) }
             var counting by remember { mutableStateOf(false) }
+            DisposableEffect(Unit) { onImported = { runs = store.load() }; onDispose { onImported = null } }
             LaunchedEffect(ui.phase) { if (ui.phase == Phase.DONE || ui.phase == Phase.IDLE) runs = store.load() }
             Box(Modifier.fillMaxSize().background(Ink).systemBarsPadding()) {
                 when {
@@ -81,7 +123,8 @@ class MainActivity : ComponentActivity() {
                         discard = { RunService.send(this@MainActivity, RunService.DISCARD) })
                     ui.phase == Phase.PREP -> PrepScreen(ui, start = { counting = true }, back = { RunService.send(this@MainActivity, RunService.STOP) })
                     ui.phase == Phase.DONE && ui.result != null -> DoneScreen(ui.result!!) { RunBus.state.value = RunUi() }
-                    else -> HomeScreen(runs, ui.gpsError,
+                    else -> HomeScreen(runs, ui.gpsError ?: importMsg,
+                        importBackup = { pickBackup.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) },
                         run = { withLocation { RunService.send(this@MainActivity, RunService.PREP) } },
                         battery = { startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) },
                         open = { r -> RunBus.state.value = RunUi(phase = Phase.DONE, result = r) })
@@ -105,10 +148,10 @@ fun Btn(text: String, primary: Boolean = true, modifier: Modifier = Modifier, on
 }
 
 @Composable
-fun HomeScreen(runs: List<Run>, error: String?, run: () -> Unit, battery: () -> Unit, open: (Run) -> Unit) {
+fun HomeScreen(runs: List<Run>, error: String?, importBackup: () -> Unit, run: () -> Unit, battery: () -> Unit, open: (Run) -> Unit) {
     Column(Modifier.fillMaxSize().padding(20.dp)) {
         Text("Zancada", color = Paper, fontSize = 34.sp, fontWeight = FontWeight.Bold)
-        Text("Versión nativa · fase 1", color = Muted, fontSize = 14.sp)
+        Text("Versión nativa · fase 2", color = Muted, fontSize = 14.sp)
         Spacer(Modifier.height(24.dp))
         val week = runs.filter { it.start > System.currentTimeMillis() - 7 * 864e5.toLong() }.sumOf { it.dist }
         Label("Últimos 7 días"); Big(fmtKm(week), 64); Text("km", color = Muted)
@@ -133,6 +176,10 @@ fun HomeScreen(runs: List<Run>, error: String?, run: () -> Unit, battery: () -> 
                 }
             }
             if (runs.isEmpty()) item { Text("Aún no hay carreras en la versión nativa.", color = Muted, modifier = Modifier.padding(vertical = 12.dp)) }
+            item {
+                Text("Traer mis carreras de la app actual: en la otra app, Perfil → «Exportar copia» y guárdala en el móvil. Luego toca aquí y elige el archivo zancada-copia.",
+                    color = Muted, fontSize = 13.sp, modifier = Modifier.fillMaxWidth().clickable(onClick = importBackup).padding(vertical = 14.dp))
+            }
         }
     }
 }
@@ -228,6 +275,7 @@ fun DoneScreen(r: Run, close: () -> Unit) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Stat("Tiempo", fmtTime(r.dur)); Stat("Ritmo", fmtPace(r.dur / (r.dist / 1000))); Stat("Desnivel", r.gain?.let { "+$it m" } ?: "–")
             }
+            if (r.points.size > 2) { Spacer(Modifier.height(24.dp)); Label("Recorrido"); Spacer(Modifier.height(8.dp)); Trace(r) }
             Spacer(Modifier.height(24.dp))
             if (r.splits.isNotEmpty()) Label("Parciales")
         }
@@ -239,4 +287,34 @@ fun DoneScreen(r: Run, close: () -> Unit) {
         }
         item { Spacer(Modifier.height(20.dp)); Btn("Listo", modifier = Modifier.fillMaxWidth(), onClick = close) }
     }
+}
+
+/** Dibujo del recorrido (sin mapa de calles: eso llega con las rutas). Verde = salida, blanco = llegada. */
+@Composable
+fun Trace(r: Run) {
+    val pts = r.points
+    Canvas(Modifier.fillMaxWidth().height(240.dp).clip(RoundedCornerShape(16.dp)).background(Card)) {
+        val lat0 = Math.toRadians(pts.sumOf { it.lat } / pts.size)
+        val xs = pts.map { it.lon * cos(lat0) }; val ys = pts.map { it.lat }
+        val minX = xs.min(); val minY = ys.min()
+        val spanX = (xs.max() - minX).coerceAtLeast(1e-9); val spanY = (ys.max() - minY).coerceAtLeast(1e-9)
+        val pad = 24.dp.toPx()
+        val k = min((size.width - 2 * pad) / spanX, (size.height - 2 * pad) / spanY)
+        val ox = (size.width - spanX * k) / 2; val oy = (size.height - spanY * k) / 2
+        fun at(i: Int) = Offset((ox + (xs[i] - minX) * k).toFloat(), (size.height - oy - (ys[i] - minY) * k).toFloat())
+        val path = Path().apply {
+            moveTo(at(0).x, at(0).y)
+            for (i in 1 until pts.size) { val o = at(i); if (pts[i].gap) moveTo(o.x, o.y) else lineTo(o.x, o.y) }
+        }
+        drawPath(path, Volt, style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+        drawCircle(Paper, 6.dp.toPx(), at(pts.size - 1))
+        drawCircle(Ink, 6.dp.toPx(), at(0)); drawCircle(Volt, 4.dp.toPx(), at(0))
+    }
+}
+
+/** Lee como mucho [max] bytes; null si el archivo es más grande (no es una copia y no queremos llenar la memoria). */
+private fun InputStream.readNBytesCompat(max: Int): ByteArray? {
+    val out = java.io.ByteArrayOutputStream(); val buf = ByteArray(64 * 1024); var total = 0
+    while (true) { val n = read(buf); if (n < 0) break; total += n; if (total > max) return null; out.write(buf, 0, n) }
+    return out.toByteArray()
 }

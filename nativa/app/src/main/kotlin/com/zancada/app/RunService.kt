@@ -44,10 +44,12 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
     companion object {
         const val PREP = "prep"; const val START = "start"; const val PAUSE = "pause"; const val RESUME = "resume"
         const val FINISH = "finish"; const val SAVE_SHORT = "save_short"; const val DISCARD = "discard"; const val STOP = "stop"
+        /** Retomar una carrera que Android cerró a medias (la guarda [LiveStore]). */
+        const val RECOVER = "recover"
         private const val CHANNEL = "run"; private const val NOTIF_ID = 1
         fun send(ctx: Context, action: String) {
             val i = Intent(ctx, RunService::class.java).setAction(action)
-            if (action == PREP) ctx.startForegroundService(i) else ctx.startService(i)
+            if (action == PREP || action == RECOVER) ctx.startForegroundService(i) else ctx.startService(i)
         }
     }
 
@@ -57,13 +59,17 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
     private var ttsReady = false
     private var listening = false
+    private val live by lazy { LiveStore(this) }
+    private var ticks = 0
 
     private val callback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             // Android puede entregar varias lecturas de golpe (pantalla apagada): cada una con su hora real.
+            val kmBefore = session.lastKm
             for (l in result.locations) {
                 session.onFix(Fix(l.latitude, l.longitude, l.accuracy.toDouble(), if (l.hasAltitude()) l.altitude else null, l.time), System.currentTimeMillis())
             }
+            if (session.lastKm != kmBefore) persist()
             publish()
         }
     }
@@ -83,21 +89,54 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        // Android puede volver a arrancar el servicio sin orden (intent nulo) tras cerrarlo; o la pantalla pide RECOVER.
+        if (!session.active && (intent == null || intent.action == RECOVER)) recover()
         when (intent?.action) {
             PREP -> { goForeground("Buscando GPS…"); startLocation(); RunBus.state.value = RunUi(phase = Phase.PREP) }
             START -> if (!session.active) {
                 session.begin(System.currentTimeMillis())
                 say("¡Vamos!")
-                ticker?.cancel()
-                ticker = lifecycleScope.launch { while (isActive) { session.tick(System.currentTimeMillis()); publish(); delay(500) } }
+                startTicker(); persist()
             }
-            PAUSE -> { session.pause(System.currentTimeMillis()); publish() }
-            RESUME -> { session.resume(System.currentTimeMillis()); publish() }
+            PAUSE -> { session.pause(System.currentTimeMillis()); persist(); publish() }
+            RESUME -> { session.resume(System.currentTimeMillis()); persist(); publish() }
             FINISH -> finishRun(force = false)
             SAVE_SHORT -> finishRun(force = true)
-            DISCARD, STOP -> { RunBus.state.value = RunUi(); shutdown() }
+            // Se pidió recuperar pero no había nada (o ya se borró): cerrar limpio. Android exige mostrar la notificación igualmente.
+            RECOVER -> if (!session.active) { goForeground("Zancada"); shutdown() }
+            null -> if (!session.active) stopSelf()
+            DISCARD, STOP -> { live.clear(); RunBus.state.value = RunUi(); shutdown() }
         }
-        return START_NOT_STICKY
+        // Con carrera en marcha, si Android mata el servicio le pedimos que lo vuelva a arrancar.
+        return if (session.active) START_STICKY else START_NOT_STICKY
+    }
+
+    private fun startTicker() {
+        ticker?.cancel()
+        ticker = lifecycleScope.launch {
+            while (isActive) {
+                session.tick(System.currentTimeMillis()); publish()
+                if (++ticks % 10 == 0) persist()   // cada 5 s
+                delay(500)
+            }
+        }
+    }
+
+    /** Guarda la foto de la carrera en curso. Si falla (disco lleno…), la carrera sigue en memoria. */
+    private fun persist() { if (session.active) try { live.save(session.snapshot()) } catch (e: Exception) { } }
+
+    /** Retoma la carrera guardada, si la hay. El tramo sin GPS mientras estuvo cerrada se une en línea recta. */
+    private fun recover() {
+        val snap = live.load() ?: return
+        try { goForeground("Recuperando tu carrera…") } catch (e: Exception) {
+            // Android no deja arrancar el GPS desde segundo plano: se recupera al abrir la app.
+            stopSelf(); return
+        }
+        session.restore(snap)
+        startLocation()
+        startTicker()
+        say("Carrera recuperada")
+        publish()
     }
 
     private fun finishRun(force: Boolean) {
@@ -105,10 +144,11 @@ class RunService : LifecycleService(), TextToSpeech.OnInitListener {
         val res = if (force) session.finish(now, forceShort = true) else session.finish(now)
         ticker?.cancel()
         when (res) {
-            is RunSession.Result.Empty -> { RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
+            is RunSession.Result.Empty -> { live.clear(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
             is RunSession.Result.TooShort -> RunBus.state.value = RunBus.state.value.copy(tooShort = res.meters)   // la pantalla pregunta
             is RunSession.Result.Saved -> {
                 RunStore(this).add(res.run)
+                live.clear()   // solo después de guardarla de verdad
                 val r = res.run
                 say("Carrera terminada. ${fmtKm(r.dist).replace(",", " coma ")} kilómetros. Ritmo ${fmtPace(r.dur / (r.dist / 1000)).replace(":", " ")}.")
                 RunBus.state.value = RunUi(phase = Phase.DONE, result = r)

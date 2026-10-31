@@ -119,6 +119,23 @@ class RunSession(private val autopause: Boolean = true) {
         }
     }
 
+    /** Foto completa del estado, para guardarla en disco y recuperar la carrera si Android cierra la app. */
+    data class Snapshot(
+        val active: Boolean, val paused: Boolean, val autoPaused: Boolean, val start: Long, val pausedMs: Long, val pauseAt: Long,
+        val dist: Double, val lastKm: Int, val points: List<Point>, val liveSplits: List<Split>, val liveSplitTimes: List<Double>,
+        val bestKm: Double, val gap: Boolean, val clk: Long?, val lastFix: Fix?, val pausePos: Fix?,
+    )
+
+    fun snapshot() = Snapshot(active, paused, autoPaused, start, pausedMs, pauseAt, dist, lastKm, points.map { it.copy() },
+        liveSplits.toList(), liveSplitTimes.toList(), bestKm, gap, clk, lastFix, pausePos)
+
+    fun restore(s: Snapshot) {
+        active = s.active; paused = s.paused; autoPaused = s.autoPaused; start = s.start; pausedMs = s.pausedMs; pauseAt = s.pauseAt
+        dist = s.dist; lastKm = s.lastKm; points.clear(); points.addAll(s.points.map { it.copy() })
+        liveSplits.clear(); liveSplits.addAll(s.liveSplits); liveSplitTimes.clear(); liveSplitTimes.addAll(s.liveSplitTimes)
+        bestKm = s.bestKm; gap = s.gap; clk = s.clk; lastFix = s.lastFix; pausePos = s.pausePos
+    }
+
     sealed interface Result {
         data object Empty : Result
         data class TooShort(val meters: Double) : Result
