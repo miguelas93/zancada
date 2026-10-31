@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.12 (madrugada del 31 de octubre)
+- **Entreno por tramos** (Preparar → Tramos): sin necesidad de plan, elige una plantilla clásica (6 × 400 m, 8 × 200 m, 5 × 1000 m, tempo 4 km, pirámide, progresivo 6 km) o monta la tuya (repeticiones × metros y recuperación). La app te guía por voz en cada tramo como en las sesiones del plan y recuerda la última que usaste.
+- **Cuenta atrás**: la tarjeta del plan en Inicio dice cuántos días faltan para tu 5K, 10K o media.
+
 ## Novedades 0.11 (madrugada del 31 de octubre)
 - **Texto más grande** (ajuste en Perfil) para leer mejor en carrera o con sol. Tamaños mínimos subidos (pestañas, insignias) y contorno visible al navegar con teclado o lector.
 - **Desnivel en tus carreras**: la app guarda la altitud del GPS (y el `<ele>` de los GPX importados) y calcula el desnivel positivo con filtro de ruido; sale en el resumen y en Mis recorridos.

@@ -315,7 +315,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.11 · desnivel, texto grande y aviso de carga · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.12 · entreno por tramos · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -414,7 +414,8 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <span style="width:44px"></span>
   </div>
   <div class="sheet col" style="gap:16px">
-    <div><div class="handle"></div><div class="seg" id="prepMode" style="display:none"><button class="on" data-pm="plan">Sesión del plan</button><button data-pm="libre">Carrera libre</button></div></div>
+    <div><div class="handle"></div><div class="seg" id="prepMode"><button class="on" data-pm="plan">Plan</button><button data-pm="libre">Libre</button><button data-pm="tramos">Tramos</button></div></div>
+    <div id="prepTramos" class="col" style="display:none;gap:8px"><div class="chips fl" id="tramosChips" style="margin:0 -20px;padding:0 20px"></div><form id="tramosForm" style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="tReps" type="number" min="1" max="30" inputmode="numeric" value="6" aria-label="Repeticiones" style="width:52px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">×<input id="tOn" type="number" min="100" max="5000" step="100" inputmode="numeric" value="400" aria-label="Metros fuertes" style="width:68px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m · rec.<input id="tOff" type="number" min="0" max="2000" step="50" inputmode="numeric" value="200" aria-label="Metros de recuperación" style="width:62px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m<button class="btn sec" type="submit" style="width:auto;height:38px;padding:0 12px;font-size:13px;margin-left:auto">A mi gusto</button></form></div>
     <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p><p class="sub" id="prepWx" style="display:none;margin:8px 0 0;font-size:13px;line-height:1.45;white-space:pre-line"></p></div>
     <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
@@ -1037,7 +1038,7 @@ function renderPlanCard() {
   const when = !nx ? '' : nx === td ? 'Hoy' : dayStart(nx.date) === dayStart(Date.now()) + 864e5 ? 'Mañana' : 'El ' + DAY_N[nx.dayIdx];
   const rev = plan.lastReview && plan.lastReview.week === wi - 1 ? `<p class="sub" style="margin:0;font-size:12px;border-top:1px solid rgba(244,245,240,.12);padding-top:10px">Semana pasada: ${plan.lastReview.done} de ${plan.lastReview.total} sesiones, ${fmtKmS(plan.lastReview.doneKm)} de ${fmtKmS(plan.lastReview.planKm)} km. ${plan.lastReview.text}</p>` : '';
   box.innerHTML = `<button class="card dark col" id="planOpen" style="width:100%;text-align:left;gap:12px;padding:20px">
-    <div class="between"><span class="lbl">Plan ${g.name} · semana ${wi + 1} de ${plan.weeks}</span><span class="sub">${done}/${total}</span></div>
+    <div class="between"><span class="lbl">Plan ${g.name} · semana ${wi + 1} de ${plan.weeks}${g.race ? ` · ${Math.max(0, Math.ceil((plan.start + plan.weeks * 7 * 864e5 - Date.now()) / 864e5))} días` : ''}</span><span class="sub">${done}/${total}</span></div>
     ${nx ? `<div><span class="chip" style="align-self:flex-start;margin-bottom:8px">${when}</span><div class="num" style="font-size:26px">${nx.title} · ${fmtKmS(nx.m)} km</div><div class="sub" style="margin-top:4px">${nx.desc}</div></div>` : '<div class="num" style="font-size:24px">Semana cumplida</div>'}
     <div class="track"><i style="width:${total ? done / total * 100 : 0}%"></i></div>${rev}</button>`;
   $('#planOpen').onclick = () => { planView = null; go('plan'); };
@@ -1139,6 +1140,7 @@ async function syncReminders() {
 // ---------- guía de la sesión durante la carrera ----------
 function buildGuide(s) {
   if (!s) return null;
+  if (s.segs) return s.segs;
   if (!s.struct) return [{ label: s.title, say: `${s.title}, ${fmtKmS(s.m).replace(',', ' coma ')} kilómetros.`, kind: 'suave', m: s.m }];
   const st = s.struct, segs = [{ label: 'Calentamiento', say: `Calentamiento, ${st.warm} metros suaves.`, kind: 'suave', m: st.warm }];
   for (let k = 1; k <= st.reps; k++) {
@@ -1391,15 +1393,44 @@ function startPrep() {
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
   watchId = navigator.geolocation.watchPosition(onFix, onGeoError, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
 }
+// Entreno por tramos sin plan: plantillas clásicas o "a mi gusto". Usa la misma guía por voz que las sesiones del plan.
+const TRAMOS = [
+  ['6x400', '6 × 400 m', 'Series cortas: 6 repeticiones de 400 m fuertes con 200 m al trote.', { warm: 1000, reps: 6, on: 400, off: 200, cool: 800 }, 'series'],
+  ['8x200', '8 × 200 m', 'Velocidad: 8 repeticiones de 200 m con 200 m al trote.', { warm: 1000, reps: 8, on: 200, off: 200, cool: 800 }, 'series'],
+  ['5x1000', '5 × 1000 m', 'Series largas: 5 repeticiones de 1 km con 400 m al trote.', { warm: 1200, reps: 5, on: 1000, off: 400, cool: 800 }, 'series'],
+  ['tempo4', 'Tempo 4 km', 'Calienta, 4 km a ritmo controlado (incómodo pero sostenible) y vuelta a la calma.', { warm: 1200, reps: 1, on: 4000, off: 0, cool: 800 }, 'tempo'],
+  ['piramide', 'Pirámide', '200-400-600-800-600-400-200 m fuertes con 200 m al trote entre ellas.', null, 'series', [200, 400, 600, 800, 600, 400, 200].map((m) => [m, 200])],
+  ['progresivo', 'Progresivo 6 km', '3 km suaves, 2 km a ritmo medio y 1 km fuerte: acabas más rápido de lo que empiezas.', null, 'tempo', 'prog'],
+];
+function tramosSession(id, custom) {
+  let t = TRAMOS.find((x) => x[0] === id);
+  if (id === 'custom' && custom) t = ['custom', `${custom.reps} × ${custom.on} m`, `${custom.reps} repeticiones de ${custom.on} m fuertes${custom.off ? ` con ${custom.off} m al trote` : ''}.`, { warm: 1000, reps: custom.reps, on: custom.on, off: custom.off, cool: 800 }, 'series'];
+  if (!t) return null;
+  const [key, title, desc, struct, type, extra] = t;
+  if (struct) return { key, title, desc, type, struct, custom: true, m: struct.warm + struct.reps * struct.on + Math.max(0, struct.reps - 1) * struct.off + struct.cool };
+  if (extra === 'prog') { const segs = [{ label: 'Suave', say: 'Empieza suave, 3 kilómetros.', kind: 'suave', m: 3000 }, { label: 'Ritmo medio', say: 'Sube a ritmo medio, 2 kilómetros.', kind: 'fuerte', m: 2000 }, { label: 'Fuerte · último km', say: 'Último kilómetro, fuerte.', kind: 'fuerte', m: 1000 }]; return { key, title, desc, type, segs, custom: true, m: 6000 }; }
+  const segs = [{ label: 'Calentamiento', say: 'Calentamiento, mil metros suaves.', kind: 'suave', m: 1000 }];
+  extra.forEach(([on, off], i) => { segs.push({ label: `Tramo ${i + 1} de ${extra.length} · ${on} m fuerte`, say: `Tramo ${i + 1}. Fuerte, ${on} metros.`, kind: 'fuerte', m: on }); if (i < extra.length - 1) segs.push({ label: 'Recupera al trote', say: `Recupera, ${off} metros al trote.`, kind: 'suave', m: off }); });
+  segs.push({ label: 'Vuelta a la calma', say: 'Vuelta a la calma, 800 metros suaves.', kind: 'suave', m: 800 });
+  return { key, title, desc, type, segs, custom: true, m: segs.reduce((a, x) => a + x.m, 0) };
+}
+function renderTramos() {
+  const cur = prep.tramos?.key || settings.tramos || '6x400';
+  $('#tramosChips').innerHTML = TRAMOS.map(([k, t]) => `<button class="chipb ${cur === k ? 'on' : ''}" data-tr="${k}">${t}</button>`).join('') + (cur === 'custom' ? '<button class="chipb on" data-tr="custom">A mi gusto</button>' : '');
+  $$('#tramosChips [data-tr]').forEach((b) => b.onclick = () => { if (b.dataset.tr === 'custom') return; settings.tramos = b.dataset.tr; save(SET, settings); prep.tramos = tramosSession(b.dataset.tr); renderPrepSheet(); });
+}
+$('#tramosForm').onsubmit = (e) => { e.preventDefault(); const c = { reps: Math.max(1, Number($('#tReps').value) || 6), on: Math.max(100, Number($('#tOn').value) || 400), off: Math.max(0, Number($('#tOff').value) || 0) }; settings.tramos = 'custom'; settings.tramosCustom = c; save(SET, settings); prep.tramos = tramosSession('custom', c); renderPrepSheet(); };
 function renderPrepSheet() {
   const s0 = todaySession(), s = s0 && prep.light ? lightSession(s0) : s0; prep.session = s;
-  $('#prepMode').style.display = s ? '' : 'none';
-  if (!s) prepMode = 'libre'; else if (prepMode !== 'libre') prepMode = 'plan';
+  $('#prepMode [data-pm="plan"]').style.display = s ? '' : 'none';
+  if (!s && prepMode === 'plan') prepMode = 'libre';
   $$('#prepMode [data-pm]').forEach((b) => b.classList.toggle('on', b.dataset.pm === prepMode));
-  const usePlan = s && prepMode === 'plan';
-  $('#prepLbl').textContent = usePlan ? `Plan · semana ${s.week + 1}` : 'Entreno';
-  $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : 'Carrera libre';
-  $('#prepDesc').textContent = usePlan ? `${s.desc} Ritmo objetivo ~${targetPace(s.type)}/km.${s.struct ? ' Te guío por voz en cada tramo.' : ''}` : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
+  if (prepMode === 'tramos' && !prep.tramos) prep.tramos = tramosSession(settings.tramos || '6x400', settings.tramosCustom) || tramosSession('6x400');
+  $('#prepTramos').style.display = prepMode === 'tramos' ? '' : 'none'; if (prepMode === 'tramos') renderTramos();
+  const usePlan = s && prepMode === 'plan', tr = prepMode === 'tramos' ? prep.tramos : null;
+  $('#prepLbl').textContent = usePlan ? `Plan · semana ${s.week + 1}` : tr ? 'Entreno por tramos' : 'Entreno';
+  $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : tr ? `${tr.title} · ${fmtKmS(tr.m)} km` : 'Carrera libre';
+  $('#prepDesc').textContent = usePlan ? `${s.desc} Ritmo objetivo ~${targetPace(s.type)}/km.${s.struct ? ' Te guío por voz en cada tramo.' : ''}` : tr ? `${tr.desc} Ritmo fuerte ~${targetPace(tr.type)}/km. Te guío por voz en cada tramo.` : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
   $('#prepLight').style.display = usePlan ? '' : 'none'; $('#prepLight').textContent = s && s.light ? 'Volver a la sesión completa' : 'Hoy no estoy al 100 %';
   $('#prepRoute').style.display = pickedRoute ? 'flex' : 'none';
   if (pickedRoute) { $('#prepRouteName').textContent = pickedRoute.name; prepStartHint(); }
@@ -1446,7 +1477,7 @@ const run = { active: false, paused: false, points: [], dist: 0, start: 0, pause
 $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
   Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1 });
-  run.session = prep.session && prepMode === 'plan' ? prep.session : null; run.guide = buildGuide(run.session); run.route = pickedRoute;
+  run.session = prep.session && prepMode === 'plan' ? prep.session : prepMode === 'tramos' ? prep.tramos : null; run.guide = buildGuide(run.session); run.route = pickedRoute;
   run.nav = run.route ? buildNav(run.route.ll) : null; run.heading = null;
   run.ghostRef = run.route ? bestOnRoute(run.route.id) : null; $('#runGhost').classList.toggle('on', !!run.ghostRef); if (run.ghostRef) { $('#ghostBest').textContent = fmtTime(run.ghostRef.dur); updateGhost(); }
   if (run.nav && lastFix && haversine(lastFix, run.nav.pts[0]) > 50) run.nav.phase = 'start';
@@ -1581,7 +1612,7 @@ function finishRun() {
   if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }
   run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
-  if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light };
+  if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom };
   if (run.route) { r.route = { id: run.route.id, name: run.route.name }; if (run.ghostRef) r.ghost = { ref: run.ghostRef.id, refDur: run.ghostRef.dur }; }
   if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
   if (wx.data && Date.now() - wx.at < 4 * 3600e3) r.wx = { t: wx.data.t, wind: wx.data.wind, rain: wx.data.now ? 1 : 0 };
@@ -1590,7 +1621,7 @@ function finishRun() {
   const newB = badges().filter((b) => b.when && !before.includes(b.id)); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
-  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.session && r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
+  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.session && r.dist >= r.session.m * 0.9 ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   const okS = r.splits.filter((x) => !x.partial), bestS = okS.length ? okS.reduce((a, x) => (x.split < a.split ? x : a)) : null;
@@ -1628,6 +1659,7 @@ function openSummary(id) {
     <div><span class="lbl">Mejor km</span><span><span class="num" style="font-size:26px">${okSplits.length ? fmtPace(Math.min(...okSplits.map((s) => s.split))) : '–:––'}</span><span class="unit">/km</span></span></div>`;
   const info = [];
   if (plan) { const ps1 = planStatus(plan).flat().find((x) => x.run && x.run.id === r.id); if (ps1) info.push(`Plan · semana ${ps1.week + 1} · ${ps1.title} ${fmtKmS(ps1.m)} km · ${r.dist >= ps1.m * 0.9 ? 'cumplida' : 'parcial'}${ps1.moved ? ' (otro día)' : ''}`); }
+  if (r.session?.custom) info.push(`Entreno por tramos: ${r.session.title}`);
   if (r.route) info.push('Ruta: ' + r.route.name);
   if (r.gain != null) info.push(`Desnivel: +${r.gain} m`);
   if (r.manual) info.push('Añadida a mano (cinta o reloj)');
@@ -1661,7 +1693,8 @@ function runInsights(r) {
   const longest = prev.length ? Math.max(...prev.map((x) => x.dist)) : 0; if (prev.length >= 2 && r.dist > longest) out.push('Es tu carrera más larga hasta ahora.');
   const wk = runs.filter((x) => x.start >= weekStart(r.start) && x.start < weekStart(r.start) + 7 * 864e5 && x.start <= r.start).length; if (wk >= 3) out.push(`Van ${wk} carreras esta semana.`);
   { const ws1 = weekStart(r.start), wkm = runs.filter((x) => x.start >= ws1 && x.start < ws1 + 7 * 864e5 && x.start <= r.start).reduce((a, x) => a + x.dist, 0), p4 = runs.filter((x) => x.start >= ws1 - 28 * 864e5 && x.start < ws1).reduce((a, x) => a + x.dist, 0) / 4; if (p4 > 3000 && wkm > p4 * 1.35) out.push(`Esta semana llevas ${fmtKmS(wkm)} km, un ${Math.round((wkm / p4 - 1) * 100)} % más que tu media: subir más del 10 % por semana es la forma más fácil de lesionarse.`); }
-  if (r.session) out.push(r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : `Sesión del plan a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km; el lunes lo tengo en cuenta.`);
+  if (r.session?.custom) out.push(r.dist >= r.session.m * 0.9 ? 'Entreno por tramos completado.' : `Entreno por tramos a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km.`);
+  else if (r.session) out.push(r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : `Sesión del plan a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km; el lunes lo tengo en cuenta.`);
   return out.slice(0, 3).join(' ');
 }
 $('#replayBtn').onclick = () => openReplay();
