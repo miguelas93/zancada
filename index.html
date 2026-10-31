@@ -321,7 +321,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.24 · por meses · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.25 · ficha de ruta ampliada · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -355,6 +355,8 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="card col" id="rdProfileCard" style="gap:8px;padding:18px 20px"><div class="between"><h2>Perfil</h2><span class="sub" id="rdProfileSub"></span></div><div id="rdProfile" style="color:var(--ink)"></div></div>
     <div class="card col" id="rdAbout" style="gap:8px;padding:18px 20px"><h2 id="rdSurface"></h2><p id="rdWhy" style="margin:0;font-size:14px;line-height:1.45"></p><p id="rdAccess" class="sub" style="margin:0;font-size:13px;line-height:1.45"></p></div>
     <div class="card col" style="gap:10px;padding:18px 20px"><h2>Cómo llegar</h2><p id="rdAway" style="margin:0;font-size:14px;line-height:1.45"></p><a class="btn sec" id="rdMaps" target="_blank" rel="noopener" style="text-decoration:none;height:48px;font-size:15px">Transporte público (Google Maps)</a><div style="display:flex;gap:8px"><button class="btn ghost" id="rdShare" style="height:44px;font-size:14px">Compartir la ruta</button><button class="btn ghost" id="rdGpx" style="height:44px;font-size:14px">GPX de la ruta</button></div></div>
+    <div class="card col" id="rdNowCard" style="gap:6px;padding:18px 20px;display:none"><h2>Ahora mismo allí</h2><p id="rdNow" class="sub" style="margin:0;font-size:14px;line-height:1.45;white-space:pre-line"></p></div>
+    <div class="col" id="rdSimilarWrap" style="gap:10px;display:none"><h2 style="padding:0 4px">Parecidas</h2><div class="col" id="rdSimilar" style="gap:10px"></div></div>
   </div>
   <div style="position:fixed;left:16px;right:16px;bottom:calc(var(--sab) + 14px);z-index:1000"><button class="btn" id="rdRun">Correr esta ruta</button></div>
 </section>
@@ -948,8 +950,8 @@ function renderBadges() {
 const wx = { at: 0, data: null, p: null };
 async function loadWeather(lat, lon) {
   if (wx.p || (wx.data && Date.now() - wx.at < 20 * 60e3 && haversine(wx.p0, { lat, lon }) < 3000)) return wx.data;
-  wx.p = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code&hourly=precipitation_probability&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(6000) })
-    .then((r) => r.json()).then((j) => { const c = j.current, h = new Date().getHours(), pp = j.hourly?.precipitation_probability || []; wx.data = { t: Math.round(c.temperature_2m), app: Math.round(c.apparent_temperature), wind: Math.round(c.wind_speed_10m), rain: Math.max(pp[h] || 0, pp[h + 1] || 0), now: c.precipitation > 0, code: c.weather_code }; wx.at = Date.now(); wx.p0 = { lat, lon }; return wx.data; })
+  wx.p = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code&hourly=precipitation_probability&daily=sunrise,sunset&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(6000) })
+    .then((r) => r.json()).then((j) => { const c = j.current, h = new Date().getHours(), pp = j.hourly?.precipitation_probability || []; wx.data = { t: Math.round(c.temperature_2m), app: Math.round(c.apparent_temperature), wind: Math.round(c.wind_speed_10m), rain: Math.max(pp[h] || 0, pp[h + 1] || 0), now: c.precipitation > 0, code: c.weather_code, sunrise: j.daily?.sunrise?.[0]?.slice(11, 16) || null, sunset: j.daily?.sunset?.[0]?.slice(11, 16) || null }; wx.at = Date.now(); wx.p0 = { lat, lon }; return wx.data; })
     .catch(() => null).finally(() => { wx.p = null; });
   return wx.p;
 }
@@ -1423,6 +1425,11 @@ function renderRouteDetail() {
   if (r.src === 'rec') { $('#rdSurface').textContent = `${r.surface} · ${r.loop === false ? 'ida y vuelta' : 'bucle'}`; $('#rdWhy').textContent = r.why; $('#rdAccess').textContent = r.access || ''; }
   const st = r.start || { lat: r.ll[0][0], lon: r.ll[0][1] }, away = rt.here ? haversine(rt.here, st) : null;
   $('#rdAway').textContent = away == null ? 'Activa la ubicación para saber a cuánto estás de la salida.' : away <= 60 ? 'Estás en la salida.' : away <= 2500 ? `La salida está ${fmtAway(away / 1000)} de ti: al empezar te llevo hasta allí (cuenta como calentamiento).` : `La salida está ${fmtAway(away / 1000)} de ti: mejor ir en transporte.`;
+  // Clima y luz en la salida, y otras rutas parecidas de la misma zona (para seguir descubriendo sin volver a la lista)
+  $('#rdNowCard').style.display = 'none'; const rdTok = (renderRouteDetail.tok = (renderRouteDetail.tok || 0) + 1);
+  loadWeather(st.lat, st.lon).then((w) => { if (!w || rdTok !== renderRouteDetail.tok || detailRoute !== r) return; const h = new Date().getHours(), light = w.sunset ? (h >= 6 && h < 20 ? `Anochece a las ${w.sunset}.` : `Amanece a las ${w.sunrise}.`) : ''; $('#rdNow').textContent = wxText(w) + (light ? ' ' + light : '') + (r.why && /noche|iluminad|farol/i.test(r.why) ? '' : (h >= 19 || h < 7) && r.surf === 'tierra' ? ' De noche, los caminos de tierra van peor: mejor asfalto.' : ''); $('#rdNowCard').style.display = ''; });
+  const sim = r.src === 'rec' ? ZR.filter((x) => x.id !== r.id && x.city === r.city).map((x) => Object.assign({}, x)).sort((a, b) => Math.abs(a.km - r.km) - Math.abs(b.km - r.km)).slice(0, 3) : [];
+  $('#rdSimilarWrap').style.display = sim.length ? '' : 'none'; if (sim.length) { withAway(sim); $('#rdSimilar').innerHTML = sim.map(routeCard).join(''); $$('#rdSimilar [data-open]').forEach((b) => b.onclick = () => { openRoute(sim[Number(b.dataset.open)]); $('#routeDetail').scrollTop = 0; }); }
   const hist = runs.filter((x) => x.route?.id === r.id || 'run-' + x.id === r.id), bestR = bestOnRoute(r.id);
   if (bestR) $('#rdAway').textContent += ` La has corrido ${hist.length === 1 ? 'una vez' : hist.length + ' veces'}; tu mejor tiempo, ${fmtTime(bestR.dur)}: al repetirla te comparo en directo con esa marca.`;
   $('#rdMaps').href = `https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lon}&travelmode=transit`;
