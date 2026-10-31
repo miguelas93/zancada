@@ -318,7 +318,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.19 · entrenador IA · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.20 · corre y anda · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -419,7 +419,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
   </div>
   <div class="sheet col" style="gap:16px">
     <div><div class="handle"></div><div class="seg" id="prepMode"><button class="on" data-pm="plan">Plan</button><button data-pm="libre">Libre</button><button data-pm="tramos">Tramos</button></div></div>
-    <div id="prepTramos" class="col" style="display:none;gap:8px"><div class="chips fl" id="tramosChips" style="margin:0 -20px;padding:0 20px"></div><form id="tramosForm" style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="tReps" type="number" min="1" max="30" inputmode="numeric" value="6" aria-label="Repeticiones" style="width:52px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">×<input id="tOn" type="number" min="100" max="5000" step="100" inputmode="numeric" value="400" aria-label="Metros fuertes" style="width:68px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m · rec.<input id="tOff" type="number" min="0" max="2000" step="50" inputmode="numeric" value="200" aria-label="Metros de recuperación" style="width:62px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m<button class="btn sec" type="submit" style="width:auto;height:38px;padding:0 12px;font-size:13px;margin-left:auto">Usar</button></form></div>
+    <div id="prepTramos" class="col" style="display:none;gap:8px"><div class="chips fl" id="tramosChips" style="margin:0 -20px;padding:0 20px"></div><form id="tramosForm" style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="tReps" type="number" min="1" max="30" inputmode="numeric" value="6" aria-label="Repeticiones" style="width:52px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">×<input id="tOn" type="number" min="100" max="5000" step="100" inputmode="numeric" value="400" aria-label="Metros fuertes" style="width:68px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center"><select id="tUnit" aria-label="Unidad" style="height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:13px;padding:0 4px"><option value="m">m</option><option value="min">min</option></select>· rec.<input id="tOff" type="number" min="0" max="2000" step="50" inputmode="numeric" value="200" aria-label="Recuperación" style="width:62px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center"><span id="tUnit2">m</span><button class="btn sec" type="submit" style="width:auto;height:38px;padding:0 12px;font-size:13px;margin-left:auto">Usar</button></form></div>
     <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p><p class="sub" id="prepWx" style="display:none;margin:8px 0 0;font-size:13px;line-height:1.45;white-space:pre-line"></p></div>
     <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <div class="chips fl" id="prepGoal" style="display:none;margin:-4px -20px 0;padding:0 20px"><button class="chipb on" data-goal="0">Sin objetivo</button><button class="chipb" data-goal="3000">3 km</button><button class="chipb" data-goal="5000">5 km</button><button class="chipb" data-goal="10000">10 km</button><button class="chipb" data-goal="t20">20 min</button><button class="chipb" data-goal="t30">30 min</button><button class="chipb" data-goal="t60">60 min</button></div>
@@ -1208,12 +1208,13 @@ function buildGuide(s) {
 }
 function updateGuide() {
   const g = run.guide; if (!g) return;
-  let acc = 0, i = 0; while (i < g.length && run.dist >= acc + g[i].m) { acc += g[i].m; i++; }
+  const timed = g[0].sec != null, pos = timed ? elapsed() : run.dist, len = (x) => timed ? x.sec : x.m;
+  let acc = 0, i = 0; while (i < g.length && pos >= acc + len(g[i])) { acc += len(g[i]); i++; }
   if (i >= g.length) { if (run.guideIdx !== 'done') { run.guideIdx = 'done'; const isGoal = run.session?.goal; $('#gLabel').textContent = isGoal ? 'Objetivo cumplido' : 'Sesión completada'; $('#gLabel').className = 'num'; $('#gStep').textContent = 'lo que corras ahora suma'; $('#gLeft').textContent = '0'; $('#gTrack').style.width = '100%'; speak(isGoal ? 'Objetivo cumplido. Lo que corras ahora suma.' : 'Sesión completada. Enhorabuena.'); } return; }
-  const seg = g[i], left = Math.max(0, acc + seg.m - run.dist);
-  if (run.guideIdx !== i) { run.guideIdx = i; $('#gLabel').textContent = seg.label; $('#gLabel').className = 'num ' + seg.kind; $('#gStep').textContent = `paso ${i + 1} de ${g.length}`; if (run.dist > 0 || i > 0) speak(seg.say); }
-  $('#gLeft').textContent = left >= 1000 ? fmtKmS(left) + ' k' : String(Math.round(left / 10) * 10);
-  $('#gTrack').style.width = ((seg.m - left) / seg.m * 100) + '%';
+  const seg = g[i], left = Math.max(0, acc + len(seg) - pos);
+  if (run.guideIdx !== i) { run.guideIdx = i; $('#gLabel').textContent = seg.label; $('#gLabel').className = 'num ' + seg.kind; $('#gStep').textContent = `paso ${i + 1} de ${g.length}`; if (run.dist > 0 || i > 0 || timed) speak(seg.say); }
+  $('#gLeft').textContent = timed ? fmtTime(left) : left >= 1000 ? fmtKmS(left) + ' k' : String(Math.round(left / 10) * 10); $('#gUnit').textContent = timed ? '' : 'm';
+  $('#gTrack').style.width = ((len(seg) - left) / len(seg) * 100) + '%';
 }
 
 // ---------- rutas ----------
@@ -1492,14 +1493,25 @@ const TRAMOS = [
   ['5x1000', '5 × 1000 m', 'Series largas: 5 repeticiones de 1 km con 400 m al trote.', { warm: 1200, reps: 5, on: 1000, off: 400, cool: 800 }, 'series'],
   ['tempo4', 'Tempo 4 km', 'Calienta, 4 km a ritmo controlado (incómodo pero sostenible) y vuelta a la calma.', { warm: 1200, reps: 1, on: 4000, off: 0, cool: 800 }, 'tempo'],
   ['piramide', 'Pirámide', '200-400-600-800-600-400-200 m fuertes con 200 m al trote entre ellas.', null, 'series', [200, 400, 600, 800, 600, 400, 200].map((m) => [m, 200])],
+  ['anda1', 'Corre 1 min · anda 1,5 ×8', 'Para empezar a correr (semana 1): 5 min andando, 8 veces 1 min corriendo y 1,5 min andando, y 5 min andando.', null, 'suave', { t: true, warm: 300, reps: 8, on: 60, off: 90, cool: 300, walk: true }],
+  ['anda3', 'Corre 3 min · anda 1,5 ×5', 'Siguiente paso: 5 min andando, 5 veces 3 min corriendo y 1,5 min andando, y 5 min andando.', null, 'suave', { t: true, warm: 300, reps: 5, on: 180, off: 90, cool: 300, walk: true }],
+  ['fartlek', 'Fartlek 10 × 1 min', 'Por tiempo: 10 min suaves, 10 veces 1 min fuerte y 1 min suave, y 5 min de calma.', null, 'series', { t: true, warm: 600, reps: 10, on: 60, off: 60, cool: 300 }],
   ['progresivo', 'Progresivo 6 km', '3 km suaves, 2 km a ritmo medio y 1 km fuerte: acabas más rápido de lo que empiezas.', null, 'tempo', 'prog'],
 ];
+const fmtMin = (sec) => sec % 60 ? `${Math.floor(sec / 60)},${Math.round((sec % 60) / 6)} min` : `${sec / 60} min`;
 function tramosSession(id, custom) {
   let t = TRAMOS.find((x) => x[0] === id);
-  if (id === 'custom' && custom) t = ['custom', `${custom.reps} × ${custom.on} m`, `${custom.reps} repeticiones de ${custom.on} m fuertes${custom.off ? ` con ${custom.off} m al trote` : ''}.`, { warm: 1000, reps: custom.reps, on: custom.on, off: custom.off, cool: 800 }, 'series'];
+  if (id === 'custom' && custom && custom.t) t = ['custom', `${custom.reps} × ${fmtMin(custom.on)}`, `${custom.reps} repeticiones de ${fmtMin(custom.on)} fuertes${custom.off ? ` con ${fmtMin(custom.off)} suaves` : ''}, con 5 min de calentamiento y de calma.`, null, 'series', { t: true, warm: 300, reps: custom.reps, on: custom.on, off: custom.off, cool: 300 }];
+  else if (id === 'custom' && custom) t = ['custom', `${custom.reps} × ${custom.on} m`, `${custom.reps} repeticiones de ${custom.on} m fuertes${custom.off ? ` con ${custom.off} m al trote` : ''}.`, { warm: 1000, reps: custom.reps, on: custom.on, off: custom.off, cool: 800 }, 'series'];
   if (!t) return null;
   const [key, title, desc, struct, type, extra] = t;
   if (struct) return { key, title, desc, type, struct, custom: true, m: struct.warm + struct.reps * struct.on + Math.max(0, struct.reps - 1) * struct.off + struct.cool };
+  if (extra && extra.t) { // tramos por tiempo (corre/anda, fartlek): la guía avanza con el reloj, no con los metros
+    const x = extra, w = x.walk, segs = [{ label: w ? 'Calienta andando' : 'Calentamiento suave', say: w ? `Empieza andando ${fmtMin(x.warm)}.` : `Calentamiento, ${fmtMin(x.warm)} suaves.`, kind: 'suave', sec: x.warm }];
+    for (let k = 1; k <= x.reps; k++) { segs.push({ label: `${w ? 'Corre' : 'Fuerte'} ${k} de ${x.reps} · ${fmtMin(x.on)}`, say: `${w ? 'Corre' : 'Fuerte'}, ${fmtMin(x.on)}.`, kind: 'fuerte', sec: x.on }); if (x.off && k < x.reps) segs.push({ label: w ? 'Anda' : 'Suave', say: w ? `Anda ${fmtMin(x.off)}.` : `Suave, ${fmtMin(x.off)}.`, kind: 'suave', sec: x.off }); }
+    segs.push({ label: w ? 'Acaba andando' : 'Vuelta a la calma', say: w ? `Ya está. Acaba andando ${fmtMin(x.cool)}.` : `Vuelta a la calma, ${fmtMin(x.cool)} suaves.`, kind: 'suave', sec: x.cool });
+    const sec = segs.reduce((a, q) => a + q.sec, 0); return { key, title, desc, type, segs, custom: true, timed: true, min: Math.round(sec / 60), m: Math.round(sec / userPace() * 1000 * (w ? 0.7 : 1)) };
+  }
   if (extra === 'prog') { const segs = [{ label: 'Suave', say: 'Empieza suave, 3 kilómetros.', kind: 'suave', m: 3000 }, { label: 'Ritmo medio', say: 'Sube a ritmo medio, 2 kilómetros.', kind: 'fuerte', m: 2000 }, { label: 'Fuerte · último km', say: 'Último kilómetro, fuerte.', kind: 'fuerte', m: 1000 }]; return { key, title, desc, type, segs, custom: true, m: 6000 }; }
   const segs = [{ label: 'Calentamiento', say: 'Calentamiento, mil metros suaves.', kind: 'suave', m: 1000 }];
   extra.forEach(([on, off], i) => { segs.push({ label: `Tramo ${i + 1} de ${extra.length} · ${on} m fuerte`, say: `Tramo ${i + 1}. Fuerte, ${on} metros.`, kind: 'fuerte', m: on }); if (i < extra.length - 1) segs.push({ label: 'Recupera al trote', say: `Recupera, ${off} metros al trote.`, kind: 'suave', m: off }); });
@@ -1511,7 +1523,8 @@ function renderTramos() {
   $('#tramosChips').innerHTML = TRAMOS.map(([k, t]) => `<button class="chipb ${cur === k ? 'on' : ''}" data-tr="${k}">${t}</button>`).join('') + (cur === 'custom' ? '<button class="chipb on" data-tr="custom">A mi gusto</button>' : '');
   $$('#tramosChips [data-tr]').forEach((b) => b.onclick = () => { if (b.dataset.tr === 'custom') return; settings.tramos = b.dataset.tr; save(SET, settings); prep.tramos = tramosSession(b.dataset.tr); renderPrepSheet(); });
 }
-$('#tramosForm').onsubmit = (e) => { e.preventDefault(); const c = { reps: Math.max(1, Number($('#tReps').value) || 6), on: Math.max(100, Number($('#tOn').value) || 400), off: Math.max(0, Number($('#tOff').value) || 0) }; settings.tramos = 'custom'; settings.tramosCustom = c; save(SET, settings); prep.tramos = tramosSession('custom', c); renderPrepSheet(); };
+$('#tUnit').onchange = () => { const min = $('#tUnit').value === 'min'; $('#tUnit2').textContent = min ? 'min' : 'm'; $('#tOn').step = min ? 0.5 : 100; $('#tOn').min = min ? 0.5 : 100; $('#tOff').step = min ? 0.5 : 50; if (min) { $('#tOn').value = 1; $('#tOff').value = 1; } else { $('#tOn').value = 400; $('#tOff').value = 200; } };
+$('#tramosForm').onsubmit = (e) => { e.preventDefault(); const min = $('#tUnit').value === 'min'; const c = min ? { t: true, reps: Math.max(1, Number($('#tReps').value) || 6), on: Math.round(Math.max(0.5, Number($('#tOn').value) || 1) * 60), off: Math.round(Math.max(0, Number($('#tOff').value) || 0) * 60) } : { reps: Math.max(1, Number($('#tReps').value) || 6), on: Math.max(100, Number($('#tOn').value) || 400), off: Math.max(0, Number($('#tOff').value) || 0) }; settings.tramos = 'custom'; settings.tramosCustom = c; save(SET, settings); prep.tramos = tramosSession('custom', c); renderPrepSheet(); };
 function renderPrepSheet() {
   const s0 = todaySession(), s = s0 && prep.light ? lightSession(s0) : s0; prep.session = s;
   $('#prepMode [data-pm="plan"]').style.display = s ? '' : 'none';
@@ -1521,7 +1534,7 @@ function renderPrepSheet() {
   $('#prepTramos').style.display = prepMode === 'tramos' ? '' : 'none'; if (prepMode === 'tramos') renderTramos();
   const usePlan = s && prepMode === 'plan', tr = prepMode === 'tramos' ? prep.tramos : null;
   $('#prepLbl').textContent = usePlan ? `Plan · semana ${s.week + 1}` : tr ? 'Entreno por tramos' : 'Entreno';
-  $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : tr ? `${tr.title} · ${fmtKmS(tr.m)} km` : 'Carrera libre';
+  $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : tr ? `${tr.title} · ${tr.timed ? tr.min + ' min' : fmtKmS(tr.m) + ' km'}` : 'Carrera libre';
   $('#prepDesc').textContent = usePlan ? `${s.desc} Ritmo objetivo ~${targetPace(s.type)}/km.${s.struct ? ' Te guío por voz en cada tramo.' : ''}` : tr ? `${tr.desc} Ritmo fuerte ~${targetPace(tr.type)}/km. Te guío por voz en cada tramo.` : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
   $('#prepGoal').style.display = prepMode === 'libre' ? '' : 'none'; $$('#prepGoal [data-goal]').forEach((b) => b.classList.toggle('on', b.dataset.goal === String(prep.goal || '0')));
   if (prepMode === 'libre' && prep.goal && prep.goal !== '0') { const g = goalSession(prep.goal); $('#prepTitle').textContent = `Carrera libre · ${g.title}`; $('#prepDesc').textContent = `${g.desc} Sin más guía: ritmo y parciales en directo.`; }

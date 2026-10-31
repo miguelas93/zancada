@@ -1,6 +1,6 @@
 {
   "name": "zancada",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "private": true,
   "description": "Zancada beta: envoltorio Android (Capacitor) de la web",
   "dependencies": {
