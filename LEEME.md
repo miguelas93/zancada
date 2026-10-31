@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.49 (31 oct 2026)
+
+- **Revisión**: los ánimos por voz ya no interrumpen la guía en las sesiones por tramos (series, corre/anda), donde manda la voz de cada tramo.
+- **Accesibilidad**: los avisos emergentes se leen con el lector de pantalla y las ventanas de estiramientos, cinta y carrera a mano se anuncian como diálogos.
+
 ## Novedades 0.48 (31 oct 2026)
 
 - **Ánimos por voz** cuando corres con un objetivo o una sesión: "Mitad hecha" con tu ritmo medio, "Último kilómetro" y "Doscientos metros". En objetivos por tiempo, mitad del tiempo y último minuto. No pisan el aviso de cada kilómetro.

@@ -168,10 +168,10 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
-<div class="modal" id="stretchModal"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl" id="stStep">Estiramientos</span><button class="sub" id="stClose" style="font-size:13px;text-decoration:underline">Cerrar</button></div><h1 style="font-size:28px" id="stName">—</h1><p class="sub" id="stHow" style="margin:0;font-size:15px;line-height:1.45"></p><div style="display:flex;align-items:baseline;gap:6px"><span class="num" id="stLeft" style="font-size:72px;letter-spacing:-.04em">40</span><span class="unit">s</span></div><div class="track"><i id="stTrack" style="width:0"></i></div><div style="display:flex;gap:8px"><button class="btn sec" id="stPause" style="height:48px;font-size:15px;flex:1">Pausa</button><button class="btn sec" id="stSkip" style="height:48px;font-size:15px;flex:1">Siguiente</button></div><p class="sub" style="margin:0;font-size:11px">Suave y sin rebotes: tensión, nunca dolor.</p></div></div>
-<div class="modal" id="cintaModal"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl">Cinta · sin GPS</span><button class="sub" id="cClose" style="font-size:13px;text-decoration:underline">Cancelar</button></div><span class="num" id="cTime" style="font-size:84px;letter-spacing:-.04em;text-align:center">0:00</span><p class="sub" id="cHint" style="margin:0;text-align:center;font-size:14px">Te aviso por voz cada 5 minutos. Al terminar, apunta los km que marca la cinta.</p><div style="display:flex;gap:8px"><button class="btn sec" id="cPause" style="height:52px;font-size:15px;flex:1">Pausa</button><button class="btn" id="cEnd" style="height:52px;font-size:15px;flex:1">Terminar</button></div></div></div>
-<div class="modal" id="manualModal"><form class="card col" style="gap:12px" id="manualForm">
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal" id="stretchModal" role="dialog" aria-modal="true" aria-label="Estiramientos y calentamiento guiados"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl" id="stStep">Estiramientos</span><button class="sub" id="stClose" style="font-size:13px;text-decoration:underline">Cerrar</button></div><h1 style="font-size:28px" id="stName">—</h1><p class="sub" id="stHow" style="margin:0;font-size:15px;line-height:1.45"></p><div style="display:flex;align-items:baseline;gap:6px"><span class="num" id="stLeft" style="font-size:72px;letter-spacing:-.04em">40</span><span class="unit">s</span></div><div class="track"><i id="stTrack" style="width:0"></i></div><div style="display:flex;gap:8px"><button class="btn sec" id="stPause" style="height:48px;font-size:15px;flex:1">Pausa</button><button class="btn sec" id="stSkip" style="height:48px;font-size:15px;flex:1">Siguiente</button></div><p class="sub" style="margin:0;font-size:11px">Suave y sin rebotes: tensión, nunca dolor.</p></div></div>
+<div class="modal" id="cintaModal" role="dialog" aria-modal="true" aria-label="Cronómetro de cinta"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl">Cinta · sin GPS</span><button class="sub" id="cClose" style="font-size:13px;text-decoration:underline">Cancelar</button></div><span class="num" id="cTime" style="font-size:84px;letter-spacing:-.04em;text-align:center">0:00</span><p class="sub" id="cHint" style="margin:0;text-align:center;font-size:14px">Te aviso por voz cada 5 minutos. Al terminar, apunta los km que marca la cinta.</p><div style="display:flex;gap:8px"><button class="btn sec" id="cPause" style="height:52px;font-size:15px;flex:1">Pausa</button><button class="btn" id="cEnd" style="height:52px;font-size:15px;flex:1">Terminar</button></div></div></div>
+<div class="modal" id="manualModal" role="dialog" aria-modal="true" aria-label="Añadir carrera a mano"><form class="card col" style="gap:12px" id="manualForm">
     <h2>Carrera a mano</h2><p class="sub" style="margin:0;font-size:13px">Para la cinta o una carrera medida con el reloj. Sin mapa ni parciales, pero cuenta para la semana, el plan, las insignias y las zapatillas.</p>
     <label class="setrow">Fecha y hora<input type="datetime-local" id="mDate" required style="height:40px;border-radius:10px;border:1px solid var(--line);padding:0 10px;background:var(--surface2);color:var(--ink);font:inherit"></label>
     <label class="setrow">Distancia (km)<input type="number" id="mKm" step="0.01" min="0.1" max="100" inputmode="decimal" placeholder="5,0" required style="width:110px;height:40px;border-radius:10px;border:1px solid var(--line);padding:0 10px;background:var(--surface2);color:var(--ink);font:inherit"></label>
@@ -179,7 +179,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <label class="setrow">Nombre<input id="mName" maxlength="40" placeholder="Cinta en el gimnasio" style="flex:1;height:40px;border-radius:10px;border:1px solid var(--line);padding:0 10px;background:var(--surface2);color:var(--ink);font:inherit"></label>
     <div style="display:flex;gap:8px"><button class="btn sec" type="button" id="mCancel" style="height:46px">Cancelar</button><button class="btn" type="submit" style="height:46px">Guardar</button></div>
   </form></div>
-  <div class="modal" id="shortModal"><div class="card col" style="gap:12px">
+  <div class="modal" id="shortModal" role="dialog" aria-modal="true" aria-label="Carrera muy corta"><div class="card col" style="gap:12px">
   <h1 style="font-size:24px">Carrera muy corta</h1>
   <p style="margin:0" class="sub" id="shortText">Has recorrido menos de 50 m. ¿La guardo igualmente?</p>
   <button class="btn" id="shortSave">Guardar igualmente</button>
@@ -331,7 +331,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.48 · ánimos por voz · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.49 · revisión y accesibilidad · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1959,7 +1959,7 @@ function tick() {
 }
 // Ánimos por voz (adidas/NRC): mitad del objetivo, último kilómetro y 200 m finales (desplazados 80 m para no pisar el aviso de cada km); en objetivos por tiempo, mitad y último minuto.
 function cheer(el) {
-  const ss = run.session; if (!ss || run.paused) return; run.cheer = run.cheer || {};
+  const ss = run.session; if (!ss || run.paused || (run.guide && run.guide.length > 1)) return; run.cheer = run.cheer || {};   // en sesiones por tramos manda la guía: no la interrumpimos
   const say = (k, t) => { if (!run.cheer[k]) { run.cheer[k] = 1; speak(t); } }, avg = () => run.dist > 100 ? ` Ritmo medio ${fmtPace(el / (run.dist / 1000)).replace(':', ' ')}.` : '';
   if (ss.min) { const T = ss.min * 60; if (T < 600) return; if (el >= T / 2 + 10) say('half', `Mitad del tiempo.${avg()} Sigue así.`); if (el >= T - 60 && el < T) say('last', 'Último minuto.'); return; }
   const T = ss.m; if (!(T >= 2000)) return;
