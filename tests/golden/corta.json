@@ -1,0 +1,9 @@
+{
+ "track": "corta",
+ "desc": "Solo 20 m: la app pregunta si guardarla (se descarta)",
+ "expected": {
+  "saved": false,
+  "screen": "run",
+  "askShort": true
+ }
+}

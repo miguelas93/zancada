@@ -1,0 +1,8 @@
+{
+  "name": "zancada-tests",
+  "private": true,
+  "description": "Pruebas automáticas de Zancada (carreras simuladas y pantallas)",
+  "type": "module",
+  "scripts": { "test": "node run-tests.mjs", "update": "node run-tests.mjs --update" },
+  "devDependencies": { "playwright": "1.63.0" }
+}

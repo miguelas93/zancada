@@ -336,7 +336,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.58 · GPS con pantalla apagada · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.59 · copia de seguridad en la app · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1172,7 +1172,22 @@ function renderShoes() {
 }
 $('#shoeForm').onsubmit = (e) => { e.preventDefault(); const name = $('#shoeName').value.trim(); if (!name) return; const sh = { id: 's' + Date.now(), name, km0: Number($('#shoeKm0').value) || 0, created: Date.now() }; shoes.unshift(sh); settings.shoe = sh.id; save(SHOES, shoes); save(SET, settings); $('#shoeName').value = ''; $('#shoeKm0').value = ''; renderShoes(); toast('Par añadido y en uso'); };
 // ---------- copia de seguridad ----------
+// Dentro del APK (WebView) ni navigator.share con archivos ni la descarga con <a download> funcionan: el botón no hacía nada.
+// Allí se escribe el archivo en la caché de la app (plugin Filesystem) y se abre el menú de compartir de Android (plugin Share):
+// Drive, Telegram, WhatsApp, Gmail, «Guardar en el dispositivo»…
+const CapFS = window.Capacitor?.Plugins?.Filesystem || null, CapShare = window.Capacitor?.Plugins?.Share || null;
+async function nativeShare(blob, name, text) {
+  if (!CapFS || !CapShare || !window.Capacitor?.isNativePlatform?.()) return false;
+  try {
+    const isText = /^(text\/|application\/(json|gpx|xml))/.test(blob.type || '');
+    const data = isText ? await blob.text() : await new Promise((ok, ko) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1]); fr.onerror = ko; fr.readAsDataURL(blob); });
+    const { uri } = await CapFS.writeFile({ path: name, data, directory: 'CACHE', ...(isText ? { encoding: 'utf8' } : {}) });
+    await CapShare.share({ title: name, text, files: [uri], dialogTitle: 'Guardar o enviar' });
+    return true;
+  } catch (e) { if (/cancel/i.test(String(e?.message || e))) return true; toast('No he podido compartir el archivo: ' + (e?.message || e), 4000); return true; }
+}
 async function shareOrDownload(blob, name, text) {
+  if (await nativeShare(blob, name, text)) return true;
   const file = new File([blob], name, { type: blob.type });
   if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text }); return true; } catch (e) { if (e.name === 'AbortError') return false; } }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
@@ -2471,6 +2486,7 @@ async function shareImage(r) {
   const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
   const file = new File([blob], `zancada-${new Date(r.start).toISOString().slice(0, 10)}.png`, { type: 'image/png' });
   const text = `He corrido ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))} /km) con Zancada 🏃${recs.length ? ' · récord personal: ' + recs.join(', ').toLowerCase() : ''}`;
+  if (await nativeShare(blob, file.name, text)) return;
   if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   toast('Imagen guardada en descargas', 3000);
@@ -2531,7 +2547,8 @@ history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
 zetaFabFor(profile.done ? 'home' : 'welcome');
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
-const NEWS_VER = '0.58', NEWS = [
+const NEWS_VER = '0.59', NEWS = [
+  ['Copia de seguridad', 'en Perfil, «Exportar copia» ya funciona dentro de la app de Android: abre el menú de compartir para guardarla en Drive, Telegram o el móvil. Hazla antes de la próxima gran actualización. También funcionan así el GPX, el CSV y la imagen de tu carrera.'],
   ['GPS arreglado', 'en la app de Android la carrera sigue grabando con la pantalla apagada o en otra app (verás la notificación «Zancada está grabando»). En la web, deja la pantalla encendida.'],
   ['Tiempo final', 'la pantalla de fin de carrera ya enseña el tiempo de verdad, no 0:00.'],
   ['Zeta, tu entrenador IA', 'el botón redondo de la esquina: tócalo y pregúntale lo que quieras. Conoce tu plan, tus carreras y tus récords.'],

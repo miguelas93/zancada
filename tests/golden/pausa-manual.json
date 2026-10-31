@@ -1,0 +1,47 @@
+{
+ "track": "pausa-manual",
+ "desc": "Pausa manual de 60 s a los 2 km; lo andado en pausa no cuenta",
+ "expected": {
+  "saved": true,
+  "screen": "cele",
+  "dist": 3649.42,
+  "dur": 1187.5,
+  "nPoints": 1105,
+  "gain": 0,
+  "splits": [
+   {
+    "km": 1,
+    "split": 328.73
+   },
+   {
+    "km": 2,
+    "split": 324
+   },
+   {
+    "km": 3,
+    "split": 324.72
+   },
+   {
+    "km": 4,
+    "split": 323.43,
+    "partial": true
+   }
+  ],
+  "best": {
+   "1000": 321.12,
+   "5000": null,
+   "10000": null,
+   "21097.5": null
+  },
+  "bestFor": {
+   "1000": 324,
+   "5000": null,
+   "10000": null
+  },
+  "cele": {
+   "dist": "3,65",
+   "time": "19:48",
+   "pace": "5:25"
+  }
+ }
+}

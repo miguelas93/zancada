@@ -7,3 +7,4 @@ android/
 *.b64
 .env
 .env.*
+tests/node_modules/

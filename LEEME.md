@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.59 (31 oct 2026)
+
+- **Pruebas automáticas (fase 0 del paso a app nativa).** Nueva carpeta `tests/`: ocho carreras simuladas (parque, árboles, pausas, semáforo, pantalla bloqueada, cuestas, carrera muy corta y media maratón) que se corren en la app con un GPS y un reloj falsos, más una revisión de todas las pantallas. Se ejecutan solas en GitHub en cada cambio y, si algo cambia sin querer, el APK no se publica. Son también la referencia que tendrá que igualar la app nativa en Kotlin. Detalles en `tests/README.md`.
+- **Copia de seguridad dentro de la app.** En el APK, «Exportar copia» (Perfil) no hacía nada: el navegador interno de Android no sabe descargar archivos. Ahora abre el menú de compartir de Android para guardarla en Drive, Telegram, el correo o el móvil. Igual con el GPX, el CSV y la imagen de la carrera (plugins `@capacitor/filesystem` y `@capacitor/share`).
+
 ## Novedades 0.58 (31 oct 2026)
 
 - **GPS con la pantalla apagada (APK).** Hasta ahora la app pedía la ubicación con el GPS del navegador (Geolocation API, `watchPosition`), que deja de dar posiciones en cuanto se bloquea el móvil o pasas a otra app: por eso salían rectas largas y faltaban kilómetros. Durante la carrera, el APK usa ahora un servicio de Android en primer plano (plugin `@capacitor-community/background-geolocation`) que sigue grabando con la pantalla apagada; se ve la notificación «Zancada está grabando tu carrera». En la web no es posible: hay que dejar la pantalla encendida, y la app lo avisa al empezar.

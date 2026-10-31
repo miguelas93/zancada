@@ -1,0 +1,46 @@
+{
+ "track": "pantalla-bloqueada",
+ "desc": "Lecturas que llegan de golpe tras 120 s y un hueco de 90 s sin GPS",
+ "expected": {
+  "saved": true,
+  "screen": "cele",
+  "dist": 4079.74,
+  "dur": 1252.5,
+  "nPoints": 1119,
+  "gain": 8,
+  "splits": [
+   {
+    "km": 1,
+    "split": 304.72
+   },
+   {
+    "km": 2,
+    "split": 306.94
+   },
+   {
+    "km": 3,
+    "split": 307.78
+   },
+   {
+    "km": 4,
+    "split": 307.75
+   }
+  ],
+  "best": {
+   "1000": 303.06,
+   "5000": null,
+   "10000": null,
+   "21097.5": null
+  },
+  "bestFor": {
+   "1000": 304.72,
+   "5000": null,
+   "10000": null
+  },
+  "cele": {
+   "dist": "4,08",
+   "time": "20:53",
+   "pace": "5:07"
+  }
+ }
+}
