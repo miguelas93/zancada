@@ -13,13 +13,24 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.7 (noche del 31 de octubre)
+- **Rutas v2**: la pestaña es ahora una lista con filtros (cerca de ti / Madrid / San Fernando, distancia, suelo) y un minimapa del trazado en cada tarjeta. Cada ruta tiene **ficha completa**: mapa grande, km, desnivel, tiempo a tu ritmo, nivel, **perfil de desnivel**, suelo, por qué ir y cómo llegar (a cuánto estás de la salida, transporte público). 16 rutas con **trazado fijo** calculado sobre OpenStreetMap (BRouter) y guardado en la app (`routes-data.js`): ya no dependen de ningún servicio externo. "Bucle desde aquí" sigue usando el enrutador en línea.
+- **Compartir la carrera como imagen** (botón compartir del resumen): tarjeta 1080×1350 con el trazado y los datos, lista para Telegram, WhatsApp o Instagram.
+- **Zapatillas** (Perfil): añade tus pares, cada carrera suma km al par en uso y a los 700 km avisa.
+- **Autopausa** (ajuste, activada): si te paras 10 s con buen GPS, pausa sola; al moverte 12 m, sigue.
+- **Copia de seguridad** (Perfil): exportar e importar todos tus datos en un archivo. **Exportar GPX** de cada carrera para Strava, Garmin, etc.
+- **Resumen hablado** al terminar: distancia, tiempo, ritmo y mejor kilómetro.
+- **Actividad**: gráfica de las últimas 12 semanas con media de las 4 últimas y variación.
+- **Lectura de la carrera** en el resumen: comparación con tus últimas carreras, reparto del esfuerzo (segunda mitad más rápida o salida demasiado alegre), regularidad, récord de distancia, carreras de la semana y estado de la sesión del plan. Sin IA, con reglas.
+- **Plan**: ritmo objetivo por sesión (~mm:ss/km a partir de tu ritmo habitual, como hace Runna); botón **"Hoy no estoy al 100 %"** en Preparar que recorta la sesión un 40 % manteniendo la estructura; **"Copiar mi contexto para la IA"** prepara un resumen de tu plan y tus últimas carreras para pegarlo en ChatGPT, Gemini o Claude.
+
 ## Novedades 0.6
 - **Te lleva hasta la salida de la ruta**: al elegir una ruta, Preparar dice a cuántos metros está la salida y dibuja una línea lima hasta ella; en carrera la tarjeta muestra "Hacia la salida · 480 m · calentamiento" con una flecha que apunta hacia allí, y avisa por voz al llegar. Si la salida está a más de 2,5 km, recomienda ir en transporte (Cómo llegar, en Rutas).
 - **Guía ligera por la ruta**: flecha que indica hacia dónde sigue el camino, metros hasta el siguiente cruce y km que quedan. Voz solo en los giros claros ("en 80 metros, a la izquierda"), al salirte ("la ruta está a 130 m a tu derecha") y al terminar. Sin instrucciones constantes.
 - La barra de pestañas queda fija abajo y ya no se solapa con el contenido al hacer scroll (Perfil, Actividad, Inicio).
 
 ## Novedades 0.5
-- **Rutas recomendadas**: la pestaña Rutas abre ahora en "Recomendadas", 17 sitios investigados para correr tranquilo sin semáforos ni gente: 12 en Madrid (Dehesa de la Villa, Rodríguez Sahagún, anillo del Canal en el Parque de Santander, Ciudad Universitaria, Parque del Oeste, Madrid Río, Casa de Campo, Retiro, El Pardo, Juan Carlos I, Valdebebas) y 5 en San Fernando (Camposoto–Punta del Boquerón, Carrascón, Tres Amigos, vía a Chiclana, Salina Dolores). Cada tarjeta dice la zona, a cuántos km estás, el suelo, por qué ir y tiene "Cómo llegar" (abre Google Maps en transporte público). Se ordenan por cercanía.
+- **Rutas recomendadas**: la pestaña Rutas abre ahora en "Recomendadas", 16 sitios investigados para correr tranquilo sin semáforos ni gente: 12 en Madrid (Dehesa de la Villa, Rodríguez Sahagún, anillo del Canal en el Parque de Santander, Ciudad Universitaria, Parque del Oeste, Madrid Río, Casa de Campo, Retiro, El Pardo, Juan Carlos I, Valdebebas) y 4 en San Fernando (Camposoto–Punta del Boquerón, Carrascón, Tres Amigos, vía a Chiclana). Cada tarjeta dice la zona, a cuántos km estás, el suelo, por qué ir y tiene "Cómo llegar" (abre Google Maps en transporte público). Se ordenan por cercanía.
 - El trazado real de cada ruta lo calcula el enrutador peatonal de OpenStreetMap a partir de puntos de paso fijados a mano y se guarda en el móvil; mientras llega se muestra un trazado orientativo. La investigación está en `01_Investigacion/2026-10-31_rutas-correr-madrid-san-fernando_v01.md`.
 - Los bucles generados desde tu posición siguen disponibles en "Bucle desde aquí".
 

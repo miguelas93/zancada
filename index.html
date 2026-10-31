@@ -86,6 +86,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .monthbars{display:flex;gap:3px;align-items:flex-end;height:100px}
 .monthbars i{flex:1;border-radius:3px;background:var(--ink);opacity:.8;min-height:3px}
 .monthbars i.z{opacity:.12}.monthbars i.t{opacity:1}
+.weekbars{display:flex;gap:6px;align-items:flex-end;height:90px}.weekbars>span{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-size:10px;font-weight:600;color:var(--muted)}.weekbars i{display:block;width:100%;border-radius:4px;background:var(--ink);opacity:.8;min-height:3px}.weekbars i.t{background:var(--volt);opacity:1}.weekbars i.z{opacity:.12}
 .list{background:var(--surface);border-radius:28px;padding:4px 16px}
 .hist{display:flex;align-items:center;gap:14px;padding:12px 0;width:100%;text-align:left;border-top:1px solid var(--line)}
 .hist:first-child{border-top:0}
@@ -122,6 +123,15 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:32px 32px 0 0;padding:12px 20px calc(var(--sab) + 24px);z-index:1000;box-shadow:0 -8px 32px rgba(0,0,0,.12)}
 .handle{width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 18px}
 .fab{position:absolute;z-index:1000;display:flex;justify-content:space-between;align-items:center;left:20px;right:20px;top:calc(var(--sat) + 14px)}
+/* v0.7: rutas v2 */
+.chips.fl{flex-wrap:wrap;overflow:visible}
+.rlist{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--surface);border-radius:24px;padding:14px 16px 14px 14px;color:var(--ink)}
+.rmini{flex:none;width:84px;height:84px;border-radius:18px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.rbody{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.rbody b{font-weight:600;font-size:15px;line-height:1.2}
+.rmeta{display:flex;align-items:baseline;gap:6px;font-size:13px;font-weight:600;flex-wrap:wrap}
+.rtags{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.tag{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11px;font-weight:600;color:var(--muted)}
 /* v0.4: plan de entrenamiento y rutas */
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0}.chips::-webkit-scrollbar{display:none}
 .chipb{flex:none;height:38px;padding:0 14px;border-radius:999px;background:var(--surface);color:var(--ink);font-weight:600;font-size:13px;box-shadow:0 4px 14px -6px rgba(0,0,0,.25)}
@@ -221,6 +231,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     </div>
     <div class="col" style="gap:8px"><div class="monthbars" id="monthBars"></div><div class="between sub" style="font-size:11px" id="monthAxis"></div></div>
     <div class="stats" id="monthStats"></div>
+    <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weekBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
     <div class="list" id="histList"></div>
   </div>
   <nav class="tabs" data-tab="history"></nav>
@@ -255,29 +266,57 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <label class="setrow">Avisos de voz<select class="sel" id="setVoice"><option value="1">Cada km</option><option value="0">Sin voz</option></select></label>
       <label class="setrow">Modo noche<select class="sel" id="setNight"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
       <label class="setrow">Mapa del resumen<select class="sel" id="setMap"><option value="calles">Calles</option><option value="sat">Satélite</option></select></label>
+      <label class="setrow">Autopausa al pararte<select class="sel" id="setAutopause"><option value="1">Sí</option><option value="0">No</option></select></label>
+    </div>
+    <div class="card col" style="gap:10px;padding:18px 20px">
+      <div class="between"><h2>Zapatillas</h2><span class="sub">km por par</span></div>
+      <div id="shoeList" class="col" style="gap:8px"></div>
+      <form id="shoeForm" style="display:flex;gap:8px"><input id="shoeName" placeholder="Nuevo par (p. ej. Pegasus 41)" style="flex:1;min-width:0;height:44px;border-radius:12px;border:1px solid var(--line);padding:0 12px;background:var(--surface2);color:var(--ink);font:inherit"><input id="shoeKm0" type="number" min="0" inputmode="numeric" placeholder="km ya" style="width:76px;height:44px;border-radius:12px;border:1px solid var(--line);padding:0 10px;background:var(--surface2);color:var(--ink);font:inherit"><button class="btn sec" type="submit" style="width:auto;height:44px;padding:0 14px;font-size:14px">Añadir</button></form>
+    </div>
+    <div class="card col" style="gap:8px;padding:18px 20px">
+      <h2>Tus datos</h2><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Todo se guarda solo en este móvil. Haz una copia de vez en cuando y guárdala en Drive o Telegram; con ella recuperas carreras, plan y rutas en otro teléfono.</p>
+      <div style="display:flex;gap:8px"><button class="btn sec" id="backupBtn" style="height:46px;font-size:14px">Exportar copia</button><button class="btn sec" id="restoreBtn" style="height:46px;font-size:14px">Importar copia</button></div>
+      <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
     </div>
     <button class="card between" data-go="clubs" style="width:100%;text-align:left;padding:16px 18px 16px 20px"><span><span class="chip" style="font-size:9px;padding:3px 8px">Muy pronto</span><span style="display:block;font-weight:600;font-size:16px;margin-top:6px">Clubs</span><span class="sub" style="font-size:12px">Corre con tu gente cuando haya cuentas</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></button>
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.6 · guía por la ruta · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.7 · rutas v2 · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
 
 <!-- RUTAS -->
-<section class="screen" id="routes" style="padding:0">
-  <div id="routesMap" style="position:absolute;inset:0"></div>
-  <div class="fab" style="flex-direction:column;align-items:stretch;gap:10px;left:12px;right:12px">
-    <div class="between"><span class="pill" style="font-family:var(--display);font-size:18px;font-weight:700;padding:10px 18px">Rutas</span><button class="icon" id="routesLocate" aria-label="Centrar en mi posición"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></button></div>
-    <div class="chips" id="routesChips">
+<section class="screen scroll withtabs" id="routes">
+  <div class="col" style="gap:14px">
+    <h1>Rutas</h1>
+    <div class="chips" id="routesChips" style="margin:0 -20px;padding:0 20px">
       <button class="chipb on" data-mode="rec">Recomendadas</button><button class="chipb" data-mode="mine">Mis recorridos</button><button class="chipb" data-mode="sug">Bucle desde aquí</button>
-      <span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span>
-      <button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button>
     </div>
+    <div class="col" id="routesFilters" style="gap:8px">
+      <div class="chips fl" id="routesZone"></div>
+      <div class="chips fl" id="routesDist"><button class="chipb on" data-dist="all">Todas</button><button class="chipb" data-dist="s">&lt; 4 km</button><button class="chipb" data-dist="m">4 – 8 km</button><button class="chipb" data-dist="l">&gt; 8 km</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
+    </div>
+    <div class="chips fl" id="routesKm" style="display:none"><button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button></div>
+    <div class="col" id="routesList" style="gap:10px"></div>
   </div>
-  <div style="position:absolute;left:0;right:0;bottom:calc(var(--sab) + 96px);z-index:1000"><div class="carousel" id="routesCards"></div></div>
   <nav class="tabs" data-tab="routes"></nav>
+</section>
+
+<!-- FICHA DE RUTA -->
+<section class="screen scroll" id="routeDetail" style="padding:0">
+  <div style="position:relative;height:46vh;flex:none"><div id="rdMap" style="position:absolute;inset:0"></div>
+    <div class="fab"><button class="icon" data-go="routes" aria-label="Volver a rutas"><svg class="i" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><button class="icon" id="rdSave" aria-label="Guardar en mis recorridos"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div>
+  </div>
+  <div class="col" style="gap:14px;padding:18px 20px calc(var(--sab) + 100px)">
+    <div><span class="lbl" id="rdZone"></span><h1 id="rdName" style="margin-top:4px;font-size:26px"></h1></div>
+    <div class="card stats" id="rdStats" style="padding:18px 20px"></div>
+    <div class="card col" id="rdProfileCard" style="gap:8px;padding:18px 20px"><div class="between"><h2>Perfil</h2><span class="sub" id="rdProfileSub"></span></div><div id="rdProfile" style="color:var(--ink)"></div></div>
+    <div class="card col" id="rdAbout" style="gap:8px;padding:18px 20px"><h2 id="rdSurface"></h2><p id="rdWhy" style="margin:0;font-size:14px;line-height:1.45"></p><p id="rdAccess" class="sub" style="margin:0;font-size:13px;line-height:1.45"></p></div>
+    <div class="card col" style="gap:10px;padding:18px 20px"><h2>Cómo llegar</h2><p id="rdAway" style="margin:0;font-size:14px;line-height:1.45"></p><a class="btn sec" id="rdMaps" target="_blank" rel="noopener" style="text-decoration:none;height:48px;font-size:15px">Transporte público (Google Maps)</a></div>
+  </div>
+  <div style="position:fixed;left:16px;right:16px;bottom:calc(var(--sab) + 14px);z-index:1000"><button class="btn" id="rdRun">Correr esta ruta</button></div>
 </section>
 
 <!-- PLAN -->
@@ -294,6 +333,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <label class="setrow">Hora del aviso<select class="sel" id="planHour"></select></label>
       <p class="sub" style="margin:4px 0 0;font-size:12px" id="planRemindHint"></p>
     </div>
+    <div class="card col" style="gap:8px;padding:18px 20px"><h2>Pregúntale a tu entrenador IA</h2><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Preparo un resumen con tu plan y tus últimas carreras para que se lo pegues a ChatGPT, Gemini o Claude y le preguntes lo que quieras. No sale nada de tu móvil hasta que tú lo pegues.</p><button class="btn sec" id="askAiBtn" style="height:48px;font-size:15px">Copiar mi contexto para la IA</button></div>
     <button class="btn sec" id="planEdit">Cambiar objetivo, días o nivel</button>
     <button class="btn ghost" id="planDelete" style="color:var(--danger)">Eliminar el plan</button>
   </div>
@@ -344,6 +384,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <div><div class="handle"></div><div class="seg" id="prepMode" style="display:none"><button class="on" data-pm="plan">Sesión del plan</button><button data-pm="libre">Carrera libre</button></div></div>
     <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p></div>
     <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
     <button class="btn" id="startBtn" disabled>Empezar</button>
     <p id="prepHint" class="sub" style="margin:-6px 0 0;text-align:center;font-size:12px">Necesito permiso de ubicación para medir tu carrera.</p>
   </div>
@@ -419,7 +460,9 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <div class="stats" id="sStats"></div>
       <div id="sPlan" class="sub" style="display:none;font-size:13px;border-top:1px solid var(--line);padding-top:12px;line-height:1.6"></div>
     </div>
+    <div class="card dark col" id="sInsight" style="gap:8px;padding:20px 22px;display:none"><span class="lbl">Lectura de la carrera</span><p id="sInsightText" style="margin:0;font-size:15px;line-height:1.5"></p></div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
+    <button class="btn ghost" id="gpxBtn">Exportar GPX (Strava, Garmin…)</button>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
   </div>
 </section>
@@ -448,13 +491,15 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 </section>
 
 <script src="vendor/leaflet/leaflet.js" crossorigin=""></script>
+<script src="routes-data.js"></script>
 <script>
 (() => {
 'use strict';
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1', PROF = 'zancada.profile.v1', PLAN = 'zancada.plan.v1', ROUTES = 'zancada.routes.v1';
-const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat' }, load(SET, {}));
+const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat', autopause: '1', shoe: null }, load(SET, {}));
+const SHOES = 'zancada.shoes.v1'; let shoes = load(SHOES, []);
 let runs = load(KEY, []);
 let plan = load(PLAN, null), savedRoutes = load(ROUTES, []);
 const profile = Object.assign({ name: '', goal: 3, done: false }, load(PROF, {}));
@@ -515,6 +560,7 @@ function go(id, opts = {}) {
   if (id === 'profile') renderProfile();
   if (id === 'clubs') renderClubs();
   if (id === 'routes') renderRoutes();
+  if (id === 'routeDetail') renderRouteDetail();
   if (id === 'plan') renderPlan();
   if (id === 'prep') startPrep();
   setTimeout(() => Object.values(maps).forEach((m) => m.invalidateSize()), 60);
@@ -643,6 +689,11 @@ function renderHistory() {
   const mx = Math.max(5000, ...per);
   $('#monthBars').innerHTML = per.map((m, i) => `<i class="${m ? '' : 'z'} ${i === now.getDate() - 1 && m ? 't' : ''}" style="height:${Math.max(3, Math.round(m / mx * 100))}px"></i>`).join('');
   $('#monthAxis').innerHTML = [1, 8, 15, 22, days].map((d) => `<span>${d}</span>`).join('');
+  const ws0 = weekStart(Date.now()), weeks = Array.from({ length: 12 }, (_, i) => { const from = ws0 - (11 - i) * 7 * 864e5, rs = runs.filter((r) => r.start >= from && r.start < from + 7 * 864e5); return { from, km: rs.reduce((a, r) => a + r.dist, 0) / 1000, n: rs.length }; });
+  const wmx = Math.max(5, ...weeks.map((w) => w.km)), last4 = weeks.slice(-4).reduce((a, w) => a + w.km, 0) / 4, prev4 = weeks.slice(-8, -4).reduce((a, w) => a + w.km, 0) / 4;
+  $('#weekBars').innerHTML = weeks.map((w, i) => `<span>${w.km ? Math.round(w.km) : ''}<i class="${w.km ? '' : 'z'} ${i === 11 ? 't' : ''}" style="height:${Math.max(3, Math.round(w.km / wmx * 64))}px"></i></span>`).join('');
+  $('#weekAxis').innerHTML = [weeks[0], weeks[4], weeks[8], weeks[11]].map((w) => `<span>${new Date(w.from).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>`).join('');
+  $('#weeksSub').textContent = last4 ? `media ${last4.toFixed(1).replace('.', ',')} km/sem${prev4 ? ` · ${last4 >= prev4 ? '+' : '−'}${Math.round(Math.abs(last4 - prev4) / prev4 * 100)} %` : ''}` : 'sin carreras aún';
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
@@ -689,10 +740,37 @@ function renderProfile() {
   });
   const newest = marks.filter((x) => isFinite(x.best)).reduce((a, x) => (!a || x.when > a.when ? x : a), null);
   $('#prList').innerHTML = marks.map((x) => `<div class="pr"><div style="flex:1"><div style="font-weight:600">${x.name}</div><div class="sub" style="font-size:12px">${isFinite(x.best) ? new Date(x.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Aún sin marca'}</div></div>${newest === x && runs.length > 1 ? '<span class="chip" style="font-size:9px">Nueva</span>' : ''}<span class="num" style="font-size:22px;${isFinite(x.best) ? '' : 'color:var(--muted)'}">${isFinite(x.best) ? fmtTime(x.best) : '—'}</span></div>`).join('');
-  $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map;
+  $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map; $('#setAutopause').value = settings.autopause;
+  renderShoes();
 }
-['setVoice', 'setNight', 'setMap'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
-$('#wipeBtn').onclick = () => { if ($('#wipeBtn').dataset.sure) { runs = []; plan = null; savedRoutes = []; save(KEY, runs); save(PLAN, null); save(ROUTES, savedRoutes); syncReminders(); toast('Datos borrados'); go('home'); } else { $('#wipeBtn').dataset.sure = '1'; $('#wipeBtn').textContent = 'Pulsa otra vez para confirmar'; setTimeout(() => { delete $('#wipeBtn').dataset.sure; $('#wipeBtn').textContent = 'Borrar todos los datos de este móvil'; }, 3000); } };
+['setVoice', 'setNight', 'setMap', 'setAutopause'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
+// ---------- zapatillas ----------
+const SHOE_LIMIT = 700;  // km orientativos para cambiar de par
+function shoeKm(sh) { return (sh.km0 || 0) + runs.filter((r) => r.shoe === sh.id).reduce((a, r) => a + r.dist / 1000, 0); }
+function renderShoes() {
+  $('#shoeList').innerHTML = shoes.length ? shoes.map((sh) => { const km = shoeKm(sh), pct = Math.min(100, km / SHOE_LIMIT * 100), on = settings.shoe === sh.id; return `<div class="col" style="gap:6px;padding:10px 12px;border-radius:16px;background:${on ? 'var(--surface2)' : 'transparent'}">
+    <div class="between"><button data-shoe="${sh.id}" style="text-align:left;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--ink)">${sh.name}${on ? '<span class="chip">En uso</span>' : ''}${km >= SHOE_LIMIT ? '<span class="chip hard">Toca cambiar</span>' : ''}</button><span style="display:flex;align-items:center;gap:10px"><b class="num" style="font-size:18px">${Math.round(km)}</b><span class="sub">km</span><button class="icon" data-shoedel="${sh.id}" aria-label="Quitar par" style="width:32px;height:32px;background:transparent"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div>
+    <div class="track" style="height:4px"><i style="width:${pct}%;background:${km >= SHOE_LIMIT ? 'var(--danger)' : 'var(--volt)'}"></i></div></div>`; }).join('') : '<span class="sub" style="font-size:13px">Añade tus zapatillas y cada carrera sumará km al par en uso. A los 700 km te aviso.</span>';
+  $$('#shoeList [data-shoe]').forEach((b) => b.onclick = () => { settings.shoe = settings.shoe === b.dataset.shoe ? null : b.dataset.shoe; save(SET, settings); renderShoes(); });
+  $$('#shoeList [data-shoedel]').forEach((b) => b.onclick = () => { shoes = shoes.filter((x) => x.id !== b.dataset.shoedel); if (settings.shoe === b.dataset.shoedel) settings.shoe = null; save(SHOES, shoes); save(SET, settings); renderShoes(); });
+}
+$('#shoeForm').onsubmit = (e) => { e.preventDefault(); const name = $('#shoeName').value.trim(); if (!name) return; const sh = { id: 's' + Date.now(), name, km0: Number($('#shoeKm0').value) || 0, created: Date.now() }; shoes.unshift(sh); settings.shoe = sh.id; save(SHOES, shoes); save(SET, settings); $('#shoeName').value = ''; $('#shoeKm0').value = ''; renderShoes(); toast('Par añadido y en uso'); };
+// ---------- copia de seguridad ----------
+async function shareOrDownload(blob, name, text) {
+  const file = new File([blob], name, { type: blob.type });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text }); return true; } catch (e) { if (e.name === 'AbortError') return false; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast('Archivo guardado en descargas', 3000); return true;
+}
+$('#backupBtn').onclick = () => { const data = { app: 'zancada', version: 1, exported: new Date().toISOString() }; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith('zancada.') && k !== 'zancada.routecache.v1') data[k] = JSON.parse(localStorage.getItem(k)); } shareOrDownload(new Blob([JSON.stringify(data)], { type: 'application/json' }), `zancada-copia-${new Date().toISOString().slice(0, 10)}.json`, 'Copia de seguridad de Zancada'); };
+$('#restoreBtn').onclick = () => $('#restoreFile').click();
+$('#restoreFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { const data = JSON.parse(await f.text()); if (data.app !== 'zancada') throw new Error('no es una copia de Zancada'); let n = 0; Object.keys(data).forEach((k) => { if (k.startsWith('zancada.')) { localStorage.setItem(k, JSON.stringify(data[k])); n++; } }); toast(`Copia importada (${n} apartados). Recargando…`, 2500); setTimeout(() => location.reload(), 1200); } catch (err) { toast('No he podido leer esa copia: ' + err.message, 4000); } e.target.value = ''; };
+function runGpx(r) {
+  const esc = (t) => String(t).replace(/[<&>]/g, (c) => ({ '<': '&lt;', '&': '&amp;', '>': '&gt;' }[c]));
+  const pts = r.points.map((p) => `<trkpt lat="${p.lat.toFixed(6)}" lon="${p.lon.toFixed(6)}"><time>${new Date(r.start + p.t).toISOString()}</time></trkpt>`).join('');
+  return `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Zancada" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${esc(r.name)}</name><time>${new Date(r.start).toISOString()}</time></metadata><trk><name>${esc(r.name)}</name><type>running</type><trkseg>${pts}</trkseg></trk></gpx>`;
+}
+$('#wipeBtn').onclick = () => { if ($('#wipeBtn').dataset.sure) { runs = []; plan = null; savedRoutes = []; shoes = []; save(KEY, runs); save(PLAN, null); save(ROUTES, savedRoutes); save(SHOES, shoes); syncReminders(); toast('Datos borrados'); go('home'); } else { $('#wipeBtn').dataset.sure = '1'; $('#wipeBtn').textContent = 'Pulsa otra vez para confirmar'; setTimeout(() => { delete $('#wipeBtn').dataset.sure; $('#wipeBtn').textContent = 'Borrar todos los datos de este móvil'; }, 3000); } };
 $('#demoBtn').onclick = () => { runs.unshift(demoRun()); save(KEY, runs); toast('Carrera de ejemplo añadida'); go('home'); };
 function demoRun() {
   const pts = [], start = Date.now() - 3600e3, lat0 = 40.4152, lon0 = -3.6845; let t = 0, lat = lat0, lon = lon0;
@@ -778,6 +856,10 @@ function reviewPlan() {
   }
   if (changed) { save(PLAN, plan); syncReminders(); }
 }
+// Ritmo objetivo por tipo de sesión a partir de tu ritmo habitual (mediana de las últimas carreras; 6:30 si aún no hay datos)
+const PACE_K = { suave: 1.12, largo: 1.08, tempo: 0.93, series: 0.86, carrera: 0.95 };
+function targetPace(type) { return fmtPace(userPace() * (PACE_K[type] || 1)); }
+function lightSession(s) { if (!s) return s; const o = Object.assign({}, s, { light: true, title: s.title + ' · corta' }); if (s.struct) { o.struct = Object.assign({}, s.struct, { reps: Math.max(2, Math.ceil(s.struct.reps * 0.6)) }); o.m = s.struct.warm + o.struct.reps * (s.struct.on + s.struct.off) + s.struct.cool; } else o.m = Math.max(2000, Math.round(s.m * 0.6 / 500) * 500); return o; }
 function todaySession() { if (!plan) return null; const wi = curWeek(plan); if (wi < 0 || wi >= plan.weeks) return null; return planStatus(plan)[wi].find((s) => s.state === 'today') || null; }
 function nextSession(weeks) { const now = dayStart(Date.now()); return weeks.flat().find((s) => !s.run && s.state !== 'skip' && dayStart(s.date) >= now) || null; }
 const sessIcon = (s) => s.state === 'ok' ? '<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;stroke-width:3"><path d="M5 12l5 5L20 7"/></svg>' : DAY_L[s.dayIdx];
@@ -812,10 +894,17 @@ function renderPlan() {
     <div class="track"><i style="width:${Math.min(100, km ? done / km * 100 : 0)}%"></i></div>`;
   $('#planWeeks').innerHTML = weeks.map((x, i) => `<button class="${i === w ? 'on' : ''} ${i < wi ? 'past' : ''}" data-w="${i}"><b>${i + 1}</b>${Math.round(x.reduce((a, s) => a + s.m, 0) / 1000)} km</button>`).join('');
   $$('#planWeeks [data-w]').forEach((b) => b.onclick = () => { planView = Number(b.dataset.w); renderPlan(); });
+  $('#askAiBtn').onclick = async () => {
+    const g = GOALS[plan.goal], wi = curWeek(plan), st = planStatus(plan), last = runs.slice(0, 6).map((r) => `- ${new Date(r.start).toLocaleDateString('es-ES')}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))}/km)${r.session ? ' · sesión: ' + r.session.title : ''}`).join('\n');
+    const week = (st[wi] || []).map((x) => `${x.title} ${fmtKmS(x.m)} km (${x.state === 'done' ? 'hecha' : x.state === 'miss' ? 'no hecha' : 'pendiente'})`).join('; ');
+    const text = `Actúa como mi entrenador de running. Soy ${profile.name || 'corredor/a'}, nivel ${({ inicio: 'principiante', medio: 'intermedio', avanzado: 'avanzado' })[plan.level] || plan.level}. Objetivo: ${g.name} en ${plan.weeks} semanas (voy por la semana ${wi + 1}), corro ${plan.days.length} días por semana. Mi ritmo habitual es ${fmtPace(userPace())}/km.\nEsta semana: ${week || 'sin sesiones'}.\nÚltimas carreras:\n${last || '- ninguna todavía'}\n${plan.lastReview ? 'Última revisión del plan: ' + plan.lastReview.text + '\n' : ''}Pregunta: `;
+    try { await navigator.clipboard.writeText(text); toast('Contexto copiado. Pégalo en tu IA y añade la pregunta.', 3500); } catch (e) {}
+    if (navigator.share) { try { await navigator.share({ text }); } catch (e) {} }
+  };
   $('#planWeeks .on')?.scrollIntoView({ inline: 'center', block: 'nearest' });
   $('#planSessions').innerHTML = ss.map((s) => `<button class="sess" data-key="${s.key}"><span class="st ${s.state}">${sessIcon(s)}</span>
     <span style="flex:1;min-width:0"><b style="font-weight:600;display:block">${s.title}</b><span class="sub" style="font-size:12px">${new Date(s.date).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' })}${s.run ? ` · hecha${s.moved ? ' (otro día)' : ''}: ${fmtKm(s.run.dist)} km` : s.state === 'miss' ? ' · no hecha' : s.state === 'skip' ? ' · antes de crear el plan' : s.state === 'today' ? ' · hoy' : ''}</span></span>
-    <span><span class="num" style="font-size:20px">${fmtKmS(s.m)}</span><span class="unit" style="font-size:12px">km</span></span></button>`).join('');
+    <span style="text-align:right"><span class="num" style="font-size:20px">${fmtKmS(s.m)}</span><span class="unit" style="font-size:12px">km</span>${s.type !== 'carrera' && !s.run ? `<small class="sub" style="display:block;font-size:11px">~${targetPace(s.type)}/km</small>` : ''}</span></button>`).join('');
   $$('#planSessions [data-key]').forEach((b) => b.onclick = () => { const s = ss.find((x) => x.key === b.dataset.key); if (s.run) openSummary(s.run.id); else if (s.state === 'today') go('prep'); else toast(s.desc, 4000); });
   $('#planRemind').value = plan.remind?.on ? '1' : '0';
   $('#planHour').innerHTML = [6, 7, 8, 9, 10, 12, 14, 17, 18, 19, 20].map((h) => `<option value="${h}">${h}:00</option>`).join('');
@@ -906,10 +995,11 @@ function updateGuide() {
 }
 
 // ---------- rutas ----------
-// Rutas "para ti": bucles desde donde estás, calculados con el enrutador peatonal de Valhalla (FOSSGIS, OpenStreetMap), con desnivel.
+// Rutas v2: lista con filtros y minimapas, ficha completa y trazados fijos (routes-data.js, calculados con BRouter sobre OpenStreetMap).
+// El enrutador externo (Valhalla) solo se usa para "Bucle desde aquí".
 const ROUTER = 'https://valhalla1.openstreetmap.de';
-const rt = { map: null, mode: 'rec', km: 5, list: [], layers: [], sel: 0, here: null, hereM: null, token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
-let pickedRoute = null;
+const rt = { mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
+let pickedRoute = null, detailRoute = null;
 function decodePoly6(str) {
   const out = []; let i = 0, lat = 0, lon = 0;
   while (i < str.length) {
@@ -949,117 +1039,120 @@ async function makeLoop(start, km, brg) {
 const compass = (b) => ['norte', 'noreste', 'este', 'sureste', 'sur', 'suroeste', 'oeste', 'noroeste'][Math.round((((b % 360) + 360) % 360) / 45) % 8];
 function userPace() { const ps2 = runs.slice(0, 5).map((r) => r.dur / (r.dist / 1000)).filter((x) => isFinite(x) && x > 150 && x < 1200).sort((a, b) => a - b); return ps2.length ? ps2[Math.floor(ps2.length / 2)] : 390; }
 function routeMeta(r) { const t = r.km * userPace() + (r.gain || 0) * 6, d = r.km < 7 && (r.gain || 0) < 80 ? ['Fácil', ''] : r.km < 13 && (r.gain || 0) < 220 ? ['Media', 'mid'] : ['Exigente', 'hard']; return { time: t, diff: d }; }
+const fmtDur = (s) => fmtTime(s).replace(/^(\d+):(\d+):\d+$/, '$1 h $2 min').replace(/^(\d+):\d+$/, '$1 min');
+const fmtAway = (km) => km < 1 ? `a ${Math.round(km * 1000)} m` : km < 10 ? `a ${(Math.round(km * 10) / 10).toString().replace('.', ',')} km` : `a ${Math.round(km)} km`;
+// Rutas recomendadas con trazado fijo (routes-data.js)
+const ZR = (window.ZROUTES || []).map((r) => { const ll = decodePoly6(r.enc); return Object.assign({ src: 'rec', ll, start: { lat: ll[0][0], lon: ll[0][1] } }, r, { enc: undefined }); });
+const CITIES = { madrid: { name: 'Madrid', lat: 40.44, lon: -3.70 }, sanfernando: { name: 'San Fernando', lat: 36.46, lon: -6.20 } };
+function nearCity() { if (!rt.here) return null; let best = null; for (const k in CITIES) { const d = haversine(rt.here, CITIES[k]); if (d < 40000 && (!best || d < best.d)) best = { k, d }; } return best?.k || null; }
+// Minimapa del trazado en SVG (sin mapa de fondo: rápido, sin red y legible en las tarjetas)
+function routeSvg(ll, w = 84, h = 84, stroke = 'currentColor') {
+  if (!ll || ll.length < 2) return '';
+  const step = Math.max(1, Math.floor(ll.length / 160)), pts = ll.filter((_, i) => i % step === 0 || i === ll.length - 1), k = Math.cos(ll[0][0] * Math.PI / 180);
+  const xs = pts.map((p) => p[1] * k), ys = pts.map((p) => -p[0]), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const span = Math.max(maxX - minX, maxY - minY) || 1e-6, pad = 8, s = (Math.min(w, h) - pad * 2) / span, ox = (w - (maxX - minX) * s) / 2, oy = (h - (maxY - minY) * s) / 2;
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${((p[1] * k - minX) * s + ox).toFixed(1)} ${((-p[0] - minY) * s + oy).toFixed(1)}`).join('');
+  const s0 = pts[0];
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${((s0[1] * k - minX) * s + ox).toFixed(1)}" cy="${((-s0[0] - minY) * s + oy).toFixed(1)}" r="3.5" fill="${VOLT}" stroke="${stroke}" stroke-width="1.5"/></svg>`;
+}
+// Perfil de desnivel (relleno) a partir de las alturas del trazado
+function profileSvg(ele, w = 320, h = 90) {
+  if (!ele || ele.length < 4) return '';
+  const step = Math.max(1, Math.floor(ele.length / 200)), e = ele.filter((_, i) => i % step === 0), min = Math.min(...e), max = Math.max(...e), span = Math.max(max - min, 12);
+  const pts = e.map((v, i) => `${(i / (e.length - 1) * w).toFixed(1)},${(h - 6 - (v - min) / span * (h - 14)).toFixed(1)}`);
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none" aria-hidden="true"><path d="M0,${h} L${pts.join(' L')} L${w},${h} Z" fill="${VOLT}" opacity=".55"/><polyline points="${pts.join(' ')}" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function withAway(list) { if (rt.here) list.forEach((r) => { r.away = haversine(rt.here, r.start || { lat: r.ll[0][0], lon: r.ll[0][1] }) / 1000; }); return rt.here ? list.sort((a, b) => a.away - b.away) : list; }
+function recList() {
+  const zone = rt.zone || nearCity() || 'madrid';
+  let list = ZR.filter((r) => zone === 'cerca' ? rt.here && haversine(rt.here, r.start) < 40000 : r.city === zone);
+  if (rt.dist === 's') list = list.filter((r) => r.km < 4); else if (rt.dist === 'm') list = list.filter((r) => r.km >= 4 && r.km <= 8); else if (rt.dist === 'l') list = list.filter((r) => r.km > 8);
+  if (rt.surf !== 'all') list = list.filter((r) => r.surf === rt.surf);
+  return withAway(list.map((r) => Object.assign({}, r)));
+}
+function myRoutes() {
+  const fromRuns = runs.filter((r) => r.points?.length > 5 && r.dist > 500).slice(0, 20).map((r) => ({ id: 'run-' + r.id, name: r.name, sub: fmtDate(r.start), ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: null, src: 'run' }));
+  return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
+}
+const SURF = { tierra: 'Tierra', asfalto: 'Asfalto', pista: 'Pista', mixto: 'Mixto' };
+function routeCard(r, i) {
+  const m = routeMeta(r), sub = r.src === 'rec' ? `${r.zone}${r.away != null ? ' · ' + fmtAway(r.away) : ''}` : r.src === 'sug' ? `Desde tu ubicación${r.away != null && r.away > 0.05 ? ' · ' + fmtAway(r.away) : ''}` : r.sub || '';
+  return `<button class="rlist" data-open="${i}"><span class="rmini">${routeSvg(r.ll)}</span><span class="rbody"><b>${r.name}</b><span class="sub">${sub}</span><span class="rmeta"><span class="num" style="font-size:20px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span><span class="sub">·</span><span>${r.gain == null ? '—' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span>${fmtDur(m.time)}</span></span><span class="rtags"><span class="chip ${m.diff[1]}">${m.diff[0]}</span>${r.surf ? `<span class="tag">${SURF[r.surf] || r.surface}</span>` : ''}${r.loop === false ? '<span class="tag">Ida y vuelta</span>' : ''}</span></span></button>`;
+}
+let rtList = [];
+function renderRoutes() {
+  $$('#routesChips [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rt.mode));
+  $('#routesFilters').style.display = rt.mode === 'rec' ? '' : 'none';
+  $('#routesKm').style.display = rt.mode === 'sug' ? '' : 'none';
+  $$('#routesKm [data-km]').forEach((b) => b.classList.toggle('on', Number(b.dataset.km) === rt.km));
+  if (!rt.here && lastFix) rt.here = lastFix;
+  if (!rt.here && 'geolocation' in navigator) navigator.geolocation.getCurrentPosition((pos) => { rt.here = { lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }; if ($('#routes').classList.contains('on')) renderRoutes(); }, () => {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  if (rt.mode === 'rec') {
+    const near = nearCity(), zone = rt.zone || near || 'madrid';
+    $('#routesZone').innerHTML = (near ? [['cerca', 'Cerca de ti']] : []).concat(Object.keys(CITIES).map((k) => [k, CITIES[k].name])).map(([k, n]) => `<button class="chipb ${zone === k ? 'on' : ''}" data-zone="${k}">${n}</button>`).join('');
+    $$('#routesDist [data-dist]').forEach((b) => b.classList.toggle('on', b.dataset.dist === rt.dist));
+    $$('#routesSurf [data-surf]').forEach((b) => b.classList.toggle('on', b.dataset.surf === rt.surf));
+    rtList = recList();
+    renderList(rtList, rtList.length ? '' : '<div class="card col" style="gap:6px"><b style="font-weight:600">Nada con esos filtros</b><span class="sub">Prueba otra distancia o suelo. Las rutas están investigadas para Madrid y San Fernando; si quieres otra zona, dímelo.</span></div>');
+    return;
+  }
+  if (rt.mode === 'mine') { rtList = withAway(myRoutes()); renderList(rtList, '<div class="card col" style="gap:6px"><b style="font-weight:600">Aún no tienes recorridos</b><span class="sub">Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.</span></div>'); return; }
+  if (rt.mode === 'sug') { if (!rt.here) { renderList([], '<div class="card col" style="gap:6px"><b style="font-weight:600">Buscando tu posición…</b><span class="sub">Los bucles se calculan desde donde estás.</span></div>'); return; } loadSuggestions(); }
+}
+function renderList(list, empty) {
+  $('#routesList').innerHTML = list.length ? list.map(routeCard).join('') : empty;
+  $$('#routesList [data-open]').forEach((b) => b.onclick = () => openRoute(list[Number(b.dataset.open)]));
+}
 async function loadSuggestions() {
-  const here = rt.here; if (!here) return;
-  const key = `${here.lat.toFixed(3)},${here.lon.toFixed(3)},${rt.km},${rt.seed}`, token = ++rt.token;
-  if (rt.cache[key]) { rt.list = rt.cache[key]; rt.sel = 0; drawRoutes(); return; }
-  rt.list = []; $('#routesCards').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; clearRouteLayers();
+  const here = rt.here, key = `${here.lat.toFixed(3)},${here.lon.toFixed(3)},${rt.km},${rt.seed}`, token = ++rt.token;
+  const more = `<button class="btn sec" style="height:48px;margin-top:4px" id="routesMore">Generar otros tres bucles</button>`;
+  if (rt.cache[key]) { rtList = rt.cache[key]; renderList(rtList, ''); $('#routesList').insertAdjacentHTML('beforeend', more); $('#routesMore').onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); }; return; }
+  rtList = []; $('#routesList').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
   const out = [];
   for (const k of [0, 1, 2]) {
     const brg = rt.seed + k * 120;
     try {
       const res = await makeLoop(here, rt.km, brg); if (token !== rt.token) return;
       const gain = await elevGain(res.ll); if (token !== rt.token) return;
-      out.push({ id: 'sug-' + key + '-' + k, name: `Bucle hacia el ${compass(brg)}`, ll: res.ll, km: Math.round(res.km * 10) / 10, gain, src: 'sug', created: Date.now() });
-      rt.list = out.slice(); rt.sel = 0; drawRoutes();
+      out.push({ id: 'sug-' + key + '-' + k, name: `Bucle hacia el ${compass(brg)}`, ll: res.ll, km: Math.round(res.km * 10) / 10, gain, src: 'sug', created: Date.now(), start: { lat: res.ll[0][0], lon: res.ll[0][1] } });
+      rtList = out.slice(); renderList(rtList, '');
     } catch (e) { /* una ruta fallida no tumba las demás */ }
   }
   if (token !== rt.token) return;
-  if (!out.length) { $('#routesCards').innerHTML = `<div class="rcard"><b style="font-weight:600">No he podido calcular rutas ahora</b><span class="sub" style="font-size:13px">Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Prueba de nuevo en un momento.</span><button class="btn sec" style="height:46px" id="routesRetry">Reintentar</button></div>`; $('#routesRetry').onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); }; return; }
+  if (!out.length) { $('#routesList').innerHTML = `<div class="card col" style="gap:8px"><b style="font-weight:600">No he podido calcular bucles ahora</b><span class="sub">Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Las rutas recomendadas sí funcionan sin él.</span><button class="btn sec" style="height:46px" id="routesRetry">Reintentar</button></div>`; $('#routesRetry').onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); }; return; }
+  $('#routesList').insertAdjacentHTML('beforeend', more); $('#routesMore').onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); };
   rt.cache[key] = out; const keys = Object.keys(rt.cache); if (keys.length > 12) delete rt.cache[keys[0]]; save('zancada.routecache.v1', rt.cache);
 }
-// Rutas recomendadas: sitios investigados para correr tranquilo (parques, sendas, carriles sin coches). Ver 01_Investigacion/2026-10-31_rutas-correr-madrid-san-fernando_v01.md.
-// wp = puntos de paso aproximados; el trazado real lo calcula el enrutador peatonal y se guarda en caché. loop=false → ida y vuelta.
-const CURATED = [
-  { id: 'rec-dehesa', name: 'Dehesa de la Villa · vuelta', zone: 'Madrid · Tetuán/Moncloa', km: 5.2, gain: 90, surface: 'Tierra y pinar', why: 'El bosque de al lado de casa: sombra, fuentes y sube-baja constante. Entrada por Francos Rodríguez (metro L7).', loop: true, wp: [[40.4568,-3.7190],[40.4613,-3.7215],[40.4640,-3.7280],[40.4615,-3.7345],[40.4570,-3.7330],[40.4548,-3.7260]] },
-  { id: 'rec-dehesa-llano', name: 'Dehesa · llano del Cerro de los Locos', zone: 'Madrid · Tetuán/Moncloa', km: 3.6, gain: 20, surface: 'Tierra', why: 'Camino llano de 1,8 km bajo el cerro, ida y vuelta: el sitio de la Dehesa para hacer series sin cuestas.', loop: false, wp: [[40.4590,-3.7215],[40.4600,-3.7260],[40.4612,-3.7320]] },
-  { id: 'rec-sahagun', name: 'Parque Rodríguez Sahagún · pista', zone: 'Madrid · Tetuán', km: 1.6, gain: 10, surface: 'Pista de running', why: 'El parque grande del barrio, con circuito señalizado para correr. Llano, para calentar o rodajes cortos. Da varias vueltas.', loop: true, wp: [[40.4660,-3.7070],[40.4700,-3.7080],[40.4710,-3.7020],[40.4668,-3.7015]] },
-  { id: 'rec-santander', name: 'Parque de Santander · anillo del Canal', zone: 'Madrid · Chamberí', km: 1.2, gain: 0, surface: 'Tartán, marcas cada 100 m', why: 'Anillo de tartán de 1.200 m sobre el Tercer Depósito: series y tempos medidos sin coches. Metro Canal o Islas Filipinas.', loop: true, wp: [[40.4428,-3.7085],[40.4455,-3.7090],[40.4458,-3.7135],[40.4428,-3.7135]] },
-  { id: 'rec-cu', name: 'Ciudad Universitaria · ruta verde', zone: 'Madrid · Moncloa', km: 5.5, gain: 70, surface: 'Asfalto sin tráfico', why: 'Avenidas anchas del campus cerradas al tráfico de paso. Enlaza la Dehesa con el Parque del Oeste.', loop: true, wp: [[40.4435,-3.7275],[40.4490,-3.7290],[40.4540,-3.7300],[40.4500,-3.7345],[40.4420,-3.7345]] },
-  { id: 'rec-oeste', name: 'Parque del Oeste', zone: 'Madrid · Moncloa', km: 3.2, gain: 60, surface: 'Tierra y gravilla', why: 'Cuestas cortas para ganar fuerza, sombra y atardecer en Debod. Se alarga bajando a Madrid Río.', loop: true, wp: [[40.4240,-3.7175],[40.4300,-3.7245],[40.4345,-3.7230],[40.4290,-3.7195]] },
-  { id: 'rec-madridrio', name: 'Madrid Río · bucle', zone: 'Madrid · Arganzuela', km: 10.5, gain: 40, surface: 'Asfalto, marcas en el suelo', why: 'Diez kilómetros sin un semáforo, con fuentes y marcas de distancia. El sitio para tempos y tiradas largas.', loop: true, wp: [[40.4175,-3.7200],[40.4030,-3.7130],[40.3930,-3.6985],[40.4030,-3.7100],[40.4175,-3.7190]] },
-  { id: 'rec-casacampo', name: 'Casa de Campo · lago', zone: 'Madrid · Moncloa', km: 4.5, gain: 50, surface: 'Tierra y pinar', why: 'El mejor trail dentro de la ciudad. Esta vuelta rodea el lago; el perímetro completo son 16 km.', loop: true, wp: [[40.4215,-3.7285],[40.4175,-3.7320],[40.4185,-3.7380],[40.4225,-3.7345]] },
-  { id: 'rec-retiro', name: 'El Retiro · Paseo de Coches', zone: 'Madrid · Retiro', km: 4.5, gain: 30, surface: 'Tierra y asfalto', why: 'El clásico. A primera hora entre semana está vacío; los fines de semana, lleno.', loop: true, wp: [[40.4195,-3.6835],[40.4165,-3.6790],[40.4095,-3.6805],[40.4105,-3.6895],[40.4170,-3.6880]] },
-  { id: 'rec-pardo', name: 'El Pardo · senda del Manzanares', zone: 'Madrid · El Pardo', km: 6, gain: 40, surface: 'Tierra y pasarelas', why: 'Río, encinas y ciervos: lo más salvaje cerca de Madrid. Bus 179 desde Plaza de Castilla. Lleva agua.', loop: false, wp: [[40.5185,-3.7745],[40.5070,-3.7690],[40.4960,-3.7620]] },
-  { id: 'rec-jc1', name: 'Parque Juan Carlos I', zone: 'Madrid · Barajas', km: 4, gain: 20, surface: 'Asfalto', why: 'Llano y abierto, con fuentes y baños. Bueno para tiradas largas de domingo. Metro Feria de Madrid.', loop: true, wp: [[40.4640,-3.6160],[40.4670,-3.6060],[40.4600,-3.6020],[40.4590,-3.6120]] },
-  { id: 'rec-valdebebas', name: 'Valdebebas · senda de los Montes', zone: 'Madrid · Hortaleza', km: 5.5, gain: 50, surface: 'Tierra', why: 'Parque forestal nuevo con 32 km de caminos y casi nadie. Sin sombra: mejor temprano.', loop: true, wp: [[40.4820,-3.6160],[40.4900,-3.6180],[40.4930,-3.6060],[40.4860,-3.6000],[40.4810,-3.6080]] },
-  { id: 'rec-boqueron', name: 'Camposoto · Punta del Boquerón', zone: 'San Fernando · playa', km: 5.8, gain: 10, surface: 'Pasarela y arena', why: 'La joya de la Isla: pasarela de madera y sendero entre dunas y el caño hasta la Batería de Urrutia. Sin coches.', loop: false, wp: [[36.4420,-6.2270],[36.4300,-6.2190],[36.4150,-6.2120]] },
-  { id: 'rec-carrascon', name: 'Sendero del Carrascón', zone: 'San Fernando · salinas', km: 5.6, gain: 0, surface: 'Albero', why: 'Por los muros de las salinas, del molino del Zaporito al puerto de Gallineras. Cinco entradas desde la Ronda del Estero.', loop: false, wp: [[36.4625,-6.1945],[36.4530,-6.1930],[36.4440,-6.2000]] },
-  { id: 'rec-tresamigos', name: 'Tres Amigos · río Arillo', zone: 'San Fernando · Camposoto', km: 3.2, gain: 0, surface: 'Albero', why: 'Salina tradicional, observatorios de aves y molino de mareas. Corto: ideal para calentar antes de la pasarela.', loop: false, wp: [[36.4500,-6.2290],[36.4560,-6.2400]] },
-  { id: 'rec-chiclana', name: 'Vía San Fernando – Chiclana', zone: 'San Fernando · parque natural', km: 10.8, gain: 10, surface: 'Pasarelas y camino', why: 'Cinco kilómetros por dentro del parque natural cruzando el caño por cuatro pasarelas. La tirada larga sin coches de la Isla.', loop: false, wp: [[36.4520,-6.1900],[36.4350,-6.1720],[36.4200,-6.1530]] },
-  { id: 'rec-dolores', name: 'Salina Dolores', zone: 'San Fernando · río Arillo', km: 3.5, gain: 0, surface: 'Albero', why: 'Bucle por el muro de la salina junto al río Arillo. A veces lo cierran: comprueba antes.', loop: true, wp: [[36.4740,-6.2320],[36.4700,-6.2250],[36.4680,-6.2300]] },
-];
-function curatedPath(c) { const ll = c.wp.slice(); return c.loop ? ll.concat([ll[0]]) : ll.concat(ll.slice(0, -1).reverse()); }
-function curatedList() {
-  const list = CURATED.map((c) => { const k = rt.cache[c.id]; return Object.assign({ src: 'rec', ll: curatedPath(c), routed: false, start: { lat: c.wp[0][0], lon: c.wp[0][1] } }, c, k ? { ll: k.ll, km: k.km, gain: k.gain == null ? c.gain : k.gain, routed: true } : {}); });
-  if (rt.here) list.forEach((r) => { r.away = haversine(rt.here, r.start) / 1000; });
-  return rt.here ? list.sort((a, b) => a.away - b.away) : list;
-}
-let recBusy = false;
-// Calcula el trazado real de las recomendadas que aún no están en caché: primero la seleccionada, luego las más cercanas, de una en una.
-async function routeCurated() {
-  if (recBusy || rt.mode !== 'rec') return; recBusy = true;
-  try {
-    for (let n = 0; n < 40 && rt.mode === 'rec'; n++) {
-      const list = rt.list, pend = list.filter((r) => !r.routed && !r.failed); if (!pend.length) break;
-      const r = list[rt.sel] && !list[rt.sel].routed && !list[rt.sel].failed ? list[rt.sel] : pend[0], c = CURATED.find((x) => x.id === r.id);
-      try {
-        const res = await routeThrough(curatedPath(c).map(([lat, lon]) => ({ lat, lon }))), gain = await elevGain(res.ll);
-        rt.cache[c.id] = { ll: res.ll, km: Math.round(res.km * 10) / 10, gain }; save('zancada.routecache.v1', rt.cache);
-      } catch (e) { r.failed = true; }
-      if (rt.mode !== 'rec') break;
-      const sel = rt.list[rt.sel]?.id, failed = rt.list.filter((x) => x.failed).map((x) => x.id);
-      rt.list = curatedList(); rt.list.forEach((x) => { if (failed.includes(x.id)) x.failed = true; }); rt.sel = Math.max(0, rt.list.findIndex((x) => x.id === sel)); drawRoutes();
-    }
-  } finally { recBusy = false; }
-}
-const fmtAway = (km) => km < 1 ? `a ${Math.round(km * 1000)} m` : km < 100 ? `a ${km < 10 ? (Math.round(km * 10) / 10).toString().replace('.', ',') : Math.round(km)} km` : `a ${Math.round(km)} km`;
-function myRoutes() {
-  const fromRuns = runs.filter((r) => r.points?.length > 5 && r.dist > 500).slice(0, 20).map((r) => ({ id: 'run-' + r.id, name: r.name, sub: fmtDate(r.start), ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: null, src: 'run' }));
-  return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
-}
-function clearRouteLayers() { rt.layers.forEach((l) => rt.map.removeLayer(l)); rt.layers = []; }
-function drawRoutes() {
-  const list = rt.list; clearRouteLayers();
-  if (!list.length) { $('#routesCards').innerHTML = rt.mode === 'mine' ? '<div class="rcard"><b style="font-weight:600">Aún no tienes recorridos</b><span class="sub" style="font-size:13px">Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar las rutas que te proponga.</span></div>' : ''; return; }
-  rt.sel = Math.min(rt.sel, list.length - 1);
-  list.forEach((r, i) => { if (i !== rt.sel) rt.layers.push(L.polyline(r.ll, { color: INK, weight: 3, opacity: .3, lineCap: 'round' }).addTo(rt.map)); });
-  const s = list[rt.sel];
-  rt.layers.push(L.polyline(s.ll, ROUTE_HALO).addTo(rt.map), L.polyline(s.ll, ROUTE_STYLE).addTo(rt.map), L.marker(s.ll[0], { icon: dotIcon('#fff', INK) }).addTo(rt.map));
-  rt.map.fitBounds(s.ll, { paddingTopLeft: [30, 150], paddingBottomRight: [30, rt.mode === 'rec' ? 350 : 300] });
-  $('#routesCards').innerHTML = list.map((r, i) => { const m = routeMeta(r), saved = savedRoutes.some((x) => x.id === r.id); return `<div class="rcard ${i === rt.sel ? 'on' : ''}" data-i="${i}">
-    <div class="between"><div style="min-width:0"><b style="font-weight:600;font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</b><span class="sub" style="font-size:12px">${r.src === 'sug' ? 'Desde tu ubicación · Generada para ti' : r.src === 'rec' ? `${r.zone}${r.away != null ? ' · ' + fmtAway(r.away) : ''}` : r.sub || ''}</span></div>
-      <button class="icon" data-save="${i}" aria-label="${saved ? 'Quitar de guardadas' : 'Guardar'}" style="width:40px;height:40px;background:${saved ? 'var(--volt)' : 'var(--surface2)'};color:var(--on-volt)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;${saved ? 'fill:currentColor' : ''}"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="chip ${m.diff[1]}">${m.diff[0]}</span><span><span class="num" style="font-size:22px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span></span><span class="sub">·</span><span class="sub" style="font-weight:600;color:var(--ink)">${r.gain == null ? '— ' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span class="sub" style="font-weight:600;color:var(--ink)">${fmtTime(m.time).replace(/^(\d+):(\d+):\d+$/, '$1 h $2 min').replace(/^(\d+):\d+$/, '$1 min')}</span></div>
-    ${r.src === 'rec' ? `<p style="margin:0;font-size:13px;line-height:1.35" class="sub"><b style="color:var(--ink);font-weight:600">${r.surface}.</b> ${r.why}${r.routed ? '' : r.failed ? ' <i>Trazado orientativo: no he podido calcular el camino real.</i>' : ' <i>Calculando el camino real…</i>'}</p>` : ''}
-    <div style="display:flex;gap:8px"><button class="btn" data-runroute="${i}" style="height:48px;font-size:15px;flex:1 1 auto;width:auto;min-width:0;padding:0 12px;white-space:nowrap">Correr esta ruta</button>${r.src === 'rec' ? `<a class="btn sec" href="https://www.google.com/maps/dir/?api=1&destination=${r.start.lat},${r.start.lon}&travelmode=transit" target="_blank" rel="noopener" style="height:48px;width:auto;padding:0 14px;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;flex:none;white-space:nowrap">Cómo llegar</a>` : ''}</div></div>`; }).join('') + (rt.mode === 'sug' ? `<div class="rcard" style="justify-content:center;align-items:center;text-align:center"><b style="font-weight:600">¿Otras opciones?</b><span class="sub" style="font-size:13px">Genero tres bucles nuevos de ${rt.km} km.</span><button class="btn sec" style="height:46px" id="routesMore">Generar otras</button></div>` : '');
-  $$('#routesCards [data-i]').forEach((c) => c.onclick = (e) => { if (e.target.closest('button')) return; rt.sel = Number(c.dataset.i); drawRoutes(); });
-  $$('#routesCards [data-save]').forEach((b) => b.onclick = () => { const r = list[Number(b.dataset.save)]; if (savedRoutes.some((x) => x.id === r.id)) { savedRoutes = savedRoutes.filter((x) => x.id !== r.id); toast('Quitada de tus recorridos'); } else { savedRoutes.unshift({ id: r.id, name: r.name, ll: r.ll, km: r.km, gain: r.gain, created: Date.now() }); toast('Guardada en Mis recorridos'); } save(ROUTES, savedRoutes); drawRoutes(); });
-  $$('#routesCards [data-runroute]').forEach((b) => b.onclick = () => { pickedRoute = list[Number(b.dataset.runroute)]; go('prep'); });
-  const more = $('#routesMore'); if (more) more.onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); };
-  const card = $(`#routesCards [data-i="${rt.sel}"]`); if (card) card.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-}
-function renderRoutes() {
-  rt.map = makeMap('routesMap', 'calles');
-  $$('#routesChips [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rt.mode));
-  $$('#routesChips [data-km]').forEach((b) => { b.classList.toggle('on', Number(b.dataset.km) === rt.km); b.style.display = rt.mode === 'sug' ? '' : 'none'; });
-  const place = (p) => { rt.here = p; if (!rt.hereM) rt.hereM = L.marker([p.lat, p.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(rt.map); else rt.hereM.setLatLng([p.lat, p.lon]); };
-  if (lastFix) place(lastFix);
-  if (rt.mode === 'mine') { rt.list = myRoutes(); rt.sel = 0; drawRoutes(); if (!rt.list.length && rt.here) rt.map.setView([rt.here.lat, rt.here.lon], 14); return; }
-  if (rt.mode === 'rec') {
-    rt.list = curatedList(); rt.sel = 0; drawRoutes(); routeCurated();
-    if (!rt.here && 'geolocation' in navigator) navigator.geolocation.getCurrentPosition((pos) => { place({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }); if (rt.mode === 'rec' && $('#routes').classList.contains('on')) { const id = rt.list[rt.sel]?.id; rt.list = curatedList(); rt.sel = Math.max(0, rt.list.findIndex((x) => x.id === id)); drawRoutes(); } }, () => {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
-    return;
-  }
-  if (rt.here) { loadSuggestions(); return; }
-  $('#routesCards').innerHTML = '<div class="rcard"><b style="font-weight:600">Buscando tu posición…</b><span class="sub" style="font-size:13px">Las rutas se calculan desde donde estás.</span></div>';
-  if (!('geolocation' in navigator)) return;
-  navigator.geolocation.getCurrentPosition((pos) => { place({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }); if ($('#routes').classList.contains('on')) loadSuggestions(); }, () => { $('#routesCards').innerHTML = '<div class="rcard"><b style="font-weight:600">Sin ubicación</b><span class="sub" style="font-size:13px">Activa la ubicación para que te proponga rutas desde donde estás.</span><button class="btn sec" style="height:46px" id="routesRetry">Reintentar</button></div>'; $('#routesRetry').onclick = renderRoutes; }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
-}
 $$('#routesChips [data-mode]').forEach((b) => b.onclick = () => { rt.mode = b.dataset.mode; renderRoutes(); });
-$$('#routesChips [data-km]').forEach((b) => b.onclick = () => { rt.km = Number(b.dataset.km); renderRoutes(); });
-$('#routesLocate').onclick = () => { if (rt.here) rt.map.setView([rt.here.lat, rt.here.lon], 15); else renderRoutes(); };
-// Distancia de un punto a la ruta elegida (al vértice más cercano; las rutas vienen densas).
+$('#routesZone').addEventListener('click', (e) => { const b = e.target.closest('[data-zone]'); if (b) { rt.zone = b.dataset.zone; renderRoutes(); } });
+$$('#routesDist [data-dist]').forEach((b) => b.onclick = () => { rt.dist = b.dataset.dist; renderRoutes(); });
+$$('#routesSurf [data-surf]').forEach((b) => b.onclick = () => { rt.surf = b.dataset.surf; renderRoutes(); });
+$$('#routesKm [data-km]').forEach((b) => b.onclick = () => { rt.km = Number(b.dataset.km); renderRoutes(); });
+// Ficha de ruta
+function openRoute(r) { detailRoute = r; go('routeDetail'); }
+let rdLayers = [];
+function renderRouteDetail() {
+  const r = detailRoute; if (!r) return go('home', { pop: true });
+  const m = routeMeta(r), saved = savedRoutes.some((x) => x.id === r.id);
+  $('#rdZone').textContent = r.src === 'rec' ? r.zone : r.src === 'sug' ? 'Bucle generado desde tu ubicación' : r.sub || 'Recorrido';
+  $('#rdName').textContent = r.name;
+  $('#rdStats').innerHTML = [[String(r.km).replace('.', ','), 'km'], [r.gain == null ? '—' : r.gain, 'm D+'], [fmtDur(m.time), 'tiempo']].map(([v, l]) => `<div><span class="lbl">${l}</span><span class="num" style="font-size:26px">${v}</span></div>`).join('') + `<div><span class="lbl">Nivel</span><span class="chip ${m.diff[1]}" style="align-self:flex-start;margin-top:4px">${m.diff[0]}</span></div>`;
+  const hasEle = r.ele && r.ele.length > 3;
+  $('#rdProfileCard').style.display = hasEle ? '' : 'none';
+  if (hasEle) { const mn = Math.min(...r.ele), mx = Math.max(...r.ele); $('#rdProfile').innerHTML = profileSvg(r.ele); $('#rdProfileSub').textContent = `${mn} – ${mx} m · ${r.loop === false ? 'ida y vuelta' : 'bucle'}`; }
+  $('#rdAbout').style.display = r.src === 'rec' ? '' : 'none';
+  if (r.src === 'rec') { $('#rdSurface').textContent = `${r.surface} · ${r.loop === false ? 'ida y vuelta' : 'bucle'}`; $('#rdWhy').textContent = r.why; $('#rdAccess').textContent = r.access || ''; }
+  const st = r.start || { lat: r.ll[0][0], lon: r.ll[0][1] }, away = rt.here ? haversine(rt.here, st) : null;
+  $('#rdAway').textContent = away == null ? 'Activa la ubicación para saber a cuánto estás de la salida.' : away <= 60 ? 'Estás en la salida.' : away <= 2500 ? `La salida está ${fmtAway(away / 1000)} de ti: al empezar te llevo hasta allí (cuenta como calentamiento).` : `La salida está ${fmtAway(away / 1000)} de ti: mejor ir en transporte.`;
+  $('#rdMaps').href = `https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lon}&travelmode=transit`;
+  $('#rdSave').style.background = saved ? 'var(--volt)' : 'var(--surface)'; $('#rdSave svg').style.fill = saved ? 'currentColor' : 'none';
+  const map = makeMap('rdMap', 'calles'); rdLayers.forEach((l) => map.removeLayer(l)); rdLayers = [];
+  rdLayers.push(L.polyline(r.ll, ROUTE_HALO).addTo(map), L.polyline(r.ll, ROUTE_STYLE).addTo(map), L.marker(r.ll[0], { icon: dotIcon('#fff', INK) }).addTo(map));
+  if (rt.here && away != null && away < 20000) rdLayers.push(L.marker([rt.here.lat, rt.here.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(map));
+  setTimeout(() => { map.invalidateSize(); map.fitBounds(r.ll, { padding: [36, 36] }); }, 80);
+}
+$('#rdRun').onclick = () => { pickedRoute = detailRoute; go('prep'); };
+$('#rdSave').onclick = () => { const r = detailRoute; if (savedRoutes.some((x) => x.id === r.id)) { savedRoutes = savedRoutes.filter((x) => x.id !== r.id); toast('Quitada de tus recorridos'); } else { savedRoutes.unshift({ id: r.id, name: r.name, ll: r.ll, km: r.km, gain: r.gain, created: Date.now() }); toast('Guardada en Mis recorridos'); } save(ROUTES, savedRoutes); renderRouteDetail(); };
 // ---------- guía ligera por la ruta ----------
 // Te lleva hasta la salida si estás lejos, y en carrera indica hacia dónde sigue el camino. Voz solo en cruces claros y si te sales.
 function bearing(a, b) { const r = Math.PI / 180, la1 = a.lat * r, la2 = b.lat * r, dl = (b.lon - a.lon) * r; const y = Math.sin(dl) * Math.cos(la2), x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(dl); return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360; }
@@ -1075,9 +1168,9 @@ function buildNav(ll) {
     while (cum[lo + 1] < d - 20) lo++;                 // punto ~20 m antes
     while (hi < pts.length - 1 && cum[hi] < d + 20) hi++;   // punto ~20 m después
     const dv = angDiff(bearing(pts[lo], pts[i]), bearing(pts[i], pts[hi]));
-    if (Math.abs(dv) < 55) continue;
+    if (Math.abs(dv) < 70) continue;   // solo giros claros; los caminos de parque serpentean
     const last = turns[turns.length - 1];
-    if (last && d - last.d < 40) { if (Math.abs(dv) > Math.abs(last.dv)) Object.assign(last, { i, d, dv }); } else turns.push({ i, d, dv });
+    if (last && d - last.d < 60) { if (Math.abs(dv) > Math.abs(last.dv)) Object.assign(last, { i, d, dv }); } else turns.push({ i, d, dv });
   }
   turns.forEach((t) => { t.dir = t.dv > 0 ? 'derecha' : 'izquierda'; t.sharp = Math.abs(t.dv) > 120; });
   return { pts, cum, total, turns, idx: 0, turnSaid: -1, phase: 'route', done: false };
@@ -1133,14 +1226,15 @@ function startPrep() {
   watchId = navigator.geolocation.watchPosition(onFix, onGeoError, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
 }
 function renderPrepSheet() {
-  const s = todaySession(); prep.session = s;
+  const s0 = todaySession(), s = s0 && prep.light ? lightSession(s0) : s0; prep.session = s;
   $('#prepMode').style.display = s ? '' : 'none';
   if (!s) prepMode = 'libre'; else if (prepMode !== 'libre') prepMode = 'plan';
   $$('#prepMode [data-pm]').forEach((b) => b.classList.toggle('on', b.dataset.pm === prepMode));
   const usePlan = s && prepMode === 'plan';
   $('#prepLbl').textContent = usePlan ? `Plan · semana ${s.week + 1}` : 'Entreno';
   $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : 'Carrera libre';
-  $('#prepDesc').textContent = usePlan ? s.desc + (s.struct ? ' Te guío por voz en cada tramo.' : '') : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
+  $('#prepDesc').textContent = usePlan ? `${s.desc} Ritmo objetivo ~${targetPace(s.type)}/km.${s.struct ? ' Te guío por voz en cada tramo.' : ''}` : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
+  $('#prepLight').style.display = usePlan ? '' : 'none'; $('#prepLight').textContent = s && s.light ? 'Volver a la sesión completa' : 'Hoy no estoy al 100 %';
   $('#prepRoute').style.display = pickedRoute ? 'flex' : 'none';
   if (pickedRoute) { $('#prepRouteName').textContent = pickedRoute.name; prepStartHint(); }
   if (prep.routeLayer) { prepMap.removeLayer(prep.routeLayer); prep.routeLayer = null; }
@@ -1158,6 +1252,7 @@ function prepStartHint() {
   else if (prep.toStart) { prepMap.removeLayer(prep.toStart); prep.toStart = null; }
 }
 $$('#prepMode [data-pm]').forEach((b) => b.onclick = () => { prepMode = b.dataset.pm; renderPrepSheet(); });
+$('#prepLight').onclick = () => { prep.light = !prep.light; renderPrepSheet(); toast(prep.light ? 'Sesión recortada un 40 %: menos series o menos km, misma estructura.' : 'Sesión completa', 3000); };
 $('#prepRouteDrop').onclick = () => { pickedRoute = null; renderPrepSheet(); if (lastFix) prepMap.setView([lastFix.lat, lastFix.lon], 16); };
 function onFix(pos) {
   const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
@@ -1171,7 +1266,7 @@ function onFix(pos) {
     $('#prepHint').textContent = good ? 'Cuando quieras.' : 'Puedes empezar igual; el principio puede salir impreciso.';
     $('#startBtn').disabled = false;
   }
-  if (run.active) runFix(lastFix);
+  if (run.active) { if (run.paused && run.auto) checkAutoPause(); runFix(lastFix); }
 }
 function onGeoError(err) {
   $('#gpsDot').className = 'dot bad';
@@ -1255,9 +1350,18 @@ function tick() {
   $('#rAvg').textContent = run.dist > 50 ? fmtPace(el / (run.dist / 1000)) : '–:––';
   $('#rBest').textContent = isFinite(run.best) ? fmtPace(run.best) : '–:––';
   if (lastFix) $('#runAcc').textContent = '±' + Math.round(lastFix.acc) + ' m';
+  checkAutoPause();
 }
-$('#pauseBtn').onclick = () => { run.paused = true; run.pauseAt = Date.now(); $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = 'En pausa'; speak('Pausa'); };
-$('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.paused = false; run.gap = true; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = runStateText(); speak('Seguimos'); };
+function pauseRun(auto) { if (run.paused) return; run.paused = true; run.auto = !!auto; run.pauseAt = Date.now(); run.pausePos = lastFix; $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = auto ? 'Autopausa · muévete para seguir' : 'En pausa'; speak(auto ? 'Pausa automática' : 'Pausa'); }
+function resumeRun() { if (!run.paused) return; run.pausedMs += Date.now() - run.pauseAt; run.paused = false; run.auto = false; run.gap = true; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = runStateText(); speak('Seguimos'); }
+$('#pauseBtn').onclick = () => pauseRun(false);
+$('#resumeBtn').onclick = resumeRun;
+// Autopausa: sin avance en 10 s con GPS fresco → pausa; al moverte 12 m, sigue sola.
+function checkAutoPause() {
+  if (settings.autopause !== '1' || !run.active) return;
+  if (!run.paused) { const last = run.points[run.points.length - 1]; if (last && run.dist > 30 && lastFix && Date.now() - lastFix.t < 6000 && lastFix.acc <= 30 && (Date.now() - run.start - run.pausedMs) - last.t > 10000) pauseRun(true); }
+  else if (run.auto && run.pausePos && lastFix && lastFix.acc <= 40 && haversine(run.pausePos, lastFix) > 12) resumeRun();
+}
 slideButton($('#finishSlide'), finishRun);
 function slideButton(el, done) {
   const knob = el.querySelector('.knob'), fill = el.querySelector('.fill');
@@ -1290,15 +1394,17 @@ function finishRun() {
   if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }
   run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
-  if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m };
+  if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light };
   if (run.route) r.route = { id: run.route.id, name: run.route.name };
+  if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
   runs.unshift(r); save(KEY, runs); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
   $('#cText').textContent = r.session && r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
-  speak('Carrera terminada. ' + fmtKm(r.dist).replace(',', ' coma ') + ' kilómetros.');
+  const okS = r.splits.filter((x) => !x.partial), bestS = okS.length ? okS.reduce((a, x) => (x.split < a.split ? x : a)) : null;
+  speak(`Carrera terminada. ${fmtKm(r.dist).replace(',', ' coma ')} kilómetros en ${fmtTime(r.dur).replace(/^(\d+):(\d+)$/, '$1 minutos $2').replace(/^(\d+):(\d+):(\d+)$/, '$1 horas $2 minutos')}. Ritmo ${fmtPace(r.dur / (r.dist / 1000)).replace(':', ' ')}.${bestS ? ` Tu mejor kilómetro, el ${bestS.km}.` : ''}`);
   go('cele');
 }
 $('#shortSave').onclick = () => { $('#shortModal').classList.remove('on'); run.forceSave = true; finishRun(); };
@@ -1330,10 +1436,12 @@ function openSummary(id) {
   const info = [];
   if (plan) { const ps1 = planStatus(plan).flat().find((x) => x.run && x.run.id === r.id); if (ps1) info.push(`Plan · semana ${ps1.week + 1} · ${ps1.title} ${fmtKmS(ps1.m)} km · ${r.dist >= ps1.m * 0.9 ? 'cumplida' : 'parcial'}${ps1.moved ? ' (otro día)' : ''}`); }
   if (r.route) info.push('Ruta: ' + r.route.name);
+  if (r.shoe) { const sh = shoes.find((x) => x.id === r.shoe); if (sh) info.push('Zapatillas: ' + sh.name); }
   $('#sPlan').style.display = info.length ? '' : 'none'; $('#sPlan').innerHTML = info.map((x) => `<div>${x}</div>`).join('');
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
   const maxS = Math.max(...r.splits.map((s) => s.split));
   $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : '<span class="sub" style="grid-column:1/-1">Menos de un kilómetro, sin parciales.</span>';
+  const ins = runInsights(r); $('#sInsight').style.display = ins ? '' : 'none'; $('#sInsightText').textContent = ins || '';
   go('summary');
   const m = makeMap('sumMap', settings.map); setLayer(m, settings.map);
   sumLayers.forEach((l) => m.removeLayer(l)); sumLayers = [];
@@ -1342,9 +1450,58 @@ function openSummary(id) {
   m.dragging.disable(); m.scrollWheelZoom.disable(); m.touchZoom.disable();
   setTimeout(() => { m.invalidateSize(); m.fitBounds(ll, { paddingTopLeft: [32, 80], paddingBottomRight: [32, 70] }); }, 80);
 }
+// Lectura con reglas (sin IA): compara con tus últimas carreras, mira cómo repartiste el esfuerzo y lo sitúa en la semana.
+function runInsights(r) {
+  if (!r || r.dist < 800) return '';
+  const out = [], pace = r.dur / (r.dist / 1000), prev = runs.filter((x) => x.id !== r.id && x.start < r.start && x.dist > 800).slice(0, 5);
+  if (prev.length >= 2) { const ref = prev.map((x) => x.dur / (x.dist / 1000)).sort((a, b) => a - b)[Math.floor(prev.length / 2)], d = Math.round(ref - pace); if (Math.abs(d) > 120) out.push(d > 0 ? 'Mucho más rápido que en tus últimas carreras.' : 'Mucho más tranquilo que en tus últimas carreras.'); else if (Math.abs(d) >= 8) out.push(d > 0 ? `Has ido ${d} s/km más rápido que en tus últimas carreras.` : `Has ido ${-d} s/km más tranquilo que de costumbre${r.session?.type === 'suave' || r.session?.type === 'largo' ? ', que es justo lo que tocaba' : ''}.`); else out.push('Ritmo en tu línea habitual.'); }
+  const ok = (r.splits || []).filter((x) => !x.partial);
+  if (ok.length >= 4) { const h = Math.floor(ok.length / 2), a = ok.slice(0, h).reduce((s1, x) => s1 + x.split, 0) / h, b = ok.slice(-h).reduce((s1, x) => s1 + x.split, 0) / h, d = Math.round(a - b); if (d >= 6) out.push(`Segunda mitad ${d} s/km más rápida: bien dosificado.`); else if (d <= -10) out.push(`Saliste ${-d} s/km más rápido de lo que luego pudiste mantener; la próxima, un poco más conservador al principio.`); const sd = Math.sqrt(ok.reduce((s1, x) => s1 + (x.split - pace) ** 2, 0) / ok.length); if (sd < 8 && d > -6 && d < 6) out.push('Parciales muy regulares.'); }
+  const longest = prev.length ? Math.max(...prev.map((x) => x.dist)) : 0; if (prev.length >= 2 && r.dist > longest) out.push('Es tu carrera más larga hasta ahora.');
+  const wk = runs.filter((x) => x.start >= weekStart(r.start) && x.start < weekStart(r.start) + 7 * 864e5 && x.start <= r.start).length; if (wk >= 3) out.push(`Van ${wk} carreras esta semana.`);
+  if (r.session) out.push(r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : `Sesión del plan a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km; el lunes lo tengo en cuenta.`);
+  return out.slice(0, 3).join(' ');
+}
 $('#replayBtn').onclick = () => openReplay();
+$('#gpxBtn').onclick = () => { if (current) shareOrDownload(new Blob([runGpx(current)], { type: 'application/gpx+xml' }), `zancada-${new Date(current.start).toISOString().slice(0, 10)}.gpx`, current.name); };
 $('#deleteBtn').onclick = () => { if (!current) return; runs = runs.filter((r) => r.id !== current.id); save(KEY, runs); toast('Carrera borrada'); go('home'); };
-$('#shareBtn').onclick = async () => { if (!current) return; const r = current, text = `He corrido ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))} /km) con Zancada 🏃`; try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); toast('Copiado al portapapeles'); } } catch (e) {} };
+$('#shareBtn').onclick = () => { if (current) shareImage(current); };
+// ---------- compartir como imagen ----------
+// Tarjeta 1080×1350 (4:5, vale para Instagram, Telegram y WhatsApp) con el trazado y los datos, en estilo Volt. Sin servidor: se dibuja en un canvas.
+async function shareImage(r) {
+  try { await document.fonts.ready; } catch (e) {}
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  // trazado
+  const pts = (r.points || []).map((p) => [p.lat, p.lon]);
+  if (pts.length > 1) {
+    const k = Math.cos(pts[0][0] * Math.PI / 180), xs = pts.map((p) => p[1] * k), ys = pts.map((p) => -p[0]);
+    const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys), span = Math.max(maxX - minX, maxY - minY) || 1e-6;
+    const box = { x: 90, y: 300, w: 900, h: 620 }, s = Math.min(box.w, box.h) / span, ox = box.x + (box.w - (maxX - minX) * s) / 2, oy = box.y + (box.h - (maxY - minY) * s) / 2;
+    const P = (i) => [(xs[i] - minX) * s + ox, (ys[i] - minY) * s + oy];
+    x.lineCap = x.lineJoin = 'round';
+    for (const [col, w] of [['rgba(212,255,58,.18)', 34], [VOLT, 12]]) { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); pts.forEach((_, i) => { const [px, py] = P(i); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke(); }
+    const [sx, sy] = P(0), [ex, ey] = P(pts.length - 1);
+    x.fillStyle = '#fff'; x.beginPath(); x.arc(sx, sy, 14, 0, 7); x.fill(); x.fillStyle = INK; x.beginPath(); x.arc(sx, sy, 7, 0, 7); x.fill();
+    x.fillStyle = VOLT; x.beginPath(); x.arc(ex, ey, 14, 0, 7); x.fill(); x.fillStyle = INK; x.beginPath(); x.arc(ex, ey, 7, 0, 7); x.fill();
+  }
+  const disp = '"Space Grotesk", "Inter", system-ui, sans-serif', body = '"Inter", system-ui, sans-serif';
+  x.fillStyle = '#F4F5F0'; x.textBaseline = 'alphabetic';
+  x.font = `700 44px ${disp}`; x.fillText('Zancada', 90, 130);
+  x.fillStyle = 'rgba(244,245,240,.6)'; x.font = `500 30px ${body}`; x.fillText(fmtDate(r.start).replace(' · ', ' · ') + (r.route ? '  ·  ' + r.route.name : r.session ? '  ·  ' + (r.session.title || 'sesión del plan') : ''), 90, 185);
+  x.fillStyle = '#F4F5F0'; x.font = `700 190px ${disp}`; x.fillText(fmtKm(r.dist), 80, 1095);
+  const kmW = x.measureText(fmtKm(r.dist)).width; x.fillStyle = 'rgba(244,245,240,.6)'; x.font = `600 56px ${body}`; x.fillText('km', 90 + kmW + 16, 1095);
+  const ok = (r.splits || []).filter((s) => !s.partial), best = ok.length ? fmtPace(Math.min(...ok.map((s) => s.split))) : null;
+  const cells = [['Tiempo', fmtTime(r.dur)], ['Ritmo', fmtPace(r.dur / (r.dist / 1000)) + ' /km'], ['Mejor km', best ? best + ' /km' : '—']];
+  cells.forEach(([l, v], i) => { const cx = 90 + i * 310; x.fillStyle = 'rgba(244,245,240,.5)'; x.font = `600 24px ${body}`; x.fillText(l.toUpperCase(), cx, 1190); x.fillStyle = i === 1 ? VOLT : '#F4F5F0'; x.font = `700 62px ${disp}`; x.fillText(v, cx, 1260); });
+  const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
+  const file = new File([blob], `zancada-${new Date(r.start).toISOString().slice(0, 10)}.png`, { type: 'image/png' });
+  const text = `He corrido ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))} /km) con Zancada 🏃`;
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast('Imagen guardada en descargas', 3000);
+  return c.toDataURL('image/png');
+}
 
 // ---------- repetición ----------
 const rep = { map: null, layers: [], playing: false, speed: 2, pos: 0, raf: 0, last: 0, total: 0 };
