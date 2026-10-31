@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.33 (31 oct 2026)
+- Actividad › Calendario del mes: cada día corrido lleva un círculo lima proporcional a los km; toca el día para abrir la carrera. Con las flechas ves los meses anteriores.
+
 ## Novedades 0.32 (31 oct 2026)
 - Estiramientos guiados de 5 minutos al terminar (pantalla de fin de carrera y resumen): 7 posturas de 40 s (gemelos, cuádriceps, isquios, glúteo) con explicación, cuenta atrás, voz y vibración al cambiar. Se puede pausar o saltar.
 
