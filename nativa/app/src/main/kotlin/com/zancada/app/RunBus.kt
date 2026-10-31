@@ -36,6 +36,8 @@ data class RunUi(
     val lockLine: String = "",
     /** Pasos por minuto en los últimos 30 s (sensor de pasos); null si no hay sensor o permiso. */
     val cad: Int? = null,
+    /** Pulso del pulsómetro Bluetooth; null si no hay o no llega señal. */
+    val hr: Int? = null,
     /** Modo seguridad activo en esta carrera. */
     val sos: Boolean = false,
 )

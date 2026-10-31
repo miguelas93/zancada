@@ -295,6 +295,7 @@ fun RunScreen() {
                 Stat("Ritmo medio", if (ui.dist > 50) fmtPace(el / (ui.dist / 1000)) else "–:––", 28.sp, unit = "/km")
                 Stat("Mejor km", if (ui.bestKm.isFinite()) fmtPace(ui.bestKm) else "–:––", 28.sp, unit = "/km")
                 ui.cad?.let { Stat("Cadencia", "$it", 28.sp, unit = "ppm") }
+                ui.hr?.let { Stat("Pulso", "$it", 28.sp, unit = "ppm") }
             }
             Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(20.dp))) { ZMap(Modifier.matchParentSize(), "calles", lines, dots, ctl) }
             if (!ui.paused) Box(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {

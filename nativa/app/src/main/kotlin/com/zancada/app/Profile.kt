@@ -150,6 +150,7 @@ fun ProfileScreen() {
             SelRow("Autopausa al pararte", listOf("1" to "Sí", "0" to "No"), s.autopause) { v -> Repo.settings { it.copy(autopause = v) } }
         }
         ShoesCard(app)
+        HrCard()
         SosCard()
         HcCard()
         // Tus datos
@@ -187,6 +188,45 @@ fun ProfileScreen() {
             Repo.update { it.copy(runs = emptyList(), plan = null, savedRoutes = emptyList(), shoes = emptyList()) }; Reminders.sync(ctx); toast("Datos borrados"); Nav.go(HOME)
         }, kind = BtnKind.Ghost, color = c.danger)
         Sub("$APP_VER · $APP_DATE", size = 12.sp, align = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** Pulsómetro Bluetooth: banda de pecho o reloj que emita el pulso. */
+@Composable
+private fun HrCard() {
+    val ctx = LocalContext.current
+    val st = Repo.data.collectAsState().value.settings
+    val found = remember { mutableStateListOf<HrFound>() }
+    var searching by remember { mutableStateOf(false) }
+    var scan by remember { mutableStateOf<HrScan?>(null) }
+    DisposableEffect(Unit) { onDispose { scan?.stop() } }
+    fun search() {
+        Perm.bt { ok ->
+            if (!ok) { toast("Sin permiso de Bluetooth: actívalo en Ajustes del móvil", 3500); return@bt }
+            if (!HrBle.adapterOn(ctx)) { toast("Activa el Bluetooth del móvil y vuelve a probar", 3500); return@bt }
+            found.clear()
+            val s = HrScan(ctx, { f -> if (found.none { it.addr == f.addr }) found += f }, { searching = false })
+            if (s.start()) { scan = s; searching = true } else toast("No he podido buscar por Bluetooth", 3000)
+        }
+    }
+    ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            H2("Pulsómetro"); if (st.hrAddr != null) Chip("Conectado")
+        }
+        if (st.hrAddr != null) {
+            Sub("Usarás ${st.hrName ?: "tu pulsómetro"} en cada carrera: verás el pulso mientras corres y el medio y el máximo en el resumen. Póntelo antes de empezar.")
+            Btn("Olvidar pulsómetro", { Repo.settings { it.copy(hrAddr = null, hrName = null) }; toast("Pulsómetro olvidado") }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
+        } else {
+            Sub("Conecta una banda de pecho o un reloj que emita el pulso por Bluetooth (Polar, Garmin, Wahoo, Coros…). Póntelo y actívalo antes de buscar.")
+            if (searching) Sub("Buscando…", size = 12.sp)
+            found.forEach { f ->
+                Btn(f.name, {
+                    scan?.stop(); Repo.settings { it.copy(hrAddr = f.addr, hrName = safeText(f.name, 30)) }; toast("${f.name} guardado")
+                }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
+            }
+            if (!searching && found.isEmpty() && scan != null) Sub("No he encontrado ninguno. Comprueba que está encendido y emitiendo (en relojes, el modo «emitir pulso»).", size = 12.sp)
+            if (!searching) Btn(if (scan == null) "Buscar pulsómetro" else "Buscar otra vez", { search() }, height = 46.dp, size = 15.sp)
+        }
     }
 }
 

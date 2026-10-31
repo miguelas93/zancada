@@ -56,6 +56,7 @@ class RunService : LifecycleService() {
     private var foreground = false
     private val steps by lazy { StepMeter(this) }
     private val sos by lazy { SosSender(this) }
+    private val hr by lazy { HrMonitor(this) }
     /** Tiempo de carrera cuando empezó a contar el sensor de pasos (tras recuperar una carrera no es 0). */
     private var stepsFromSec = 0.0
 
@@ -120,7 +121,7 @@ class RunService : LifecycleService() {
         RunBus.track.value = emptyList(); RunBus.cele.value = null
         wire(cfg, prevFix?.let { LatLon(it.lat, it.lon) })
         session.begin(System.currentTimeMillis())
-        stepsFromSec = 0.0; steps.start()
+        stepsFromSec = 0.0; steps.start(); hr.start(Repo.data.value.settings.hrAddr)
         sos.begin(System.currentTimeMillis(), prevFix?.lat, prevFix?.lon)
         startTicker(); persist(); publish()
     }
@@ -131,7 +132,7 @@ class RunService : LifecycleService() {
             while (isActive) {
                 val now = System.currentTimeMillis()
                 session.tick(now); live?.tick(session, now)
-                steps.paused = session.paused
+                steps.paused = session.paused; hr.paused = session.paused
                 sos.tick(now, session.dist, session.elapsed(now), session.lastFix?.lat, session.lastFix?.lon, manualPause = session.paused && !session.autoPaused)
                 publish()
                 if (++ticks % 10 == 0) persist()   // cada 5 s
@@ -158,7 +159,7 @@ class RunService : LifecycleService() {
         wire(cfg, null)
         RunBus.track.value = session.points.map { LatLon(it.lat, it.lon) }
         startLocation(); startTicker()
-        stepsFromSec = session.elapsed(System.currentTimeMillis()); steps.start()
+        stepsFromSec = session.elapsed(System.currentTimeMillis()); steps.start(); hr.start(Repo.data.value.settings.hrAddr)
         sos.begin(System.currentTimeMillis(), session.lastFix?.lat, session.lastFix?.lon, resumed = true)
         Voice.say("Carrera recuperada")
         publish()
@@ -176,14 +177,14 @@ class RunService : LifecycleService() {
                 val w = Repo.wxFresh()?.let { RunWx(it.t.toInt(), it.wind.toInt(), if (it.now) 1 else 0) }
                 val cele = Repo.mutate {
                     val prevBest = runs.maxOfOrNull { it.dist } ?: 0.0
-                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w).copy(cad = cadenceOf(steps.steps, res.run.dur - stepsFromSec))
+                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w).copy(cad = cadenceOf(steps.steps, res.run.dur - stepsFromSec), hr = hr.avg(), hrMax = hr.avg()?.let { hr.max })
                     val nb = addRun(r)
                     val wk = weekStats()
                     Voice.say(finishSpeech(r, nb))
                     Cele(r, nb, celeText(r, nb, prevBest), "${wk.count} de ${goalOf()}")
                 }
                 Repo.saveNow()
-                steps.stop(); sos.end(cele.run.dist, cele.run.dur)
+                steps.stop(); hr.stop(); sos.end(cele.run.dist, cele.run.dur)
                 clearLive()   // solo después de guardarla de verdad
                 Reminders.sync(this)
                 Hc.push(this)
@@ -208,7 +209,7 @@ class RunService : LifecycleService() {
             avg = if (session.dist > 50) el / (session.dist / 1000) else Double.NaN,
             bestKm = session.bestKm, paused = session.paused, autoPaused = session.autoPaused,
             live = lv?.state ?: cur.live, lockLine = lv?.lockLine() ?: "",
-            cad = if (session.active) steps.live(now) else null, sos = sos.active,
+            cad = if (session.active) steps.live(now) else null, hr = hr.now(now), sos = sos.active,
         )
         if (session.active) updateNotification("${fmtKm(session.dist)} km · ${fmtTime(el)}${if (session.paused) " · en pausa" else ""}")
         else session.lastFix?.let { updateNotification("GPS listo · ±${Math.round(it.acc)} m") }
@@ -252,7 +253,7 @@ class RunService : LifecycleService() {
     }
 
     private fun shutdown() {
-        steps.stop()
+        steps.stop(); hr.stop()
         if (listening) { fused.removeLocationUpdates(callback); listening = false }
         foreground = false
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)

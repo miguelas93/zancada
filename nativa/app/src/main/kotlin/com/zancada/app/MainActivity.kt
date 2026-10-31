@@ -38,6 +38,8 @@ object Perm {
         a.askMissing(want.toTypedArray()) { cb() }
     }
     fun sms(cb: (Boolean) -> Unit) = act?.ask(arrayOf(Manifest.permission.SEND_SMS), cb) ?: cb(false)
+    /** Buscar y conectar el pulsómetro Bluetooth. */
+    fun bt(cb: (Boolean) -> Unit) { val a = act ?: return cb(false); a.askMissing(HrBle.perms()) { cb(HrBle.allowed(a)) } }
 }
 
 class MainActivity : ComponentActivity() {
