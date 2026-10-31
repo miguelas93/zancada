@@ -169,6 +169,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 <body>
 
 <div class="toast" id="toast"></div>
+<div class="modal" id="stretchModal"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl" id="stStep">Estiramientos</span><button class="sub" id="stClose" style="font-size:13px;text-decoration:underline">Cerrar</button></div><h1 style="font-size:28px" id="stName">—</h1><p class="sub" id="stHow" style="margin:0;font-size:15px;line-height:1.45"></p><div style="display:flex;align-items:baseline;gap:6px"><span class="num" id="stLeft" style="font-size:72px;letter-spacing:-.04em">40</span><span class="unit">s</span></div><div class="track"><i id="stTrack" style="width:0"></i></div><div style="display:flex;gap:8px"><button class="btn sec" id="stPause" style="height:48px;font-size:15px;flex:1">Pausa</button><button class="btn sec" id="stSkip" style="height:48px;font-size:15px;flex:1">Siguiente</button></div><p class="sub" style="margin:0;font-size:11px">Suave y sin rebotes: tensión, nunca dolor.</p></div></div>
 <div class="modal" id="manualModal"><form class="card col" style="gap:12px" id="manualForm">
     <h2>Carrera a mano</h2><p class="sub" style="margin:0;font-size:13px">Para la cinta o una carrera medida con el reloj. Sin mapa ni parciales, pero cuenta para la semana, el plan, las insignias y las zapatillas.</p>
     <label class="setrow">Fecha y hora<input type="datetime-local" id="mDate" required style="height:40px;border-radius:10px;border:1px solid var(--line);padding:0 10px;background:var(--surface2);color:var(--ink);font:inherit"></label>
@@ -325,7 +326,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.31 · avisos de ritmo · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.32 · estiramientos guiados · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -496,6 +497,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
   </div>
   <div class="grow"></div>
   <button class="btn" id="toSummary">Ver mi carrera</button>
+  <button class="btn ghost" id="stretchBtn" style="color:var(--on-bar);opacity:.8">Estirar 5 min, guiado</button>
 </section>
 
 <!-- RESUMEN -->
@@ -517,6 +519,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="card col" id="sProfileCard" style="gap:8px;padding:18px 20px;display:none"><div class="between"><h2>Perfil</h2><span class="sub" id="sProfileSub"></span></div><div id="sProfile" style="color:var(--ink)"></div></div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
     <button class="btn sec" id="againBtn" style="height:48px;font-size:15px">Volver a correr este recorrido</button>
+    <button class="btn ghost" id="stretchBtn2">Estirar 5 min, guiado</button>
     <button class="btn ghost" id="gpxBtn">Exportar GPX (Strava, Garmin…)</button>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
   </div>
@@ -811,6 +814,25 @@ function renderHistory() {
 }
 let histFilter = 'all', heatLayers = [];
 // Carrera a mano (cinta, reloj): sin puntos GPS. Todo lo demás la trata como una carrera normal.
+// Estiramientos guiados tras correr (NRC): 7 posturas de 40 s con voz y vibración al cambiar.
+const STRETCHES = [
+  ['Gemelo izquierdo', 'Manos en una pared, pierna izquierda atrás y estirada, talón pegado al suelo. Inclínate hacia la pared.'],
+  ['Gemelo derecho', 'Igual con la pierna derecha atrás: talón al suelo, rodilla estirada.'],
+  ['Cuádriceps izquierdo', 'De pie, coge el pie izquierdo y llévalo hacia el glúteo, rodillas juntas. Apóyate si lo necesitas.'],
+  ['Cuádriceps derecho', 'Ahora el pie derecho hacia el glúteo, cadera un poco hacia delante.'],
+  ['Isquio izquierdo', 'Talón izquierdo sobre un bordillo o banco bajo, pierna estirada. Inclínate desde la cadera con la espalda recta.'],
+  ['Isquio derecho', 'Cambia: talón derecho arriba, espalda recta, sin forzar.'],
+  ['Glúteo y cadera', 'Sentado o tumbado, cruza un tobillo sobre la rodilla contraria y acércala al pecho. Cambia de lado a la mitad.'],
+];
+const stz = { i: 0, left: 40, timer: null, paused: false };
+function stShow() { const [n, h] = STRETCHES[stz.i]; $('#stStep').textContent = `Estiramiento ${stz.i + 1} de ${STRETCHES.length}`; $('#stName').textContent = n; $('#stHow').textContent = h; $('#stLeft').textContent = stz.left; $('#stTrack').style.width = ((40 - stz.left) / 40 * 100) + '%'; }
+function stGo(i) { if (i >= STRETCHES.length) { stStop(); speak('Listo. Buen trabajo.'); toast('Estiramientos hechos', 2500); return; } stz.i = i; stz.left = 40; stShow(); speak(`${STRETCHES[i][0]}. ${STRETCHES[i][1]}`); try { navigator.vibrate?.(120); } catch (e) {} }
+function stStop() { clearInterval(stz.timer); stz.timer = null; $('#stretchModal').classList.remove('on'); }
+function stStart() { stz.paused = false; $('#stPause').textContent = 'Pausa'; $('#stretchModal').classList.add('on'); stGo(0); clearInterval(stz.timer); stz.timer = setInterval(() => { if (stz.paused) return; stz.left--; if (stz.left === 10 && stz.i === STRETCHES.length - 1) speak('Cambia de lado.'); if (stz.left <= 0) return stGo(stz.i + 1); stShow(); }, 1000); }
+$('#stretchBtn').onclick = stStart; $('#stretchBtn2').onclick = stStart;
+$('#stClose').onclick = stStop;
+$('#stSkip').onclick = () => stGo(stz.i + 1);
+$('#stPause').onclick = () => { stz.paused = !stz.paused; $('#stPause').textContent = stz.paused ? 'Seguir' : 'Pausa'; };
 $('#manualBtn').onclick = () => { const d = new Date(Date.now() - 3600e3); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $('#mDate').value = d.toISOString().slice(0, 16); $('#manualModal').classList.add('on'); setTimeout(() => $('#mKm').focus(), 50); };
 $('#mCancel').onclick = () => $('#manualModal').classList.remove('on');
 $('#manualForm').onsubmit = (e) => {
