@@ -299,6 +299,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="card col" style="gap:4px">
       <h2 style="margin-bottom:6px">Ajustes</h2>
       <label class="setrow">Objetivo de km al mes<select class="sel" id="setMonthkm"><option value="0">Sin objetivo</option><option value="30">30 km</option><option value="50">50 km</option><option value="80">80 km</option><option value="100">100 km</option><option value="150">150 km</option><option value="200">200 km</option></select></label>
+      <label class="setrow">Vibrar en los avisos<select class="sel" id="setVibrate"><option value="1">Sí</option><option value="0">No</option></select></label>
       <label class="setrow">Avisos de voz<select class="sel" id="setVoice"><option value="1">Cada km</option><option value="half">Cada 500 m</option><option value="min5">Cada 5 min</option><option value="0">Sin voz</option></select></label>
       <label class="setrow">Texto más grande<select class="sel" id="setBigtext"><option value="0">Normal</option><option value="1">Grande</option></select></label>
       <label class="setrow">Modo noche<select class="sel" id="setNight"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
@@ -321,7 +322,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.25 · ficha de ruta ampliada · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.26 · repetir recorrido · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -511,6 +512,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="card col" style="gap:12px;padding:20px 22px"><div class="between"><h2>¿Cómo fue?</h2><span class="sub" style="font-size:12px" id="sFeelLbl"></span></div><div class="feel" id="sFeel"><button data-feel="1">Muy duro</button><button data-feel="2">Duro</button><button data-feel="3">Normal</button><button data-feel="4">Bien</button><button data-feel="5">Volando</button></div><textarea class="note" id="sNote" placeholder="Notas: dónde, con quién, cómo te sentiste…"></textarea></div>
     <div class="card col" id="sProfileCard" style="gap:8px;padding:18px 20px;display:none"><div class="between"><h2>Perfil</h2><span class="sub" id="sProfileSub"></span></div><div id="sProfile" style="color:var(--ink)"></div></div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
+    <button class="btn sec" id="againBtn" style="height:48px;font-size:15px">Volver a correr este recorrido</button>
     <button class="btn ghost" id="gpxBtn">Exportar GPX (Strava, Garmin…)</button>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
   </div>
@@ -906,10 +908,10 @@ function renderProfile() {
   });
   const newest = marks.filter((x) => isFinite(x.best)).reduce((a, x) => (!a || x.when > a.when ? x : a), null);
   $('#prList').innerHTML = marks.map((x) => `<div class="pr"><div style="flex:1"><div style="font-weight:600">${x.name}</div><div class="sub" style="font-size:12px">${isFinite(x.best) ? new Date(x.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Aún sin marca'}</div></div>${newest === x && runs.length > 1 ? '<span class="chip" style="font-size:9px">Nueva</span>' : ''}<span class="num" style="font-size:22px;${isFinite(x.best) ? '' : 'color:var(--muted)'}">${isFinite(x.best) ? fmtTime(x.best) : '—'}</span></div>`).join('');
-  $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map; $('#setAutopause').value = settings.autopause; $('#setMonthkm').value = String(settings.monthkm || '0'); $('#setBigtext').value = settings.bigtext || '0';
+  $('#setVoice').value = settings.voice; $('#setVibrate').value = settings.vibrate || '1'; $('#setNight').value = settings.night; $('#setMap').value = settings.map; $('#setAutopause').value = settings.autopause; $('#setMonthkm').value = String(settings.monthkm || '0'); $('#setBigtext').value = settings.bigtext || '0';
   renderShoes(); renderBadges();
 }
-['setVoice', 'setNight', 'setMap', 'setAutopause', 'setMonthkm', 'setBigtext'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
+['setVoice', 'setNight', 'setMap', 'setAutopause', 'setMonthkm', 'setBigtext', 'setVibrate'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
 // ---------- insignias ----------
 // Se calculan siempre a partir de las carreras guardadas (nada que sincronizar); solo se guarda cuáles has visto ya.
 const BADGE_DEFS = [
@@ -1814,7 +1816,8 @@ function finalizeRun(r) {
 }
 // Desnivel positivo con histéresis de 4 m para que el ruido del GPS no sume metros falsos.
 function elevGain(pts) { let g = 0, base = null, n = 0; for (const p of pts) { if (p.a == null) continue; n++; if (base == null) { base = p.a; continue; } if (p.a - base >= 4) { g += p.a - base; base = p.a; } else if (base - p.a >= 4) base = p.a; } return n > 10 ? Math.round(g) : null; }
-function speak(text) { try { if (settings.voice === '0' || !('speechSynthesis' in window)) return; const u = new SpeechSynthesisUtterance(text); u.lang = 'es-ES'; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
+function buzz(p) { try { if ((settings.vibrate || '1') !== '0' && navigator.vibrate && run.active) navigator.vibrate(p || [80, 60, 80]); } catch (e) {} }
+function speak(text) { buzz(); try { if (settings.voice === '0' || !('speechSynthesis' in window)) return; const u = new SpeechSynthesisUtterance(text); u.lang = 'es-ES'; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
 
 // ---------- resumen ----------
 let current = null, sumLayers = [];
@@ -1853,6 +1856,7 @@ function openSummary(id) {
   const maxS = Math.max(...r.splits.map((s) => s.split));
   $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : `<span class="sub" style="grid-column:1/-1">${r.manual ? 'Carrera añadida a mano: sin parciales.' : 'Menos de un kilómetro, sin parciales.'}</span>`;
   { const ele = (r.points || []).filter((p) => p.a != null).map((p) => p.a); const okE = ele.length >= 10; $('#sProfileCard').style.display = okE ? '' : 'none'; if (okE) { $('#sProfile').innerHTML = profileSvg(ele); $('#sProfileSub').textContent = `${Math.min(...ele)} – ${Math.max(...ele)} m${r.gain != null ? ` · +${r.gain} m` : ''}`; } }
+  $('#againBtn').style.display = r.points?.length > 5 || (r.route && !r.route.id.startsWith('run-')) ? '' : 'none';
   const ins = runInsights(r); $('#sInsight').style.display = ins ? '' : 'none'; $('#sInsightText').textContent = ins || '';
   go('summary'); $('#summary').scrollTop = 0;
   const hasPts = r.points && r.points.length > 1; $('#replayBtn').style.display = hasPts ? '' : 'none'; $('#gpxBtn').style.display = hasPts ? '' : 'none'; $('#sumNoMap').style.display = hasPts ? 'none' : '';
@@ -1888,6 +1892,7 @@ $('#sRename').onclick = () => { if (!current || $('#sTitleIn')) return; const h 
 $('#gpxBtn').onclick = () => { if (current) shareOrDownload(new Blob([runGpx(current)], { type: 'application/gpx+xml' }), `zancada-${new Date(current.start).toISOString().slice(0, 10)}.gpx`, current.name); };
 $('#deleteBtn').onclick = () => { if (!current) return; runs = runs.filter((r) => r.id !== current.id); save(KEY, runs); toast('Carrera borrada'); go('home'); };
 $('#shareBtn').onclick = () => { if (current) shareImage(current); };
+$('#againBtn').onclick = () => { const r = current; if (!r) return; if (r.route && !r.route.id.startsWith('run-')) { const base = ZR.find((x) => x.id === r.route.id) || savedRoutes.find((x) => x.id === r.route.id); if (base) { pickedRoute = Object.assign({}, base); go('prep'); return; } } if (!(r.points?.length > 5)) return toast('Esta carrera no tiene trazado para repetir'); pickedRoute = { id: 'run-' + r.id, name: r.name, ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: r.gain ?? null, src: 'run', start: { lat: r.points[0].lat, lon: r.points[0].lon } }; go('prep'); };
 // ---------- compartir como imagen ----------
 // Tarjeta 1080×1350 (4:5, vale para Instagram, Telegram y WhatsApp) con el trazado y los datos, en estilo Volt. Sin servidor: se dibuja en un canvas.
 async function shareImage(r) {
