@@ -336,7 +336,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.59 · copia de seguridad en la app · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.60 · seguridad · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -584,6 +584,9 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 'use strict';
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
+// Seguridad: los textos que escribe la persona o que llegan de fuera (nombre de un GPX, copia restaurada) se pintan dentro del HTML.
+// Sin < ni > no pueden colar etiquetas ni código (un GPX con <img onerror=…> en el nombre ejecutaba JavaScript en la app).
+const safeText = (t, n = 60) => String(t ?? '').replace(/[<>]/g, '').trim().slice(0, n);
 const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1', PROF = 'zancada.profile.v1', PLAN = 'zancada.plan.v1', ROUTES = 'zancada.routes.v1';
 const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat', autopause: '1', shoe: null, monthkm: '0', bigtext: '0' }, load(SET, {}));
 const BADGES = 'zancada.badges.v1'; let badgeSeen = load(BADGES, []);
@@ -591,6 +594,10 @@ const SHOES = 'zancada.shoes.v1'; let shoes = load(SHOES, []);
 let runs = load(KEY, []);
 let plan = load(PLAN, null), savedRoutes = load(ROUTES, []);
 const profile = Object.assign({ name: '', goal: 3, done: false }, load(PROF, {}));
+// Limpia lo ya guardado (datos antiguos o una copia restaurada) con la misma regla.
+profile.name = safeText(profile.name, 20); shoes.forEach((x) => { x.name = safeText(x.name, 40); });
+runs.forEach((r) => { if (r.name != null) r.name = safeText(r.name, 40); if (r.route?.name != null) r.route.name = safeText(r.route.name, 60); });
+savedRoutes.forEach((r) => { if (r.name != null) r.name = safeText(r.name, 60); });
 const GOAL_OF = () => Math.max(1, Number(profile.goal) || 3);
 // Día / noche: claro de día, oscuro de 20:00 a 7:00 o con el móvil en modo oscuro (o forzado en Perfil).
 const darkMQ = matchMedia('(prefers-color-scheme: dark)');
@@ -716,7 +723,7 @@ function showWStep() {
   if (wStep === 3) { $('#wDone').textContent = n ? `Listo, ${n}.` : 'Listo.'; $('#wDoneText').textContent = `Objetivo: ${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana seguida. Pulsa el botón lima cuando quieras salir; en Perfil tienes insignias, zapatillas y copia de seguridad.`; }
   $('#wNext').textContent = wStep === 0 ? 'Continuar' : wStep === 1 ? 'Ese es mi objetivo' : wStep === 2 ? 'Vale' : 'Empezar';
 }
-$('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 3) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); settings.newsSeen = NEWS_VER; save(SET, settings); go('home'); };
+$('#wNext').onclick = () => { if (wStep === 0) { profile.name = safeText($('#wName').value, 20); $('#wName').blur(); } if (wStep < 3) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); settings.newsSeen = NEWS_VER; save(SET, settings); go('home'); };
 $('#wName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#wNext').click(); });
 $$('#wLevel [data-lvl]').forEach((b) => b.onclick = () => { $$('#wLevel [data-lvl]').forEach((x) => x.classList.toggle('on', x === b)); settings.startSeen = b.dataset.lvl === 'corro' ? '1' : '0'; save(SET, settings); });
 $$('#welcome [data-goal]').forEach((b) => b.onclick = () => { profile.goal = Number(b.dataset.goal); $$('#welcome [data-goal]').forEach((x) => x.classList.toggle('on', x === b)); });
@@ -1170,7 +1177,7 @@ function renderShoes() {
   $$('#shoeList [data-shoe]').forEach((b) => b.onclick = () => { settings.shoe = settings.shoe === b.dataset.shoe ? null : b.dataset.shoe; save(SET, settings); renderShoes(); });
   $$('#shoeList [data-shoedel]').forEach((b) => b.onclick = () => { shoes = shoes.filter((x) => x.id !== b.dataset.shoedel); if (settings.shoe === b.dataset.shoedel) settings.shoe = null; save(SHOES, shoes); save(SET, settings); renderShoes(); });
 }
-$('#shoeForm').onsubmit = (e) => { e.preventDefault(); const name = $('#shoeName').value.trim(); if (!name) return; const sh = { id: 's' + Date.now(), name, km0: Number($('#shoeKm0').value) || 0, created: Date.now() }; shoes.unshift(sh); settings.shoe = sh.id; save(SHOES, shoes); save(SET, settings); $('#shoeName').value = ''; $('#shoeKm0').value = ''; renderShoes(); toast('Par añadido y en uso'); };
+$('#shoeForm').onsubmit = (e) => { e.preventDefault(); const name = safeText($('#shoeName').value, 40); if (!name) return; const sh = { id: 's' + Date.now(), name, km0: Number($('#shoeKm0').value) || 0, created: Date.now() }; shoes.unshift(sh); settings.shoe = sh.id; save(SHOES, shoes); save(SET, settings); $('#shoeName').value = ''; $('#shoeKm0').value = ''; renderShoes(); toast('Par añadido y en uso'); };
 // ---------- copia de seguridad ----------
 // Dentro del APK (WebView) ni navigator.share con archivos ni la descarga con <a download> funcionan: el botón no hacía nada.
 // Allí se escribe el archivo en la caché de la app (plugin Filesystem) y se abre el menú de compartir de Android (plugin Share):
@@ -1218,7 +1225,7 @@ function parseGpx(text) {
   for (const el of tp) { const tm = el.getElementsByTagName('time')[0]; const ts = tm ? Date.parse(tm.textContent) : NaN; if (!isFinite(ts)) continue; if (t0 == null) t0 = ts; const pt = { lat: parseFloat(el.getAttribute('lat')), lon: parseFloat(el.getAttribute('lon')), t: ts - t0 }; const ele = el.getElementsByTagName('ele')[0]; if (ele) { const a = parseFloat(ele.textContent); if (isFinite(a)) pt.a = Math.round(a); } pts.push(pt); }
   if (pts.length < 2) return null;
   const r = finalizeRun({ id: 'g' + t0, start: t0, points: pts, pausedMs: 0 }); if (!(r.dist > 50)) return null;
-  const nm = doc.getElementsByTagName('name')[0]; if (nm && nm.textContent.trim()) r.name = nm.textContent.trim().slice(0, 40); r.imported = true; return r;
+  const nm = doc.getElementsByTagName('name')[0]; if (nm && nm.textContent.trim()) r.name = safeText(nm.textContent, 40); r.imported = true; return r;
 }
 function runGpx(r) {
   const esc = (t) => String(t).replace(/[<&>]/g, (c) => ({ '<': '&lt;', '&': '&amp;', '>': '&gt;' }[c]));
@@ -1749,7 +1756,7 @@ function parseRouteGpx(text) {
   if (ll.length < 2) return null;
   let m = 0; for (let i = 1; i < ll.length; i++) m += haversine({ lat: ll[i - 1][0], lon: ll[i - 1][1] }, { lat: ll[i][0], lon: ll[i][1] });
   const hasEle = ele.filter((x) => x != null).length > ll.length * 0.8, gain = hasEle ? elevGain(ele.map((a) => ({ a }))) : null;
-  const nm = doc.getElementsByTagName('name')[0]; const name = (nm && nm.textContent.trim().slice(0, 40)) || 'Ruta importada';
+  const nm = doc.getElementsByTagName('name')[0]; const name = (nm && safeText(nm.textContent, 40)) || 'Ruta importada';
   return { id: 'gpx-' + Date.now(), name, ll, km: Math.round(m / 100) / 10, gain, ele: hasEle ? ele : undefined, created: Date.now(), start: { lat: ll[0][0], lon: ll[0][1] }, imported: true };
 }
 $('#routeGpxBtn').onclick = () => $('#routeGpx').click();
@@ -2446,7 +2453,7 @@ const FEEL_L = ['', 'Muy duro', 'Duro', 'Normal', 'Bien', 'Volando'];
 function renderFeel(r) { $$('#sFeel [data-feel]').forEach((b) => b.classList.toggle('on', Number(b.dataset.feel) === r.feel)); $('#sFeelLbl').textContent = r.feel ? FEEL_L[r.feel] : 'sensación y notas'; $('#sNote').value = r.note || ''; }
 $$('#sFeel [data-feel]').forEach((b) => b.onclick = () => { if (!current) return; const v = Number(b.dataset.feel); current.feel = current.feel === v ? undefined : v; save(KEY, runs); renderFeel(current); });
 $('#sNote').oninput = () => { if (!current) return; current.note = $('#sNote').value.trim() || undefined; clearTimeout(renderFeel.t); renderFeel.t = setTimeout(() => save(KEY, runs), 400); };
-$('#sRename').onclick = () => { if (!current || $('#sTitleIn')) return; const h = $('#sTitle'), inp = document.createElement('input'); inp.id = 'sTitleIn'; inp.value = current.name; inp.maxLength = 40; h.replaceWith(inp); inp.focus(); inp.select(); const done = () => { const v = inp.value.trim(); if (v) current.name = v; save(KEY, runs); const sp = document.createElement('span'); sp.id = 'sTitle'; sp.textContent = current.name; inp.replaceWith(sp); }; inp.onblur = done; inp.onkeydown = (e) => { if (e.key === 'Enter') inp.blur(); }; };
+$('#sRename').onclick = () => { if (!current || $('#sTitleIn')) return; const h = $('#sTitle'), inp = document.createElement('input'); inp.id = 'sTitleIn'; inp.value = current.name; inp.maxLength = 40; h.replaceWith(inp); inp.focus(); inp.select(); const done = () => { const v = safeText(inp.value, 40); if (v) current.name = v; save(KEY, runs); const sp = document.createElement('span'); sp.id = 'sTitle'; sp.textContent = current.name; inp.replaceWith(sp); }; inp.onblur = done; inp.onkeydown = (e) => { if (e.key === 'Enter') inp.blur(); }; };
 $('#gpxBtn').onclick = () => { if (current) shareOrDownload(new Blob([runGpx(current)], { type: 'application/gpx+xml' }), `zancada-${new Date(current.start).toISOString().slice(0, 10)}.gpx`, current.name); };
 $('#deleteBtn').onclick = () => { if (!current) return; runs = runs.filter((r) => r.id !== current.id); save(KEY, runs); toast('Carrera borrada'); go('home'); };
 $('#shareBtn').onclick = () => { if (current) shareImage(current); };
@@ -2547,7 +2554,8 @@ history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
 zetaFabFor(profile.done ? 'home' : 'welcome');
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
-const NEWS_VER = '0.59', NEWS = [
+const NEWS_VER = '0.60', NEWS = [
+  ['Más segura', 'un GPX o una copia con trampa en el nombre ya no puede ejecutar nada dentro de la app.'],
   ['Copia de seguridad', 'en Perfil, «Exportar copia» ya funciona dentro de la app de Android: abre el menú de compartir para guardarla en Drive, Telegram o el móvil. Hazla antes de la próxima gran actualización. También funcionan así el GPX, el CSV y la imagen de tu carrera.'],
   ['GPS arreglado', 'en la app de Android la carrera sigue grabando con la pantalla apagada o en otra app (verás la notificación «Zancada está grabando»). En la web, deja la pantalla encendida.'],
   ['Tiempo final', 'la pantalla de fin de carrera ya enseña el tiempo de verdad, no 0:00.'],
