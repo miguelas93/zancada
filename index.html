@@ -3,100 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#2F45FF">
+<meta name="theme-color" content="#F3F3EE" id="themeColor">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Zancada">
 <title>Zancada · beta</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232F45FF'/%3E%3Cpath d='M17 13H52L12 51H48' fill='none' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='52' cy='51' r='7' fill='%23FFD43B'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B0C0B'/%3E%3Cpath d='M18 16H46L18 48H46' fill='none' stroke='%23D4FF3A' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css" crossorigin="">
 <style>
+/* Sistema "Volt": tinta + un único acento lima. El lima nunca va como texto sobre fondo claro:
+   o es un relleno con texto tinta encima, o vive sobre superficies oscuras. */
 :root{
-  --cobalto:#2F45FF; --cobalto-hondo:#1F2FD1; --noche:#0E1440; --limon:#FFD43B; --limon-hondo:#D9AE10;
-  --cielo:#E6EAFF; --papel:#F7F8FC; --blanco:#FFFFFF; --gris:#5A6088; --linea:#DCE0F2; --alerta:#FF4D6D;
-  --display:"Fredoka","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,sans-serif;
+  --bg:#F3F3EE; --surface:#FFFFFF; --surface2:#E9E9E3; --ink:#0B0C0B; --muted:#5E625C; --line:#DCDCD5;
+  --volt:#D4FF3A; --on-volt:#0B0C0B; --bar:#0B0C0B; --on-bar:#F4F5F0; --on-bar-muted:#8A8E87;
+  --map-land:#E7E7E0; --route-case:#0B0C0B; --danger:#E5372A; --scrim:rgba(11,12,11,.55);
+  --display:"Space Grotesk","Inter",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+:root[data-theme="noche"]{
+  --bg:#0A0B0A; --surface:#151715; --surface2:#1F221F; --ink:#F4F5F0; --muted:#9BA097; --line:#2A2D2A;
+  --bar:#1F221F; --map-land:#111311; --route-case:#000000; --danger:#FF5A47; --scrim:rgba(0,0,0,.7);
+  color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
-body{background:var(--papel);color:var(--noche);font-family:var(--body);font-size:15px;line-height:1.45;overscroll-behavior:none;overflow:hidden;-webkit-user-select:none;user-select:none}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;overscroll-behavior:none;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;padding:0}
-.screen{display:none;position:fixed;inset:0;flex-direction:column;padding:calc(var(--sat) + 16px) 20px calc(var(--sab) + 16px);overflow:hidden}
+.screen{display:none;position:fixed;inset:0;flex-direction:column;padding:calc(var(--sat) + 14px) 20px calc(var(--sab) + 16px);overflow:hidden;background:var(--bg)}
 .screen.on{display:flex}
 .screen.scroll{overflow-y:auto}
-h1,h2{margin:0;font-family:var(--display);font-weight:600;letter-spacing:-.02em;line-height:1.1}
-h1{font-size:30px}h2{font-size:18px}
-.lbl{font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
-.num{font-family:var(--display);font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1}
-.card{background:var(--blanco);border-radius:24px;padding:16px 18px;box-shadow:0 1px 0 var(--linea)}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:58px;border-radius:20px;background:var(--cobalto);color:#fff;font-family:var(--display);font-weight:600;font-size:19px;box-shadow:0 4px 0 var(--cobalto-hondo);width:100%}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--cobalto-hondo)}
-.btn.y{background:var(--limon);color:var(--noche);box-shadow:0 4px 0 var(--limon-hondo)}
-.btn.y:active{box-shadow:0 1px 0 var(--limon-hondo)}
-.btn.w{background:#fff;color:var(--cobalto);box-shadow:0 4px 0 #C5CCFF}
-.btn.ghost{background:transparent;color:var(--gris);box-shadow:none;height:44px;font-size:15px}
-.btn[disabled]{opacity:.45;box-shadow:none;transform:none}
-.icon{width:44px;height:44px;border-radius:22px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 0 var(--linea);color:var(--noche)}
+h1,h2{margin:0;font-family:var(--display);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+h1{font-size:30px}h2{font-size:17px;font-family:var(--body);font-weight:600;letter-spacing:0}
+.lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.num{font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1}
+.unit{font-family:var(--body);font-weight:500;font-size:13px;color:var(--muted);letter-spacing:0;margin-left:4px}
+.sub{font-size:13px;font-weight:500;color:var(--muted)}
+.card{background:var(--surface);border-radius:28px;padding:20px}
+.dark{background:var(--bar);color:var(--on-bar)}
+.dark .lbl,.dark .unit,.dark .sub{color:var(--on-bar-muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:58px;border-radius:999px;background:var(--volt);color:var(--on-volt);font-weight:600;font-size:16px;width:100%;padding:0 28px}
+.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--surface2);color:var(--ink)}
+.btn.inv{background:var(--bar);color:var(--on-bar)}
+.btn.ghost{background:transparent;color:var(--muted);height:44px;font-size:14px}
+.btn[disabled]{opacity:.4;transform:none}
+.icon{width:44px;height:44px;border-radius:22px;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
+.icon.big{width:56px;height:56px;border-radius:28px}
 .row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
 .col{display:flex;flex-direction:column;gap:14px}
+.between{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .grow{flex:1}
-.pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:8px 14px;font-size:14px;font-weight:800;box-shadow:0 1px 0 var(--linea)}
-.dot{width:10px;height:10px;border-radius:5px;background:var(--gris)}
-.dot.ok{background:var(--cobalto)}.dot.bad{background:var(--alerta)}
-.tabs{position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 16px);height:68px;background:var(--noche);border-radius:34px;display:flex;align-items:center;justify-content:space-around;padding:0 12px}
-.tabs button{width:48px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(255,255,255,.55)}
-.tabs button.on{color:#fff}.tabs button.on::after{content:"";width:5px;height:5px;border-radius:3px;background:var(--limon)}
-.tabs .go{width:56px;height:56px;border-radius:28px;background:var(--cobalto);color:#fff;box-shadow:0 4px 0 var(--cobalto-hondo)}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--bar);color:var(--on-bar);border-radius:999px;padding:10px 14px;font-size:13px;font-weight:600}
+.chip{display:inline-flex;align-items:center;background:var(--volt);color:var(--on-volt);border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.dot{width:8px;height:8px;border-radius:4px;background:var(--on-bar-muted)}
+.dot.ok{background:var(--volt)}.dot.bad{background:var(--danger)}
+.stats{display:flex;gap:10px}.stats>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.tabs{position:absolute;left:16px;right:16px;bottom:calc(var(--sab) + 14px);height:68px;background:var(--bar);border-radius:34px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:1000;box-shadow:0 10px 30px -6px rgba(0,0,0,.25)}
+.tabs button{width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--on-bar-muted);font-size:10px;font-weight:500}
+.tabs button.on{color:var(--on-bar);font-weight:600}
+.tabs button.on::after{content:"";width:4px;height:4px;border-radius:2px;background:var(--volt)}
+.tabs .go{width:52px;height:52px;border-radius:26px;background:var(--volt);color:var(--on-volt);justify-content:center}
 .tabs .go::after{display:none}
 .withtabs{padding-bottom:calc(var(--sab) + 110px)}
-svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.map{border-radius:24px;overflow:hidden;background:var(--cielo);position:relative;isolation:isolate}
-.leaflet-container{font-family:var(--body);background:var(--cielo)}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.map{border-radius:20px;overflow:hidden;background:var(--map-land);position:relative;isolation:isolate}
+.leaflet-container{font-family:var(--body);background:var(--map-land)}
 .leaflet-control-attribution{font-size:9px;opacity:.8}
 .leaflet-top.leaflet-left{display:none}
-.mascot{width:72px;height:78px;flex:none}
-.bubble{flex:1;min-width:0;background:#fff;border-radius:20px 20px 20px 6px;padding:12px 14px;font-weight:600;box-shadow:0 1px 0 var(--linea)}
-.days{display:flex;gap:6px}
-.days span{flex:1;aspect-ratio:1;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:600;font-size:14px;background:rgba(255,255,255,.18);color:#fff}
-.days span.d{background:#fff;color:var(--cobalto)}
-.days span.t{background:transparent;border:2px dashed rgba(255,255,255,.7)}
-.hist{display:flex;align-items:center;gap:14px;background:#fff;border-radius:20px;padding:12px;box-shadow:0 1px 0 var(--linea);width:100%;text-align:left}
-.hist .thumb{width:64px;height:64px;border-radius:14px;background:var(--cielo);flex:none;overflow:hidden}
-.splits{display:grid;grid-template-columns:24px 1fr 48px;align-items:center;gap:10px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
-.bar{height:14px;border-radius:7px;background:var(--cielo);overflow:hidden}.bar i{display:block;height:100%;background:var(--cobalto);border-radius:7px}
-.bar i.best{background:var(--limon)}
-.hold{position:relative;overflow:hidden;background:#fff;color:var(--noche);box-shadow:0 4px 0 var(--linea)}
-.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--alerta);opacity:.25;transition:width .1s linear}
-.toast{position:fixed;left:20px;right:20px;top:calc(var(--sat) + 12px);background:var(--noche);color:#fff;border-radius:16px;padding:12px 16px;font-weight:700;z-index:50;display:none}
+/* Calles en gris para que la ruta sea lo único con color */
+.tiles-calles{filter:grayscale(1) contrast(.92) brightness(1.04)}
+:root[data-theme="noche"] .tiles-calles{filter:grayscale(1) invert(1) brightness(.78) contrast(.95)}
+.weekbars{display:flex;gap:7px;align-items:flex-end;height:84px}
+.weekbars div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--on-bar-muted)}
+.weekbars i{display:block;width:10px;border-radius:5px;background:var(--on-bar);opacity:.35;min-height:4px}
+.weekbars .t{color:var(--on-bar);font-weight:600}.weekbars .t i{background:var(--volt);opacity:1}
+.track{height:6px;border-radius:3px;background:rgba(244,245,240,.14);overflow:hidden}.track i{display:block;height:100%;background:var(--volt);border-radius:3px}
+.monthbars{display:flex;gap:3px;align-items:flex-end;height:100px}
+.monthbars i{flex:1;border-radius:3px;background:var(--ink);opacity:.8;min-height:3px}
+.monthbars i.z{opacity:.12}.monthbars i.t{opacity:1}
+.list{background:var(--surface);border-radius:28px;padding:4px 16px}
+.hist{display:flex;align-items:center;gap:14px;padding:12px 0;width:100%;text-align:left;border-top:1px solid var(--line)}
+.hist:first-child{border-top:0}
+.thumb{width:60px;height:60px;border-radius:14px;background:var(--map-land);flex:none;overflow:hidden}
+.splits{display:grid;grid-template-columns:22px 1fr 52px;align-items:center;gap:10px 12px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:5px;background:var(--surface2);overflow:hidden}.bar i{display:block;height:100%;background:var(--ink);border-radius:5px}
+.bar i.best{background:var(--volt)}
+.toast{position:fixed;left:20px;right:20px;top:calc(var(--sat) + 12px);background:var(--bar);color:var(--on-bar);border-radius:16px;padding:12px 16px;font-weight:600;z-index:3000;display:none}
 .toast.on{display:block}
-#run.night{background:var(--noche);color:#fff}
-#run.night .card{background:#1A2160;box-shadow:none}
-#run.night .lbl{color:#A3A9D6}
-#run.night .pill,#run.night .icon{background:#1A2160;color:#fff;box-shadow:none}
-.seg{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 1px 0 var(--linea)}
-.seg button{flex:1;height:36px;padding:0 14px;border-radius:999px;font-weight:800;font-size:13px;color:var(--gris)}
-.seg button.on{background:var(--noche);color:#fff}
+.seg{display:flex;background:var(--surface2);border-radius:999px;padding:4px}
+.seg button{flex:1;height:36px;padding:0 14px;border-radius:999px;font-weight:500;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--bar);color:var(--on-bar);font-weight:600}
 .center{text-align:center;align-items:center}
-.slide{position:relative;height:64px;border-radius:32px;background:#fff;box-shadow:0 4px 0 var(--linea);overflow:hidden;touch-action:none}
-.slide .track{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-left:56px;font-family:var(--display);font-weight:600;font-size:17px;color:var(--gris)}
-.slide .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--alerta);opacity:.18}
-.slide .knob{position:absolute;left:4px;top:4px;width:56px;height:56px;border-radius:28px;background:var(--alerta);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(14,20,64,.25)}
-#run.night .slide{background:#1A2160;box-shadow:none}#run.night .slide .track{color:#A3A9D6}
-.opt{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.14);border:2px solid transparent;border-radius:20px;padding:14px 16px;text-align:left;color:#fff;width:100%}
-.opt.on{background:#fff;color:var(--noche);border-color:var(--limon)}
-.opt b{font-family:var(--display);font-weight:600;font-size:17px;display:block}
-.opt small{font-size:13px;font-weight:600;opacity:.75}
-.opt .em{font-size:28px;flex:none}
-.dots{display:flex;gap:6px;justify-content:center}.dots i{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.35)}.dots i.on{background:var(--limon)}
-.inp{width:100%;height:56px;border-radius:18px;border:0;background:#fff;color:var(--noche);font:inherit;font-weight:800;font-size:18px;padding:0 18px;text-align:center}
-.inp:focus{outline:3px solid var(--limon)}
-.modal{position:fixed;inset:0;background:rgba(14,20,64,.6);z-index:2000;display:none;align-items:flex-end;padding:20px}
+.slide{position:relative;height:64px;border-radius:32px;background:var(--surface);overflow:hidden;touch-action:none}
+.slide .trk{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-left:56px;font-weight:600;font-size:15px;color:var(--muted)}
+.slide .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--danger);opacity:.18}
+.slide .knob{position:absolute;left:4px;top:4px;width:56px;height:56px;border-radius:28px;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center}
+.opt{display:flex;align-items:center;gap:14px;background:rgba(244,245,240,.08);border:1.5px solid transparent;border-radius:20px;padding:14px 16px;text-align:left;color:var(--on-bar);width:100%}
+.opt.on{border-color:var(--volt);background:rgba(212,255,58,.08)}
+.opt b{font-weight:600;font-size:16px;display:block}
+.opt small{font-size:13px;color:var(--on-bar-muted)}
+.opt .n{font-family:var(--display);font-weight:700;font-size:28px;width:34px;flex:none;color:var(--volt)}
+.dots{display:flex;gap:6px}.dots i{width:18px;height:4px;border-radius:2px;background:rgba(244,245,240,.2)}.dots i.on{background:var(--volt)}
+.inp{width:100%;height:56px;border-radius:18px;border:1.5px solid rgba(244,245,240,.16);background:transparent;color:var(--on-bar);font:inherit;font-weight:600;font-size:18px;padding:0 18px}
+.inp::placeholder{color:var(--on-bar-muted)}
+.inp:focus{outline:none;border-color:var(--volt)}
+.modal{position:fixed;inset:0;background:var(--scrim);z-index:2000;display:none;align-items:flex-end;padding:16px}
 .modal.on{display:flex}
-.modal .card{width:100%;border-radius:28px;padding:22px 20px}
+.modal .card{width:100%;padding:24px 20px}
+.sel{font:inherit;font-weight:600;font-size:14px;border:0;background:var(--surface2);color:var(--ink);border-radius:12px;padding:8px 12px}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:500;padding:6px 0}
+.pr{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.pr:first-of-type{border-top:0}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:32px 32px 0 0;padding:12px 20px calc(var(--sab) + 24px);z-index:1000;box-shadow:0 -8px 32px rgba(0,0,0,.12)}
+.handle{width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 18px}
+.fab{position:absolute;z-index:1000;display:flex;justify-content:space-between;align-items:center;left:20px;right:20px;top:calc(var(--sat) + 14px)}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -104,214 +129,223 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stro
 
 <div class="toast" id="toast"></div>
 <div class="modal" id="shortModal"><div class="card col" style="gap:12px">
-  <h2 style="font-size:22px">Carrera muy corta</h2>
-  <p style="margin:0;font-weight:600;color:var(--gris)" id="shortText">Has recorrido menos de 50 m. ¿La guardo igualmente?</p>
+  <h1 style="font-size:24px">Carrera muy corta</h1>
+  <p style="margin:0" class="sub" id="shortText">Has recorrido menos de 50 m. ¿La guardo igualmente?</p>
   <button class="btn" id="shortSave">Guardar igualmente</button>
-  <button class="btn ghost" id="shortDrop" style="color:var(--alerta)">Descartar</button>
+  <button class="btn ghost" id="shortDrop" style="color:var(--danger)">Descartar</button>
 </div></div>
 
 <!-- BIENVENIDA -->
-<section class="screen" id="welcome" style="background:var(--cobalto);color:#fff;gap:18px">
-  <div class="dots" id="wDots"><i class="on"></i><i></i><i></i></div>
+<section class="screen dark" id="welcome" style="background:var(--bar);gap:18px">
+  <div class="between"><span class="num" style="font-size:22px;letter-spacing:-.04em">zancada<span style="color:var(--volt)">.</span></span><div class="dots" id="wDots"><i class="on"></i><i></i><i></i></div></div>
   <div class="grow"></div>
-  <div class="center col" style="gap:8px">
-    <svg viewBox="0 0 120 130" width="150" height="162" aria-hidden="true"><path d="M60 14 C 92 14, 104 44, 100 72 C 96 98, 80 112, 60 112 C 40 112, 24 98, 20 72 C 16 44, 28 14, 60 14 Z" fill="#FFD43B"/><path d="M22 52 C 40 42, 80 42, 98 52" stroke="#2F45FF" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="46" cy="70" r="6" fill="#0E1440"/><circle cx="74" cy="70" r="6" fill="#0E1440"/><circle cx="48" cy="68" r="2" fill="#fff"/><circle cx="76" cy="68" r="2" fill="#fff"/><path d="M48 86 Q 60 96 72 86" stroke="#0E1440" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
-    <div id="wStep0" class="col" style="gap:8px">
-      <h1 style="font-size:32px">¡Hola! Soy Zanca.</h1>
-      <p style="margin:0;font-weight:600;font-size:17px;opacity:.9">Voy a seguir tus carreras, a celebrar cuando te superes y a darte la lata cuando lleves días sin salir. ¿Cómo te llamas?</p>
-      <input class="inp" id="wName" placeholder="Tu nombre" maxlength="20" autocomplete="given-name" style="margin-top:8px">
-    </div>
-    <div id="wStep1" class="col" style="gap:10px;display:none;width:100%">
-      <h1 style="font-size:28px" id="wAsk">¿Cuál es tu objetivo?</h1>
-      <p style="margin:0 0 6px;font-weight:600;opacity:.9">Lo usaré para tu objetivo semanal. Puedes cambiarlo en Perfil.</p>
-      <button class="opt" data-goal="2"><span class="em">🌱</span><span><b>Empezar a correr</b><small>2 carreras a la semana</small></span></button>
-      <button class="opt on" data-goal="3"><span class="em">🔥</span><span><b>Mantener la constancia</b><small>3 carreras a la semana</small></span></button>
-      <button class="opt" data-goal="4"><span class="em">🏅</span><span><b>Mejorar mis marcas</b><small>4 carreras a la semana</small></span></button>
-    </div>
-    <div id="wStep2" class="col" style="gap:8px;display:none">
-      <h1 style="font-size:28px" id="wDone">¡Perfecto!</h1>
-      <p style="margin:0;font-weight:600;font-size:17px;opacity:.9" id="wDoneText">Cada semana que cumplas el objetivo suma una semana de racha. La primera carrera es la que más cuenta.</p>
-    </div>
+  <div id="wStep0" class="col" style="gap:10px">
+    <span class="lbl">Bienvenida</span>
+    <h1 style="font-size:40px">Corre.<br>Mide.<br>Mejora.</h1>
+    <p class="sub" style="margin:0 0 10px;font-size:15px">Zancada graba tus carreras con el GPS del móvil: distancia, ritmo, parciales y la ruta en el mapa. ¿Cómo te llamas?</p>
+    <input class="inp" id="wName" placeholder="Tu nombre" maxlength="20" autocomplete="given-name">
+  </div>
+  <div id="wStep1" class="col" style="gap:10px;display:none">
+    <span class="lbl">Objetivo semanal</span>
+    <h1 style="font-size:32px" id="wAsk">¿Cuántas veces a la semana?</h1>
+    <p class="sub" style="margin:0 0 6px">Lo verás en Inicio. Puedes cambiarlo en Perfil.</p>
+    <button class="opt" data-goal="2"><span class="n">2</span><span><b>Empezar a correr</b><small>2 carreras a la semana</small></span></button>
+    <button class="opt on" data-goal="3"><span class="n">3</span><span><b>Mantener la constancia</b><small>3 carreras a la semana</small></span></button>
+    <button class="opt" data-goal="4"><span class="n">4</span><span><b>Mejorar mis marcas</b><small>4 carreras a la semana</small></span></button>
+  </div>
+  <div id="wStep2" class="col" style="gap:10px;display:none">
+    <span class="lbl">Todo listo</span>
+    <h1 style="font-size:36px" id="wDone">Listo.</h1>
+    <p class="sub" style="margin:0;font-size:15px" id="wDoneText"></p>
   </div>
   <div class="grow"></div>
-  <button class="btn y" id="wNext">Encantada</button>
+  <button class="btn" id="wNext">Continuar</button>
 </section>
 
 <!-- INICIO -->
 <section class="screen scroll withtabs on" id="home">
-  <div class="col">
-    <div style="display:flex;align-items:flex-end;gap:12px">
-      <svg class="mascot" viewBox="0 0 120 130" aria-hidden="true"><ellipse cx="60" cy="122" rx="30" ry="5" fill="#0E1440" opacity=".12"/><path d="M60 14 C 92 14, 104 44, 100 72 C 96 98, 80 112, 60 112 C 40 112, 24 98, 20 72 C 16 44, 28 14, 60 14 Z" fill="#FFD43B"/><path d="M23 50 C 40 40, 80 40, 97 50 L 98 60 C 80 51, 40 51, 22 60 Z" fill="#2F45FF"/><path d="M97 50 L 112 40 L 108 58 Z" fill="#2F45FF"/><circle cx="46" cy="74" r="11" fill="#fff"/><circle cx="74" cy="74" r="11" fill="#fff"/><circle cx="48" cy="76" r="5.5" fill="#0E1440"/><circle cx="76" cy="76" r="5.5" fill="#0E1440"/><path d="M50 92 Q 60 100 70 92" stroke="#0E1440" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="42" y="108" width="14" height="10" rx="5" fill="#0E1440"/><rect x="64" y="108" width="14" height="10" rx="5" fill="#0E1440"/></svg>
-      <div class="bubble" id="homeBubble">¡Hola! Soy Zanca. Pulsa el botón azul y salimos a correr.</div>
+  <div class="col" style="gap:20px">
+    <div class="between">
+      <div><div class="sub" id="homeDate"></div><h1 id="homeHello">Hola</h1></div>
     </div>
-    <div class="card" style="background:var(--cobalto);color:#fff;box-shadow:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h2 style="font-size:20px">Esta semana</h2>
-        <span style="background:var(--limon);color:var(--noche);border-radius:999px;padding:4px 10px;font-family:var(--display);font-weight:600;font-size:14px" id="streak">0 semanas</span>
+    <div class="card dark col" style="gap:18px" id="weekCard">
+      <div class="between"><span class="lbl">Esta semana</span><span class="sub" id="weekGoal"></span></div>
+      <div class="between" style="align-items:flex-end">
+        <div><span class="num" id="weekKm" style="font-size:72px;letter-spacing:-.05em">0</span><span class="unit" style="font-size:20px;font-weight:600">km</span></div>
+        <div class="weekbars" id="weekBars"></div>
       </div>
-      <div class="days" id="days"></div>
-      <div style="margin-top:12px;font-size:14px;font-weight:600;opacity:.9" id="weekText">0 de 3 carreras · objetivo semanal</div>
+      <div class="track"><i id="weekTrack" style="width:0"></i></div>
+      <div class="stats" id="weekStats"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 4px">
-      <h2 style="font-size:20px">Tu última carrera</h2>
-      <button style="color:var(--cobalto);font-weight:800;font-size:14px" data-go="history">Ver todas</button>
-    </div>
+    <button class="card between" data-go="prep" style="width:100%;text-align:left;padding:18px 18px 18px 22px">
+      <div class="col" style="gap:6px"><span class="chip" style="align-self:flex-start">Carrera libre</span><span class="num" style="font-size:26px">Salir a correr</span><span class="sub" id="homeNudge">GPS, ritmo en directo y aviso de voz en cada km</span></div>
+      <span class="icon big" style="background:var(--volt);color:var(--on-volt)"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></span>
+    </button>
     <div id="lastRun"></div>
-    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Beta · los datos se guardan solo en este móvil</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Beta · los datos se guardan solo en este móvil</p>
   </div>
-  <nav class="tabs" aria-label="Pestañas">
-    <button class="on" data-go="home" aria-label="Inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3Z"/></svg></button>
-    <button data-go="history" aria-label="Historial"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
-    <button class="go" data-go="prep" aria-label="Correr"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3.2"><path d="M6 5h12L6 19h12"/><circle cx="18" cy="19" r="2.2" fill="#FFD43B" stroke="none"/></svg></button>
-    <button data-go="profile" aria-label="Perfil"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button>
-  </nav>
+  <nav class="tabs" data-tab="home"></nav>
 </section>
 
-<!-- HISTORIAL -->
+<!-- ACTIVIDAD -->
 <section class="screen scroll withtabs" id="history">
-  <div class="col">
-    <h1>Historial</h1>
-    <div class="card" style="background:var(--noche);color:#fff;box-shadow:none" id="totals"></div>
-    <div class="col" id="histList" style="gap:10px"></div>
+  <div class="col" style="gap:22px">
+    <h1>Actividad</h1>
+    <div class="col" style="gap:6px">
+      <span class="lbl" id="monthName"></span>
+      <div><span class="num" id="monthKm" style="font-size:80px;letter-spacing:-.05em">0</span><span class="unit" style="font-size:22px;font-weight:600">km</span></div>
+    </div>
+    <div class="col" style="gap:8px"><div class="monthbars" id="monthBars"></div><div class="between sub" style="font-size:11px" id="monthAxis"></div></div>
+    <div class="stats" id="monthStats"></div>
+    <div class="list" id="histList"></div>
   </div>
-  <nav class="tabs" aria-label="Pestañas">
-    <button data-go="home" aria-label="Inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3Z"/></svg></button>
-    <button class="on" data-go="history" aria-label="Historial"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
-    <button class="go" data-go="prep" aria-label="Correr"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3.2"><path d="M6 5h12L6 19h12"/><circle cx="18" cy="19" r="2.2" fill="#FFD43B" stroke="none"/></svg></button>
-    <button data-go="profile" aria-label="Perfil"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button>
-  </nav>
+  <nav class="tabs" data-tab="history"></nav>
+</section>
+
+<!-- CLUBS -->
+<section class="screen scroll withtabs" id="clubs">
+  <div class="col" style="gap:20px">
+    <h1>Clubs</h1>
+    <div class="card dark col" style="gap:12px;padding:24px">
+      <span class="chip" style="align-self:flex-start">Muy pronto</span>
+      <span class="num" style="font-size:30px">Corre con tu gente</span>
+      <p class="sub" style="margin:0;font-size:14px">Clubs, clasificación semanal y quedadas llegarán cuando Zancada tenga cuentas. En esta beta todo vive en tu móvil, así que todavía no hay nada que compartir con otros.</p>
+    </div>
+    <div class="card col" style="gap:4px" id="clubPreview"></div>
+  </div>
+  <nav class="tabs" data-tab="clubs"></nav>
 </section>
 
 <!-- PERFIL -->
 <section class="screen scroll withtabs" id="profile">
-  <div class="col">
+  <div class="col" style="gap:18px">
     <h1>Perfil</h1>
-    <div class="row" id="profStats"></div>
-    <div class="card col" style="gap:10px">
-      <h2>Ajustes</h2>
-      <label style="display:flex;justify-content:space-between;align-items:center;font-weight:800">Avisos de voz<select id="setVoice" style="font:inherit;font-weight:700;border:0;background:var(--papel);border-radius:10px;padding:6px 10px"><option value="1">Cada km</option><option value="0">Sin voz</option></select></label>
-      <label style="display:flex;justify-content:space-between;align-items:center;font-weight:800">Modo noche al correr<select id="setNight" style="font:inherit;font-weight:700;border:0;background:var(--papel);border-radius:10px;padding:6px 10px"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
-      <label style="display:flex;justify-content:space-between;align-items:center;font-weight:800">Mapa<select id="setMap" style="font:inherit;font-weight:700;border:0;background:var(--papel);border-radius:10px;padding:6px 10px"><option value="sat">Satélite</option><option value="calles">Calles</option></select></label>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span id="avatar" style="width:72px;height:72px;border-radius:36px;background:var(--bar);color:var(--volt);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:28px;flex:none">Z</span>
+      <div><span class="num" style="font-size:26px" id="profName">Tú</span><div class="sub" id="profGoal"></div></div>
     </div>
-    <button class="btn ghost" id="goalBtn" style="color:var(--cobalto)">Cambiar mi nombre u objetivo</button>
+    <div class="card stats" id="profStats" style="padding:18px 20px"></div>
+    <div class="card col" style="gap:0;padding:18px 20px 8px"><div class="between" style="padding-bottom:6px"><h2>Mejores marcas</h2><span class="sub">en esta beta</span></div><div id="prList"></div></div>
+    <div class="card col" style="gap:4px">
+      <h2 style="margin-bottom:6px">Ajustes</h2>
+      <label class="setrow">Avisos de voz<select class="sel" id="setVoice"><option value="1">Cada km</option><option value="0">Sin voz</option></select></label>
+      <label class="setrow">Modo noche<select class="sel" id="setNight"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
+      <label class="setrow">Mapa del resumen<select class="sel" id="setMap"><option value="calles">Calles</option><option value="sat">Satélite</option></select></label>
+    </div>
+    <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
-    <button class="btn ghost" id="wipeBtn" style="color:var(--alerta)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;color:var(--gris);font-weight:600;text-align:center">Zancada beta 0.2.2 · 29 oct 2026</p>
+    <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.3 · estilo Volt · 31 oct 2026</p>
   </div>
-  <nav class="tabs" aria-label="Pestañas">
-    <button data-go="home" aria-label="Inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3Z"/></svg></button>
-    <button data-go="history" aria-label="Historial"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
-    <button class="go" data-go="prep" aria-label="Correr"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3.2"><path d="M6 5h12L6 19h12"/><circle cx="18" cy="19" r="2.2" fill="#FFD43B" stroke="none"/></svg></button>
-    <button class="on" data-go="profile" aria-label="Perfil"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button>
-  </nav>
+  <nav class="tabs" data-tab="profile"></nav>
 </section>
 
 <!-- PREPARACIÓN -->
-<section class="screen" id="prep" style="background:var(--cielo);padding:0">
+<section class="screen" id="prep" style="padding:0">
   <div id="prepMap" style="position:absolute;inset:0"></div>
-  <div style="position:absolute;left:20px;right:20px;top:calc(var(--sat) + 16px);display:flex;justify-content:space-between;align-items:center;z-index:1000">
+  <div class="fab">
     <button class="icon" data-go="home" aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <span class="pill"><span class="dot" id="gpsDot"></span><span id="gpsText">Buscando GPS…</span></span>
     <span style="width:44px"></span>
   </div>
-  <div style="position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 20px);z-index:1000">
-    <div class="card col center" style="border-radius:28px;gap:16px">
-      <div><h1 style="font-size:26px">Carrera libre</h1><p style="margin:4px 0 0;color:var(--gris);font-weight:600">Sin objetivo. Corre lo que te pida el cuerpo.</p></div>
-      <button class="btn" id="startBtn" disabled style="width:112px;height:112px;border-radius:56px;flex-direction:column;gap:2px;font-size:19px"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3.2;width:28px;height:28px"><path d="M6 5h12L6 19h12"/><circle cx="18" cy="19" r="2.2" fill="#FFD43B" stroke="none"/></svg>Empezar</button>
-      <p id="prepHint" style="margin:0;font-size:13px;color:var(--gris);font-weight:600">Necesito permiso de ubicación para medir tu carrera.</p>
-    </div>
+  <div class="sheet col" style="gap:18px">
+    <div><div class="handle"></div><span class="lbl">Entreno</span><h1 style="font-size:32px;margin-top:4px">Carrera libre</h1><p class="sub" style="margin:6px 0 0">Sin objetivo. Distancia, ritmo y parciales en directo.</p></div>
+    <button class="btn" id="startBtn" disabled>Empezar</button>
+    <p id="prepHint" class="sub" style="margin:-6px 0 0;text-align:center;font-size:12px">Necesito permiso de ubicación para medir tu carrera.</p>
   </div>
 </section>
 
 <!-- CUENTA ATRÁS -->
-<section class="screen center" id="count" style="background:var(--cobalto);color:#fff;justify-content:center">
-  <div class="num" id="countNum" style="font-size:160px">3</div>
-  <p style="font-weight:700;font-size:18px;opacity:.9">Prepárate…</p>
+<section class="screen center dark" id="count" style="background:var(--bar);justify-content:center">
+  <div class="num" id="countNum" style="font-size:180px;color:var(--volt)">3</div>
+  <p class="sub" style="font-size:16px">Prepárate…</p>
 </section>
 
 <!-- EN CURSO -->
-<section class="screen" id="run" style="gap:18px">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <span class="pill"><span class="dot ok" id="runDot"></span>GPS <span id="runAcc" style="color:var(--gris);font-weight:700"></span></span>
-    <span style="font-size:14px;font-weight:800;color:var(--gris)" id="runState">Carrera libre</span>
-    <button class="icon" id="lockBtn" aria-label="Bloquear pantalla"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+<section class="screen" id="run" style="gap:12px;padding-left:12px;padding-right:12px">
+  <div class="card dark col" style="gap:16px;padding:22px;border-radius:32px">
+    <div class="between"><span class="lbl" id="runState">Carrera libre</span><span class="sub" style="display:flex;align-items:center;gap:6px"><span class="dot ok" id="runDot"></span>GPS <span id="runAcc"></span></span></div>
+    <div><span class="lbl">Distancia</span><div><span class="num" id="rDist" style="font-size:100px;letter-spacing:-.05em">0,00</span><span class="unit" style="font-size:22px;font-weight:600">km</span></div></div>
+    <div class="stats">
+      <div><span class="lbl">Ritmo actual</span><span><span class="num" id="rPace" style="font-size:40px;color:var(--volt)">–:––</span><span class="unit">/km</span></span></div>
+      <div style="align-items:flex-end"><span class="lbl">Tiempo</span><span class="num" id="rTime" style="font-size:40px">00:00</span></div>
+    </div>
   </div>
-  <div class="center col" style="gap:2px;padding-top:10px">
-    <span class="lbl">Distancia</span>
-    <div style="display:flex;align-items:baseline;gap:6px;justify-content:center"><span class="num" id="rDist" style="font-size:104px">0,00</span><span style="font-family:var(--display);font-size:26px;color:var(--gris)">km</span></div>
-  </div>
-  <div class="row">
-    <div class="card"><span class="lbl">Tiempo</span><div class="num" id="rTime" style="font-size:40px;margin-top:4px">00:00</div></div>
-    <div class="card"><span class="lbl">Ritmo /km</span><div class="num" id="rPace" style="font-size:40px;margin-top:4px">–:––</div></div>
+  <div class="stats" style="padding:4px 10px">
+    <div><span class="lbl">Ritmo medio</span><span><span class="num" id="rAvg" style="font-size:28px">–:––</span><span class="unit">/km</span></span></div>
+    <div><span class="lbl">Mejor km</span><span><span class="num" id="rBest" style="font-size:28px">–:––</span><span class="unit">/km</span></span></div>
   </div>
   <div class="map grow" id="runMap"></div>
-  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px">
-    <div class="center col" style="gap:2px;font-size:12px;font-weight:800;color:var(--gris)"><span class="num" id="rAvg" style="font-size:20px;color:inherit">–:––</span>ritmo medio</div>
-    <button class="btn y" id="pauseBtn" aria-label="Pausar" style="width:88px;height:88px;border-radius:44px"><svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.5"/></svg></button>
-    <div class="center col" style="gap:2px;font-size:12px;font-weight:800;color:var(--gris)"><span class="num" id="rBest" style="font-size:20px;color:inherit">–:––</span>mejor km</div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:4px 0" id="runCtl">
+    <button class="icon big" id="lockBtn" aria-label="Bloquear pantalla" style="justify-self:end"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+    <button class="btn" id="pauseBtn" aria-label="Pausar" style="width:88px;height:88px;border-radius:44px;padding:0"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>
+    <span></span>
   </div>
-  <div id="pausePanel" class="col" style="display:none">
+  <div id="pausePanel" class="col" style="display:none;gap:10px">
     <button class="btn" id="resumeBtn">Seguir</button>
-    <div class="slide" id="finishSlide" aria-label="Desliza para terminar"><div class="fill"></div><div class="track">Desliza para terminar →</div><div class="knob"><svg class="i" viewBox="0 0 24 24" style="stroke-width:3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+    <div class="slide" id="finishSlide" aria-label="Desliza para terminar"><div class="fill"></div><div class="trk">Desliza para terminar →</div><div class="knob"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
   </div>
-  <div id="lockOverlay" style="display:none;position:absolute;inset:0;background:rgba(14,20,64,.92);color:#fff;z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:40px">
-    <span class="num" id="lockDist" style="font-size:72px">0,00</span><span style="font-weight:700;opacity:.8">km · pantalla bloqueada</span>
-    <button class="btn w" id="unlockBtn" style="margin-top:30px;width:auto;padding:0 28px">Mantén para desbloquear</button>
+  <div id="lockOverlay" class="dark" style="display:none;position:absolute;inset:0;background:var(--bar);z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:40px">
+    <span class="lbl">Pantalla bloqueada</span>
+    <span class="num" id="lockDist" style="font-size:88px;color:var(--volt)">0,00</span><span class="sub">km</span>
+    <button class="btn sec" id="unlockBtn" style="margin-top:30px;width:auto;position:relative;overflow:hidden">Mantén para desbloquear<i style="position:absolute;left:0;top:0;bottom:0;width:0;background:var(--volt);opacity:.35"></i></button>
   </div>
 </section>
 
-<!-- CELEBRACIÓN -->
-<section class="screen center" id="cele" style="background:var(--cobalto);color:#fff;gap:20px">
-  <span class="pill" style="background:rgba(255,255,255,.16);color:#fff;box-shadow:none;align-self:center">Carrera terminada</span>
+<!-- TERMINADA -->
+<section class="screen dark" id="cele" style="background:var(--bar);gap:20px">
+  <span class="lbl">Carrera terminada</span>
   <div class="grow"></div>
-  <svg viewBox="0 0 120 130" width="180" height="195" aria-hidden="true"><path d="M26 44 L 8 20" stroke="#FFD43B" stroke-width="9" stroke-linecap="round"/><path d="M94 44 L 112 20" stroke="#FFD43B" stroke-width="9" stroke-linecap="round"/><path d="M60 14 C 92 14, 104 44, 100 72 C 96 98, 80 112, 60 112 C 40 112, 24 98, 20 72 C 16 44, 28 14, 60 14 Z" fill="#FFD43B"/><path d="M23 50 C 40 40, 80 40, 97 50 L 98 60 C 80 51, 40 51, 22 60 Z" fill="#0E1440"/><path d="M97 50 L 112 40 L 108 58 Z" fill="#0E1440"/><path d="M36 76 Q 46 64 56 76" stroke="#0E1440" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M64 76 Q 74 64 84 76" stroke="#0E1440" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M44 88 Q 60 108 76 88 Z" fill="#0E1440"/><rect x="42" y="108" width="14" height="10" rx="5" fill="#0E1440"/><rect x="64" y="108" width="14" height="10" rx="5" fill="#0E1440"/></svg>
-  <div><div class="num" id="cDist" style="font-size:54px">0,00 km</div><p style="margin:6px 0 0;font-weight:700;font-size:17px;opacity:.9" id="cText">¡Carrera guardada!</p></div>
-  <div class="row" style="width:100%">
-    <div class="card center" style="background:var(--limon);color:var(--noche);box-shadow:none;padding:14px 10px"><span class="lbl" style="color:inherit;opacity:.7">XP</span><div class="num" id="cXp" style="font-size:26px;margin-top:2px">+0</div></div>
-    <div class="card center" style="background:rgba(255,255,255,.16);box-shadow:none;padding:14px 10px"><span class="lbl" style="color:#fff;opacity:.8">Semana</span><div class="num" id="cWeek" style="font-size:26px;margin-top:2px">1 de 3</div></div>
-    <div class="card center" style="background:var(--limon);color:var(--noche);box-shadow:none;padding:14px 10px"><span class="lbl" style="color:inherit;opacity:.7">Racha</span><div class="num" id="cStreak" style="font-size:26px;margin-top:2px">1 sem</div></div>
+  <div class="col" style="gap:8px">
+    <div><span class="num" id="cDist" style="font-size:112px;letter-spacing:-.05em;color:var(--volt)">0,00</span><span class="unit" style="font-size:26px;font-weight:600">km</span></div>
+    <p style="margin:0;font-size:17px;font-weight:500" id="cText">Carrera guardada.</p>
+  </div>
+  <div class="stats" style="border-top:1px solid rgba(244,245,240,.12);padding-top:18px">
+    <div><span class="lbl">Tiempo</span><span class="num" id="cTime" style="font-size:26px">0:00</span></div>
+    <div><span class="lbl">Ritmo</span><span class="num" id="cPace" style="font-size:26px">–:––</span></div>
+    <div><span class="lbl">Semana</span><span class="num" id="cWeek" style="font-size:26px">1 de 3</span></div>
   </div>
   <div class="grow"></div>
-  <button class="btn w" id="toSummary">Ver mi carrera</button>
+  <button class="btn" id="toSummary">Ver mi carrera</button>
 </section>
 
 <!-- RESUMEN -->
-<section class="screen scroll" id="summary" style="gap:14px">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <button class="icon" data-go="home" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="center col" style="gap:0"><span style="font-family:var(--display);font-weight:600;font-size:18px" id="sTitle">Carrera</span><span style="font-size:12px;font-weight:700;color:var(--gris)" id="sDate"></span></div>
-    <button class="icon" id="shareBtn" aria-label="Compartir"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></button>
-  </div>
-  <div class="map" style="height:230px;flex:none">
+<section class="screen scroll" id="summary" style="padding:0">
+  <div class="map" style="height:340px;flex:none;border-radius:0">
     <div id="sumMap" style="position:absolute;inset:0"></div>
-    <button id="replayBtn" aria-label="Ver la repetición" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:32px;background:var(--noche);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(14,20,64,.3);z-index:1000"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg></button>
+    <div class="fab"><button class="icon" data-go="home" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="icon" id="shareBtn" aria-label="Compartir"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></button></div>
+    <button id="replayBtn" aria-label="Ver la repetición" style="position:absolute;right:20px;bottom:56px;height:44px;padding:0 16px 0 12px;border-radius:22px;background:var(--bar);color:var(--on-bar);display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;z-index:1000"><svg viewBox="0 0 24 24" width="18" height="18" fill="var(--volt)" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg>Repetición</button>
   </div>
-  <div class="row" id="sStats"></div>
-  <div class="card col" style="gap:10px"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Parciales</h2><span style="font-size:12px;font-weight:800;color:var(--gris)">Mejor km en limón</span></div><div class="splits" id="sSplits"></div></div>
-  <button class="btn ghost" id="deleteBtn" style="color:var(--alerta)">Borrar esta carrera</button>
+  <div class="col" style="gap:12px;padding:0 12px calc(var(--sab) + 24px);margin-top:-36px;position:relative;z-index:1001">
+    <div class="card col" style="gap:18px;padding:22px">
+      <div><div class="sub" id="sDate"></div><h1 style="font-size:28px;margin-top:4px" id="sTitle">Carrera</h1></div>
+      <div><span class="num" id="sKm" style="font-size:76px;letter-spacing:-.05em">0</span><span class="unit" style="font-size:22px;font-weight:600">km</span></div>
+      <div class="stats" id="sStats"></div>
+    </div>
+    <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
+    <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
+  </div>
 </section>
 
 <!-- REPETICIÓN -->
-<section class="screen" id="replay" style="padding:0;background:var(--noche)">
+<section class="screen" id="replay" style="padding:0;background:var(--bar)">
   <div id="repMap" style="position:absolute;inset:0"></div>
-  <div style="position:absolute;left:20px;right:20px;top:calc(var(--sat) + 16px);display:flex;justify-content:space-between;align-items:center;z-index:1000">
-    <button class="icon" id="repClose" aria-label="Cerrar" style="background:var(--noche);color:#fff;box-shadow:0 4px 12px rgba(14,20,64,.3)"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    <div class="seg" style="background:var(--noche);box-shadow:none"><button class="on" data-layer="sat" style="color:#fff">Satélite</button><button data-layer="calles" style="color:rgba(255,255,255,.6)">Calles</button></div>
-    <button class="icon" id="repSpeed" aria-label="Velocidad" style="background:var(--noche);color:#fff;box-shadow:0 4px 12px rgba(14,20,64,.3);font-family:var(--display);font-weight:600">2×</button>
+  <div class="fab">
+    <button class="icon" id="repClose" aria-label="Cerrar" style="background:var(--bar);color:var(--on-bar)"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="seg" style="background:var(--bar)"><button class="on" data-layer="sat">Satélite</button><button data-layer="calles">Calles</button></div>
+    <button class="icon" id="repSpeed" aria-label="Velocidad" style="background:var(--bar);color:var(--on-bar);font-family:var(--display);font-weight:700">2×</button>
   </div>
-  <div style="position:absolute;left:20px;right:20px;bottom:calc(var(--sab) + 20px);z-index:1000" class="col">
-    <div class="row">
-      <div class="card center" style="background:var(--noche);color:#fff;box-shadow:none;padding:12px"><span class="lbl" style="color:#A3A9D6">km</span><div class="num" id="pDist" style="font-size:26px;margin-top:2px">0,00</div></div>
-      <div class="card center" style="background:var(--noche);color:#fff;box-shadow:none;padding:12px"><span class="lbl" style="color:#A3A9D6">tiempo</span><div class="num" id="pTime" style="font-size:26px;margin-top:2px">00:00</div></div>
-      <div class="card center" style="background:var(--noche);color:#fff;box-shadow:none;padding:12px"><span class="lbl" style="color:#A3A9D6">ritmo</span><div class="num" id="pPace" style="font-size:26px;margin-top:2px">–:––</div></div>
+  <div style="position:absolute;left:12px;right:12px;bottom:calc(var(--sab) + 16px);z-index:1000" class="card dark col">
+    <div class="stats">
+      <div><span class="lbl">km</span><span class="num" id="pDist" style="font-size:30px;color:var(--volt)">0,00</span></div>
+      <div><span class="lbl">Tiempo</span><span class="num" id="pTime" style="font-size:30px">00:00</span></div>
+      <div><span class="lbl">Ritmo</span><span class="num" id="pPace" style="font-size:30px">–:––</span></div>
     </div>
-    <div class="card col" style="border-radius:28px;gap:14px;box-shadow:0 8px 24px rgba(14,20,64,.2)">
-      <input type="range" id="scrub" min="0" max="1000" value="0" style="width:100%;accent-color:var(--cobalto)">
-      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px">
-        <button id="repRestart" aria-label="Volver al inicio" style="justify-self:end;width:48px;height:48px;border-radius:24px;background:var(--papel);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM19 6.5v11a1 1 0 0 1-1.55.83l-8-5.5a1 1 0 0 1 0-1.66l8-5.5A1 1 0 0 1 19 6.5Z"/></svg></button>
-        <button class="btn" id="repPlay" aria-label="Pausar" style="width:64px;height:64px;border-radius:32px"><svg id="repPlayIco" viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.5"/></svg></button>
-        <span></span>
-      </div>
+    <input type="range" id="scrub" min="0" max="1000" value="0" style="width:100%;accent-color:#D4FF3A">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px">
+      <button id="repRestart" aria-label="Volver al inicio" style="justify-self:end;width:48px;height:48px;border-radius:24px;background:rgba(244,245,240,.1);color:var(--on-bar);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM19 6.5v11a1 1 0 0 1-1.55.83l-8-5.5a1 1 0 0 1 0-1.66l8-5.5A1 1 0 0 1 19 6.5Z"/></svg></button>
+      <button class="btn" id="repPlay" aria-label="Pausar" style="width:64px;height:64px;border-radius:32px;padding:0"><svg id="repPlayIco" viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>
+      <span></span>
     </div>
   </div>
 </section>
@@ -327,6 +361,11 @@ const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat' }, load(S
 let runs = load(KEY, []);
 const profile = Object.assign({ name: '', goal: 3, done: false }, load(PROF, {}));
 const GOAL_OF = () => Math.max(1, Number(profile.goal) || 3);
+// Día / noche: claro de día, oscuro de 20:00 a 7:00 o con el móvil en modo oscuro (o forzado en Perfil).
+const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+function isNight() { const h = new Date().getHours(); return settings.night === 'on' || (settings.night === 'auto' && (h >= 20 || h < 7 || darkMQ.matches)); }
+function applyTheme() { const n = isNight(); document.documentElement.dataset.theme = n ? 'noche' : 'dia'; $('#themeColor').content = n ? '#0A0B0A' : '#F3F3EE'; }
+darkMQ.addEventListener?.('change', applyTheme); setInterval(applyTheme, 60000);
 
 function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -349,7 +388,7 @@ function haversine(a, b) {
 
 // ---------- mapas ----------
 const SAT = () => L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imágenes © Esri, Maxar, Earthstar Geographics' });
-const CALLES = () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
+const CALLES = () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap', className: 'tiles-calles' });
 const maps = {};
 function makeMap(id, layer) {
   if (maps[id]) return maps[id];
@@ -361,8 +400,10 @@ function makeMap(id, layer) {
   return m;
 }
 function setLayer(m, which) { if (m.layer) m.remove && m.removeLayer(m.layer); m.layer = which === 'sat' ? SAT() : CALLES(); m.layer.addTo(m); m.layer.bringToBack(); }
-const ROUTE_STYLE = { color: '#2F45FF', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' };
-const ROUTE_HALO = { color: '#FFFFFF', weight: 10, opacity: 0.9, lineCap: 'round', lineJoin: 'round' };
+// Ruta: trazo tinta con alma lima, igual en día y en noche.
+const INK = '#0B0C0B', VOLT = '#D4FF3A';
+const ROUTE_STYLE = { color: VOLT, weight: 4, opacity: 1, lineCap: 'round', lineJoin: 'round' };
+const ROUTE_HALO = { color: INK, weight: 9, opacity: 1, lineCap: 'round', lineJoin: 'round' };
 const dotIcon = (bg, border) => L.divIcon({ className: '', html: `<span style="display:block;width:18px;height:18px;border-radius:9px;background:${bg};border:3px solid ${border};box-shadow:0 2px 6px rgba(0,0,0,.3)"></span>`, iconSize: [18, 18], iconAnchor: [9, 9] });
 
 // ---------- navegación ----------
@@ -372,14 +413,26 @@ function go(id) {
   if (id === 'home') renderHome();
   if (id === 'history') renderHistory();
   if (id === 'profile') renderProfile();
+  if (id === 'clubs') renderClubs();
   if (id === 'prep') startPrep();
   setTimeout(() => Object.values(maps).forEach((m) => m.invalidateSize()), 60);
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
-// Deslizar entre pantallas: Inicio ↔ Historial ↔ Perfil; hacia la derecha vuelve atrás en Preparación y Resumen.
-const TABS = ['home', 'history', 'profile'];
+// Deslizar entre pantallas: Inicio ↔ Actividad ↔ Clubs ↔ Perfil; hacia la derecha vuelve atrás en Preparación y Resumen.
+const TABS = ['home', 'history', 'clubs', 'profile'];
+const TAB_ICONS = {
+  home: ['Inicio', '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],
+  history: ['Actividad', '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>'],
+  clubs: ['Clubs', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
+  profile: ['Perfil', '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
+};
+$$('nav.tabs').forEach((nav) => {
+  const tab = (id) => `<button data-go="${id}" class="${nav.dataset.tab === id ? 'on' : ''}" aria-label="${TAB_ICONS[id][0]}"><svg class="i" viewBox="0 0 24 24">${TAB_ICONS[id][1]}</svg>${TAB_ICONS[id][0]}</button>`;
+  nav.setAttribute('aria-label', 'Pestañas');
+  nav.innerHTML = tab('home') + tab('history') + '<button class="go" data-go="prep" aria-label="Correr"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></button>' + tab('clubs') + tab('profile');
+});
 let sw = null;
-document.addEventListener('touchstart', (e) => { const cur = $('.screen.on')?.id; if (e.touches.length !== 1 || !['home', 'history', 'profile', 'prep', 'summary'].includes(cur) || e.target.closest('input,.slide,#sumMap')) { sw = null; return; } sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
+document.addEventListener('touchstart', (e) => { const cur = $('.screen.on')?.id; if (e.touches.length !== 1 || !['home', 'history', 'clubs', 'profile', 'prep', 'summary'].includes(cur) || e.target.closest('input,.slide,#sumMap')) { sw = null; return; } sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
 document.addEventListener('touchend', (e) => {
   if (!sw) return; const dx = e.changedTouches[0].clientX - sw.x, dy = e.changedTouches[0].clientY - sw.y, dt = Date.now() - sw.t; sw = null;
   if (Math.abs(dx) < 60 || Math.abs(dx) < 1.6 * Math.abs(dy) || dt > 700) return;
@@ -409,9 +462,9 @@ function openWelcome() { wStep = 0; $('#wName').value = profile.name; $$('#welco
 function showWStep() {
   [0, 1, 2].forEach((i) => { $('#wStep' + i).style.display = i === wStep ? '' : 'none'; $('#wDots i:nth-child(' + (i + 1) + ')').classList.toggle('on', i === wStep); });
   const n = profile.name.trim();
-  if (wStep === 1) $('#wAsk').textContent = n ? `${n}, ¿cuál es tu objetivo?` : '¿Cuál es tu objetivo?';
-  if (wStep === 2) { $('#wDone').textContent = n ? `¡Perfecto, ${n}!` : '¡Perfecto!'; $('#wDoneText').textContent = `${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana de racha. La primera carrera es la que más cuenta.`; }
-  $('#wNext').textContent = wStep === 0 ? 'Encantada' : wStep === 1 ? 'Ese es mi objetivo' : '¡Vamos a correr!';
+  if (wStep === 1) $('#wAsk').textContent = n ? `${n}, ¿cuántas veces a la semana?` : '¿Cuántas veces a la semana?';
+  if (wStep === 2) { $('#wDone').textContent = n ? `Listo, ${n}.` : 'Listo.'; $('#wDoneText').textContent = `Objetivo: ${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana seguida. Pulsa el botón lima cuando quieras salir.`; }
+  $('#wNext').textContent = wStep === 0 ? 'Continuar' : wStep === 1 ? 'Ese es mi objetivo' : 'Empezar';
 }
 $('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 2) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); go('home'); };
 $('#wName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#wNext').click(); });
@@ -420,25 +473,35 @@ $('#goalBtn').onclick = openWelcome;
 
 // ---------- inicio ----------
 function renderHome() {
-  const w = weekStats();
-  $('#streak').textContent = w.streak + (w.streak === 1 ? ' semana' : ' semanas');
-  $('#days').innerHTML = 'LMXJVSD'.split('').map((l, i) => `<span class="${w.daysDone.has(i) ? 'd' : i === w.today ? 't' : ''}">${l}</span>`).join('');
+  const w = weekStats(), ws = weekStart(Date.now());
+  const d = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#homeDate').textContent = d[0].toUpperCase() + d.slice(1);
+  $('#homeHello').textContent = profile.name ? `Hola, ${profile.name}` : 'Hola';
+  const week = runs.filter((r) => r.start >= ws), km = week.reduce((a, r) => a + r.dist, 0), dur = week.reduce((a, r) => a + r.dur, 0);
+  const perDay = [0, 0, 0, 0, 0, 0, 0]; week.forEach((r) => { perDay[(new Date(r.start).getDay() + 6) % 7] += r.dist; });
+  const maxDay = Math.max(5000, ...perDay);
+  $('#weekKm').textContent = (km / 1000).toFixed(1).replace('.', ',');
+  $('#weekGoal').textContent = `Objetivo ${GOAL_OF()} carreras`;
+  $('#weekBars').innerHTML = 'LMXJVSD'.split('').map((l, i) => `<div class="${i === w.today ? 't' : ''}"><i style="height:${Math.max(4, Math.round(perDay[i] / maxDay * 60))}px;${perDay[i] || i === w.today ? '' : 'opacity:.18'}"></i>${l}</div>`).join('');
+  $('#weekTrack').style.width = Math.min(100, w.count / GOAL_OF() * 100) + '%';
+  $('#weekStats').innerHTML = `<div><span class="lbl">Carreras</span><span><span class="num" style="font-size:22px">${w.count}</span><span class="unit">de ${GOAL_OF()}</span></span></div>
+    <div><span class="lbl">Tiempo</span><span class="num" style="font-size:22px">${fmtTime(dur)}</span></div>
+    <div><span class="lbl">Seguidas</span><span><span class="num" style="font-size:22px">${w.streak}</span><span class="unit">sem</span></span></div>`;
   const left = Math.max(0, GOAL_OF() - w.count);
-  $('#weekText').textContent = `${Math.min(w.count, GOAL_OF())} de ${GOAL_OF()} carreras · objetivo semanal`;
-  const nm = profile.name ? ', ' + profile.name : '';
-  $('#homeBubble').textContent = runs.length === 0 ? `¡Hola${nm}! Soy Zanca. Pulsa el botón azul y salimos a correr.` : left === 0 ? '¡Semana cumplida! Lo que corras ahora es propina.' : `Te falta${left === 1 ? '' : 'n'} ${left} carrera${left === 1 ? '' : 's'} para cerrar la semana.`;
+  $('#homeNudge').textContent = runs.length === 0 ? 'Tu primera carrera: GPS, ritmo en directo y voz en cada km' : left === 0 ? 'Semana cumplida. Lo que corras ahora suma.' : `Te falta${left === 1 ? '' : 'n'} ${left} carrera${left === 1 ? '' : 's'} para el objetivo`;
   const last = runs[0];
   const box = $('#lastRun');
-  if (!last) { box.innerHTML = `<div class="card center" style="color:var(--gris);font-weight:700;padding:28px">Aún no hay carreras. La primera es la que más cuenta.</div>`; return; }
-  box.innerHTML = `<button class="card col" style="width:100%;text-align:left;gap:12px;padding:12px" id="lastBtn">
-    <div class="map" style="height:150px"><svg viewBox="0 0 100 60" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">${thumbSvg(last)}</svg><span class="pill" style="position:absolute;left:10px;top:10px;background:var(--noche);color:#fff;box-shadow:none;font-size:12px;padding:4px 10px">${fmtDate(last.start)}</span></div>
-    <div class="row" style="padding:0 4px 4px">${statCols(last, 24)}</div></button>`;
+  if (!last) { box.innerHTML = ''; return; }
+  box.innerHTML = `<button class="card col" style="width:100%;text-align:left;gap:14px;padding:16px" id="lastBtn">
+    <div class="map" style="height:150px;border-radius:18px"><svg viewBox="0 0 100 60" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">${thumbSvg(last, 7)}</svg></div>
+    <div class="between" style="padding:0 4px"><div><div style="font-weight:600;font-size:16px">${last.name}</div><div class="sub" style="font-size:12px">${fmtDate(last.start)}</div></div><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></div>
+    <div class="stats" style="padding:0 4px 4px">${statCols(last, 24)}</div></button>`;
   $('#lastBtn').onclick = () => openSummary(last.id);
 }
 function statCols(r, size) {
-  return `<div class="col" style="gap:2px"><span class="lbl">Distancia</span><span class="num" style="font-size:${size}px">${fmtKm(r.dist)} <small style="font-size:${size * .55}px;font-weight:500">km</small></span></div>
-  <div class="col" style="gap:2px"><span class="lbl">Tiempo</span><span class="num" style="font-size:${size}px">${fmtTime(r.dur)}</span></div>
-  <div class="col" style="gap:2px"><span class="lbl">Ritmo</span><span class="num" style="font-size:${size}px">${fmtPace(r.dur / (r.dist / 1000))} <small style="font-size:${size * .55}px;font-weight:500">/km</small></span></div>`;
+  return `<div><span class="lbl">Distancia</span><span><span class="num" style="font-size:${size}px">${fmtKm(r.dist)}</span><span class="unit">km</span></span></div>
+  <div><span class="lbl">Ritmo</span><span><span class="num" style="font-size:${size}px">${fmtPace(r.dur / (r.dist / 1000))}</span><span class="unit">/km</span></span></div>
+  <div><span class="lbl">Tiempo</span><span class="num" style="font-size:${size}px">${fmtTime(r.dur)}</span></div>`;
 }
 function thumbSvg(r, stroke = 2.2) {
   const pts = r.points; if (!pts || pts.length < 2) return '';
@@ -450,38 +513,71 @@ function thumbSvg(r, stroke = 2.2) {
   const P = pts.map((p) => [ox + (p.lon - minLo) * cosLat * sc, 60 - (oy + (p.lat - minLa) * sc)]);
   const d = P.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
   const a = P[0], b = P[P.length - 1];
-  return `<path d="${d}" fill="none" stroke="#2F45FF" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${a[0]}" cy="${a[1]}" r="2.2" fill="#fff" stroke="#2F45FF" stroke-width="1.2" vector-effect="non-scaling-stroke"/><circle cx="${b[0]}" cy="${b[1]}" r="2.8" fill="#FFD43B" stroke="#0E1440" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+  return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="${d}" fill="none" stroke="${VOLT}" stroke-width="${stroke * .42}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${a[0]}" cy="${a[1]}" r="2" fill="#fff" stroke="${INK}" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="${b[0]}" cy="${b[1]}" r="2.4" fill="${VOLT}" stroke="${INK}" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
 }
 
-// ---------- historial y perfil ----------
+// ---------- actividad, clubs y perfil ----------
 function renderHistory() {
-  const month = new Date().getMonth(), year = new Date().getFullYear();
+  const now = new Date(), month = now.getMonth(), year = now.getFullYear();
   const mr = runs.filter((r) => { const d = new Date(r.start); return d.getMonth() === month && d.getFullYear() === year; });
   const dist = mr.reduce((a, r) => a + r.dist, 0), dur = mr.reduce((a, r) => a + r.dur, 0);
-  const name = new Date().toLocaleDateString('es-ES', { month: 'long' });
-  $('#totals').innerHTML = `<span class="lbl" style="color:#A3A9D6">${name[0].toUpperCase() + name.slice(1)}</span><div class="row" style="margin-top:8px">
-    <div class="col" style="gap:2px"><span class="lbl" style="color:#A3A9D6">Kilómetros</span><span class="num" style="font-size:28px">${fmtKm(dist)}</span></div>
-    <div class="col" style="gap:2px"><span class="lbl" style="color:#A3A9D6">Carreras</span><span class="num" style="font-size:28px">${mr.length}</span></div>
-    <div class="col" style="gap:2px"><span class="lbl" style="color:#A3A9D6">Tiempo</span><span class="num" style="font-size:28px">${fmtTime(dur)}</span></div></div>`;
+  const name = now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  $('#monthName').textContent = name;
+  $('#monthKm').textContent = (dist / 1000).toFixed(1).replace('.', ',');
+  const days = new Date(year, month + 1, 0).getDate(), per = Array(days).fill(0);
+  mr.forEach((r) => { per[new Date(r.start).getDate() - 1] += r.dist; });
+  const mx = Math.max(5000, ...per);
+  $('#monthBars').innerHTML = per.map((m, i) => `<i class="${m ? '' : 'z'} ${i === now.getDate() - 1 && m ? 't' : ''}" style="height:${Math.max(3, Math.round(m / mx * 100))}px"></i>`).join('');
+  $('#monthAxis').innerHTML = [1, 8, 15, 22, days].map((d) => `<span>${d}</span>`).join('');
+  $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
+    <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
+    <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
   const best = runs.length ? Math.max(...runs.map((r) => r.dist)) : 0;
   $('#histList').innerHTML = runs.length ? runs.map((r) => `<button class="hist" data-run="${r.id}">
-    <div class="thumb"><svg viewBox="0 0 100 60" style="width:100%;height:100%">${thumbSvg(r, 3)}</svg></div>
-    <div class="col" style="gap:3px;flex:1;min-width:0"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:16px">${r.name}</b>${r.dist === best && runs.length > 1 ? '<span style="background:var(--limon);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800">Récord</span>' : ''}</div>
-    <span style="font-size:13px;font-weight:700;color:var(--gris)">${fmtDate(r.start)}</span>
-    <span style="font-family:var(--display);font-weight:500;font-size:15px">${fmtKm(r.dist)} km · ${fmtTime(r.dur)} · ${fmtPace(r.dur / (r.dist / 1000))} /km</span></div></button>`).join('')
-    : `<div class="card center" style="color:var(--gris);font-weight:700;padding:28px">Sin carreras todavía.</div>`;
+    <div class="thumb"><svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">${thumbSvg(r, 5)}</svg></div>
+    <div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:center"><b style="font-size:15px;font-weight:600">${r.name}</b>${r.dist === best && runs.length > 1 ? '<span class="chip" style="font-size:9px;padding:2px 7px">Récord</span>' : ''}</div>
+    <div class="sub" style="font-size:12px">${fmtDate(r.start)} · ${fmtPace(r.dur / (r.dist / 1000))} /km</div></div>
+    <span><span class="num" style="font-size:22px">${fmtKm(r.dist)}</span><span class="unit" style="font-size:12px">km</span></span></button>`).join('')
+    : `<div class="sub" style="padding:28px 4px;text-align:center">Sin carreras todavía.</div>`;
   $$('#histList [data-run]').forEach((b) => b.onclick = () => openSummary(b.dataset.run));
+}
+function renderClubs() {
+  const w = weekStats(), ws = weekStart(Date.now());
+  const km = runs.filter((r) => r.start >= ws).reduce((a, r) => a + r.dist, 0);
+  $('#clubPreview').innerHTML = `<div class="between" style="padding-bottom:8px"><h2>Clasificación semanal</h2><span class="sub" style="font-size:12px">km</span></div>
+    <div class="between dark" style="border-radius:16px;padding:12px 14px"><span style="display:flex;align-items:center;gap:12px"><span class="num" style="font-size:16px;color:var(--on-bar-muted)">1</span><span style="width:34px;height:34px;border-radius:17px;background:var(--volt);color:var(--on-volt);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px">${(profile.name || 'Tú').slice(0, 2).toUpperCase()}</span><b style="font-weight:600">Tú</b></span><span class="num" style="font-size:20px;color:var(--volt)">${(km / 1000).toFixed(1).replace('.', ',')}</span></div>
+    <p class="sub" style="margin:10px 4px 0;font-size:12px">Así se verá tu fila cuando haya más gente en tu club. ${w.count} carrera${w.count === 1 ? '' : 's'} esta semana.</p>`;
+}
+// Mejores marcas: el tramo más rápido de cada distancia dentro de cualquier carrera guardada.
+function bestEffort(r, meters) {
+  const p = r.points; if (!p || r.dist < meters) return Infinity;
+  let best = Infinity, j = 0;
+  for (let i = 1; i < p.length; i++) {
+    while (j < i && p[i].d - p[j + 1].d >= meters) j++;
+    const span = p[i].d - p[j].d;
+    if (span >= meters) best = Math.min(best, ((p[i].t - p[j].t) / 1000) * (meters / span));
+  }
+  return best;
 }
 function renderProfile() {
   const w = weekStats();
-  const total = runs.reduce((a, r) => a + r.dist, 0), xp = runs.reduce((a, r) => a + xpFor(r), 0);
-  $('#profStats').innerHTML = `<div class="card col" style="background:var(--limon);box-shadow:none;gap:2px"><span class="lbl" style="color:inherit;opacity:.7">Racha</span><span class="num" style="font-size:28px">${w.streak}</span><span style="font-size:12px;font-weight:700;opacity:.7">semanas</span></div>
-  <div class="card col" style="gap:2px"><span class="lbl">Total</span><span class="num" style="font-size:28px">${(total / 1000).toFixed(0)}</span><span style="font-size:12px;font-weight:700;color:var(--gris)">km</span></div>
-  <div class="card col" style="gap:2px"><span class="lbl">XP</span><span class="num" style="font-size:28px">${xp}</span><span style="font-size:12px;font-weight:700;color:var(--gris)">nivel ${1 + Math.floor(xp / 500)}</span></div>`;
+  const total = runs.reduce((a, r) => a + r.dist, 0), year = new Date().getFullYear();
+  const yr = runs.filter((r) => new Date(r.start).getFullYear() === year).reduce((a, r) => a + r.dist, 0);
+  $('#avatar').textContent = (profile.name || 'Z').slice(0, 1).toUpperCase();
+  $('#profName').textContent = profile.name || 'Tú';
+  $('#profGoal').textContent = `Objetivo: ${GOAL_OF()} carreras a la semana · ${w.streak} sem seguidas`;
+  $('#profStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${runs.length}</span></div>
+    <div><span class="lbl">Total</span><span><span class="num" style="font-size:26px">${Math.round(total / 1000)}</span><span class="unit">km</span></span></div>
+    <div><span class="lbl">Este año</span><span><span class="num" style="font-size:26px">${Math.round(yr / 1000)}</span><span class="unit">km</span></span></div>`;
+  const marks = [['1 km', 1000], ['5K', 5000], ['10K', 10000], ['Media maratón', 21097.5], ['Maratón', 42195]].map(([name, m]) => {
+    let best = Infinity, when = null; runs.forEach((r) => { const t = bestEffort(r, m); if (t < best) { best = t; when = r.start; } });
+    return { name, best, when };
+  });
+  const newest = marks.filter((x) => isFinite(x.best)).reduce((a, x) => (!a || x.when > a.when ? x : a), null);
+  $('#prList').innerHTML = marks.map((x) => `<div class="pr"><div style="flex:1"><div style="font-weight:600">${x.name}</div><div class="sub" style="font-size:12px">${isFinite(x.best) ? new Date(x.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Aún sin marca'}</div></div>${newest === x && runs.length > 1 ? '<span class="chip" style="font-size:9px">Nueva</span>' : ''}<span class="num" style="font-size:22px;${isFinite(x.best) ? '' : 'color:var(--muted)'}">${isFinite(x.best) ? fmtTime(x.best) : '—'}</span></div>`).join('');
   $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map;
 }
-const xpFor = (r) => Math.round(r.dist / 100) + Math.round(r.dur / 60);
-['setVoice', 'setNight', 'setMap'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); });
+['setVoice', 'setNight', 'setMap'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
 $('#wipeBtn').onclick = () => { if ($('#wipeBtn').dataset.sure) { runs = []; save(KEY, runs); toast('Datos borrados'); go('home'); } else { $('#wipeBtn').dataset.sure = '1'; $('#wipeBtn').textContent = 'Pulsa otra vez para confirmar'; setTimeout(() => { delete $('#wipeBtn').dataset.sure; $('#wipeBtn').textContent = 'Borrar todos los datos de este móvil'; }, 3000); } };
 $('#demoBtn').onclick = () => { runs.unshift(demoRun()); save(KEY, runs); toast('Carrera de ejemplo añadida'); go('home'); };
 function demoRun() {
@@ -505,7 +601,7 @@ function onFix(pos) {
   lastFix = { lat, lon, acc, t: pos.timestamp };
   if ($('#prep').classList.contains('on')) {
     prepMap.setView([lat, lon], 16);
-    if (!prepMarker) prepMarker = L.marker([lat, lon], { icon: dotIcon('#2F45FF', '#fff') }).addTo(prepMap); else prepMarker.setLatLng([lat, lon]);
+    if (!prepMarker) prepMarker = L.marker([lat, lon], { icon: dotIcon(VOLT, INK) }).addTo(prepMap); else prepMarker.setLatLng([lat, lon]);
     const good = acc <= 25;
     $('#gpsDot').className = 'dot ' + (good ? 'ok' : acc <= 60 ? '' : 'bad');
     $('#gpsText').textContent = good ? `GPS listo · ${Math.round(acc)} m` : `Afinando GPS · ${Math.round(acc)} m`;
@@ -525,14 +621,13 @@ const run = { active: false, paused: false, points: [], dist: 0, start: 0, pause
 $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
   Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity });
-  const night = settings.night === 'on' || (settings.night === 'auto' && (new Date().getHours() >= 20 || new Date().getHours() < 7 || matchMedia('(prefers-color-scheme: dark)').matches));
-  $('#run').classList.toggle('night', night);
-  $('#pausePanel').style.display = 'none'; $('#pauseBtn').style.display = ''; $('#runState').textContent = 'Carrera libre';
+  applyTheme();
+  $('#pausePanel').style.display = 'none'; $('#runCtl').style.display = 'grid'; $('#runState').textContent = 'Carrera libre';
   ['#rDist', '#lockDist'].forEach((q) => $(q).textContent = '0,00'); $('#rTime').textContent = '00:00'; ['#rPace', '#rAvg', '#rBest'].forEach((q) => $(q).textContent = '–:––');
   go('run');
   run.map = makeMap('runMap', 'calles'); run.map.setZoom(16);
-  if (run.line) run.map.removeLayer(run.line); if (run.marker) run.map.removeLayer(run.marker);
-  run.line = L.polyline([], ROUTE_STYLE).addTo(run.map); run.marker = null;
+  [run.halo, run.line, run.marker].forEach((l) => l && run.map.removeLayer(l));
+  run.halo = L.polyline([], ROUTE_HALO).addTo(run.map); run.line = L.polyline([], ROUTE_STYLE).addTo(run.map); run.marker = null;
   if (lastFix) runFix(lastFix);
   clearInterval(run.timer); tick(); run.timer = setInterval(tick, 500);
   requestWake();
@@ -561,8 +656,8 @@ function runFix(f) {
     }
   }
   run.points.push(p);
-  run.line.addLatLng([p.lat, p.lon]);
-  if (!run.marker) run.marker = L.marker([p.lat, p.lon], { icon: dotIcon('#2F45FF', '#fff') }).addTo(run.map); else run.marker.setLatLng([p.lat, p.lon]);
+  run.halo.addLatLng([p.lat, p.lon]); run.line.addLatLng([p.lat, p.lon]);
+  if (!run.marker) run.marker = L.marker([p.lat, p.lon], { icon: dotIcon(VOLT, INK) }).addTo(run.map); else run.marker.setLatLng([p.lat, p.lon]);
   run.map.panTo([p.lat, p.lon], { animate: true });
 }
 function currentPace() {
@@ -581,10 +676,10 @@ function tick() {
   const cp = currentPace(); $('#rPace').textContent = run.paused || !isFinite(cp) ? (run.dist > 20 ? fmtPace(el / (run.dist / 1000)) : '–:––') : fmtPace(cp);
   $('#rAvg').textContent = run.dist > 50 ? fmtPace(el / (run.dist / 1000)) : '–:––';
   $('#rBest').textContent = isFinite(run.best) ? fmtPace(run.best) : '–:––';
-  if (lastFix) $('#runAcc').textContent = '· ' + Math.round(lastFix.acc) + ' m';
+  if (lastFix) $('#runAcc').textContent = '±' + Math.round(lastFix.acc) + ' m';
 }
-$('#pauseBtn').onclick = () => { run.paused = true; run.pauseAt = Date.now(); $('#pauseBtn').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = 'En pausa'; speak('Pausa'); };
-$('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.paused = false; $('#pauseBtn').style.display = ''; $('#pausePanel').style.display = 'none'; $('#runState').textContent = 'Carrera libre'; speak('Seguimos'); };
+$('#pauseBtn').onclick = () => { run.paused = true; run.pauseAt = Date.now(); $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = 'En pausa'; speak('Pausa'); };
+$('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.paused = false; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = 'Carrera libre'; speak('Seguimos'); };
 slideButton($('#finishSlide'), finishRun);
 function slideButton(el, done) {
   const knob = el.querySelector('.knob'), fill = el.querySelector('.fill');
@@ -619,9 +714,9 @@ function finishRun() {
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
   runs.unshift(r); save(KEY, runs);
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
-  $('#cDist').textContent = '¡' + fmtKm(r.dist) + ' km!';
-  $('#cText').textContent = runs.length === 1 ? 'Tu primera carrera con Zancada' : r.dist > best ? 'Tu carrera más larga hasta ahora' : w.count >= GOAL_OF() ? '¡Semana cumplida!' : 'Carrera guardada. Zanca está orgullosa.';
-  $('#cXp').textContent = '+' + xpFor(r); $('#cWeek').textContent = `${Math.min(w.count, GOAL_OF())} de ${GOAL_OF()}`; $('#cStreak').textContent = w.streak + ' sem';
+  $('#cDist').textContent = fmtKm(r.dist);
+  $('#cText').textContent = runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
+  $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   speak('Carrera terminada. ' + fmtKm(r.dist).replace(',', ' coma ') + ' kilómetros.');
   go('cele');
@@ -647,18 +742,21 @@ let current = null, sumLayers = [];
 function openSummary(id) {
   current = runs.find((r) => r.id === id); if (!current) return go('home');
   const r = current;
-  $('#sTitle').textContent = r.name; $('#sDate').textContent = fmtDate(r.start);
-  $('#sStats').innerHTML = statCols(r, 28).replace(/<div class="col"/g, '<div class="card col"');
+  $('#sTitle').textContent = r.name; $('#sDate').textContent = fmtDate(r.start); $('#sKm').textContent = fmtKm(r.dist);
+  const okSplits = r.splits.filter((s) => !s.partial);
+  $('#sStats').innerHTML = `<div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(r.dur)}</span></div>
+    <div><span class="lbl">Ritmo</span><span><span class="num" style="font-size:26px">${fmtPace(r.dur / (r.dist / 1000))}</span><span class="unit">/km</span></span></div>
+    <div><span class="lbl">Mejor km</span><span><span class="num" style="font-size:26px">${okSplits.length ? fmtPace(Math.min(...okSplits.map((s) => s.split))) : '–:––'}</span><span class="unit">/km</span></span></div>`;
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
   const maxS = Math.max(...r.splits.map((s) => s.split));
-  $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span style="color:var(--gris)">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : '<span style="grid-column:1/-1;color:var(--gris);font-weight:700">Menos de un kilómetro, sin parciales.</span>';
+  $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : '<span class="sub" style="grid-column:1/-1">Menos de un kilómetro, sin parciales.</span>';
   go('summary');
-  const m = makeMap('sumMap', settings.map);
+  const m = makeMap('sumMap', settings.map); setLayer(m, settings.map);
   sumLayers.forEach((l) => m.removeLayer(l)); sumLayers = [];
   const ll = r.points.map((p) => [p.lat, p.lon]);
-  sumLayers.push(L.polyline(ll, ROUTE_HALO).addTo(m), L.polyline(ll, ROUTE_STYLE).addTo(m), L.marker(ll[0], { icon: dotIcon('#fff', '#2F45FF') }).addTo(m), L.marker(ll[ll.length - 1], { icon: dotIcon('#FFD43B', '#0E1440') }).addTo(m));
+  sumLayers.push(L.polyline(ll, ROUTE_HALO).addTo(m), L.polyline(ll, ROUTE_STYLE).addTo(m), L.marker(ll[0], { icon: dotIcon('#fff', INK) }).addTo(m), L.marker(ll[ll.length - 1], { icon: dotIcon(VOLT, INK) }).addTo(m));
   m.dragging.disable(); m.scrollWheelZoom.disable(); m.touchZoom.disable();
-  setTimeout(() => { m.invalidateSize(); m.fitBounds(ll, { padding: [24, 24] }); }, 80);
+  setTimeout(() => { m.invalidateSize(); m.fitBounds(ll, { paddingTopLeft: [32, 80], paddingBottomRight: [32, 70] }); }, 80);
 }
 $('#replayBtn').onclick = () => openReplay();
 $('#deleteBtn').onclick = () => { if (!current) return; runs = runs.filter((r) => r.id !== current.id); save(KEY, runs); toast('Carrera borrada'); go('home'); };
@@ -672,16 +770,16 @@ function openReplay() {
   rep.map = makeMap('repMap', 'sat'); setRepLayer('sat');
   rep.layers.forEach((l) => rep.map.removeLayer(l)); rep.layers = [];
   const ll = r.points.map((p) => [p.lat, p.lon]);
-  rep.ghost = L.polyline(ll, { color: '#FFFFFF', weight: 5, opacity: 0.35 }).addTo(rep.map);
+  rep.ghost = L.polyline(ll, { color: '#FFFFFF', weight: 4, opacity: 0.4, dashArray: '2 8', lineCap: 'round' }).addTo(rep.map);
   rep.trail = L.polyline([], ROUTE_HALO).addTo(rep.map); rep.trail2 = L.polyline([], ROUTE_STYLE).addTo(rep.map);
-  rep.startM = L.marker(ll[0], { icon: dotIcon('#fff', '#2F45FF') }).addTo(rep.map);
-  rep.endM = L.marker(ll[ll.length - 1], { icon: dotIcon('#FFD43B', '#0E1440') }).addTo(rep.map);
-  rep.runner = L.marker(ll[0], { icon: L.divIcon({ className: '', html: '<span style="display:block;width:26px;height:26px;border-radius:13px;background:#FFD43B;border:4px solid #0E1440;box-shadow:0 0 0 8px rgba(255,212,59,.35)"></span>', iconSize: [26, 26], iconAnchor: [13, 13] }), zIndexOffset: 1000 }).addTo(rep.map);
+  rep.startM = L.marker(ll[0], { icon: dotIcon('#fff', INK) }).addTo(rep.map);
+  rep.endM = L.marker(ll[ll.length - 1], { icon: dotIcon(VOLT, INK) }).addTo(rep.map);
+  rep.runner = L.marker(ll[0], { icon: L.divIcon({ className: '', html: '<span style="display:block;width:24px;height:24px;border-radius:12px;background:#D4FF3A;border:4px solid #0B0C0B;box-shadow:0 0 0 10px rgba(212,255,58,.3)"></span>', iconSize: [26, 26], iconAnchor: [13, 13] }), zIndexOffset: 1000 }).addTo(rep.map);
   rep.layers.push(rep.ghost, rep.trail, rep.trail2, rep.startM, rep.endM, rep.runner);
   rep.total = r.dur; rep.pos = 0; rep.playing = true; setPlayIcon();
-  setTimeout(() => { rep.map.invalidateSize(); rep.map.fitBounds(ll, { padding: [60, 60] }); rep.last = performance.now(); cancelAnimationFrame(rep.raf); rep.raf = requestAnimationFrame(frame); }, 80);
+  setTimeout(() => { rep.map.invalidateSize(); rep.map.fitBounds(ll, { paddingTopLeft: [40, 90], paddingBottomRight: [40, 240] }); rep.last = performance.now(); cancelAnimationFrame(rep.raf); rep.raf = requestAnimationFrame(frame); }, 80);
 }
-function setRepLayer(which) { if (!rep.map) return; if (rep.map.layer) rep.map.removeLayer(rep.map.layer); rep.map.layer = which === 'sat' ? SAT() : CALLES(); rep.map.layer.addTo(rep.map); rep.map.layer.bringToBack(); $$('#replay [data-layer]').forEach((b) => { const on = b.dataset.layer === which; b.classList.toggle('on', on); b.style.color = on ? '#fff' : 'rgba(255,255,255,.6)'; }); }
+function setRepLayer(which) { if (!rep.map) return; if (rep.map.layer) rep.map.removeLayer(rep.map.layer); rep.map.layer = which === 'sat' ? SAT() : CALLES(); rep.map.layer.addTo(rep.map); rep.map.layer.bringToBack(); $$('#replay [data-layer]').forEach((b) => b.classList.toggle('on', b.dataset.layer === which)); }
 $$('#replay [data-layer]').forEach((b) => b.onclick = () => setRepLayer(b.dataset.layer));
 function frame(now) {
   if (!$('#replay').classList.contains('on')) return;
@@ -705,7 +803,7 @@ function drawRep() {
   $('#pPace').textContent = dd > 5 ? fmtPace(dt / (dd / 1000)) : '–:––';
   $('#scrub').value = Math.round(rep.pos * 1000);
 }
-function setPlayIcon() { $('#repPlayIco').innerHTML = rep.playing ? '<rect x="6" y="4" width="4.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.5"/>' : '<path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5Z"/>'; $('#repPlay').setAttribute('aria-label', rep.playing ? 'Pausar' : 'Reproducir'); }
+function setPlayIcon() { $('#repPlayIco').innerHTML = rep.playing ? '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>' : '<path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/>'; $('#repPlay').setAttribute('aria-label', rep.playing ? 'Pausar' : 'Reproducir'); }
 $('#repPlay').onclick = () => { if (rep.pos >= 1) rep.pos = 0; rep.playing = !rep.playing; rep.last = performance.now(); setPlayIcon(); };
 $('#repRestart').onclick = () => { rep.pos = 0; rep.playing = true; rep.last = performance.now(); setPlayIcon(); };
 $('#repSpeed').onclick = () => { rep.speed = rep.speed === 1 ? 2 : rep.speed === 2 ? 4 : 1; $('#repSpeed').textContent = rep.speed + '×'; };
@@ -713,6 +811,7 @@ $('#scrub').oninput = (e) => { rep.pos = e.target.value / 1000; rep.playing = fa
 $('#repClose').onclick = () => { cancelAnimationFrame(rep.raf); openSummary(current.id); };
 
 // ---------- arranque ----------
+applyTheme();
 if (profile.done) renderHome(); else openWelcome();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
