@@ -120,7 +120,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .setrow{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:500;padding:6px 0}
 .pr{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
 .pr:first-of-type{border-top:0}
-.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.badge{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border-radius:18px;background:var(--surface2);text-align:center;position:relative;border:0;font:inherit;color:var(--ink);cursor:pointer}.badge svg{display:block;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}.badge:not(.on) svg{filter:none;opacity:.55}.badge small{font-size:11px;line-height:1.25;color:var(--muted)}.badge.on small b{color:var(--ink);font-weight:600}.badge .new{position:absolute;top:-6px;right:-4px}@keyframes medalIn{0%{transform:scale(.2) rotate(-25deg);opacity:0}65%{transform:scale(1.12) rotate(5deg);opacity:1}100%{transform:none}}@keyframes medalShine{0%,100%{transform:translateX(-80px)}50%{transform:translateX(80px)}}.medal-pop{animation:medalIn .7s cubic-bezier(.2,.9,.3,1.2) both}.medal-shine{animation:medalShine 2.6s ease-in-out infinite}.coach-b{max-width:88%;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.45;white-space:normal;word-wrap:break-word}.coach-b.me{align-self:flex-end;background:var(--bar);color:var(--on-bar);border-bottom-right-radius:6px}.coach-b.ai{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:6px}.coach-b.err{background:transparent;border:1px dashed var(--line);color:var(--muted);font-size:13px}@keyframes dots{0%,80%,100%{opacity:.25}40%{opacity:1}}.coach-dots i{display:inline-block;width:7px;height:7px;border-radius:4px;background:currentColor;margin-right:4px;animation:dots 1.2s infinite}.coach-dots i:nth-child(2){animation-delay:.2s}.coach-dots i:nth-child(3){animation-delay:.4s}.rphoto{flex:none;width:210px;height:150px;border-radius:14px;overflow:hidden;padding:0;border:0;background:var(--surface2)}.rphoto img{width:100%;height:100%;object-fit:cover;display:block}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.badge{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border-radius:18px;background:var(--surface2);text-align:center;position:relative;border:0;font:inherit;color:var(--ink);cursor:pointer}.badge svg{display:block;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}.badge:not(.on) svg{filter:none;opacity:.55}.badge small{font-size:11px;line-height:1.25;color:var(--muted)}.badge.on small b{color:var(--ink);font-weight:600}.badge .new{position:absolute;top:-6px;right:-4px}@keyframes medalIn{0%{transform:scale(.2) rotate(-25deg);opacity:0}65%{transform:scale(1.12) rotate(5deg);opacity:1}100%{transform:none}}@keyframes medalShine{0%,100%{transform:translateX(-80px)}50%{transform:translateX(80px)}}.medal-pop{animation:medalIn .7s cubic-bezier(.2,.9,.3,1.2) both}.medal-shine{animation:medalShine 2.6s ease-in-out infinite}#zetaFab{position:fixed;right:18px;bottom:calc(var(--sab) + 96px);z-index:1100;width:60px;height:60px;border-radius:30px;padding:0;border:0;background:transparent;box-shadow:0 8px 22px -4px rgba(0,0,0,.35)}#zetaFab.noTabs{bottom:calc(var(--sab) + 22px)}#zetaFab .zeta-av{width:60px;height:60px;font-size:32px;box-shadow:inset 0 0 0 3px var(--bar)}.zeta-av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:var(--volt);color:#0B0C0B;font-family:var(--display);font-weight:700;width:36px;height:36px;font-size:20px;letter-spacing:-.04em;flex:none}.zeta-dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:7px;background:#E5533D;border:2px solid var(--bg)}@keyframes zetaIn{0%{transform:scale(0)}70%{transform:scale(1.12)}100%{transform:none}}#zetaFab.pop{animation:zetaIn .45s cubic-bezier(.2,.9,.3,1.3) both}#coachSheet{align-items:flex-end}#coachSheet .card{border-bottom-left-radius:0;border-bottom-right-radius:0}@media(min-width:560px){#coachSheet .card{border-radius:28px}}.coach-b{max-width:88%;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.45;white-space:normal;word-wrap:break-word}.coach-b.me{align-self:flex-end;background:var(--bar);color:var(--on-bar);border-bottom-right-radius:6px}.coach-b.ai{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:6px}.coach-b.err{background:transparent;border:1px dashed var(--line);color:var(--muted);font-size:13px}@keyframes dots{0%,80%,100%{opacity:.25}40%{opacity:1}}.coach-dots i{display:inline-block;width:7px;height:7px;border-radius:4px;background:currentColor;margin-right:4px;animation:dots 1.2s infinite}.coach-dots i:nth-child(2){animation-delay:.2s}.coach-dots i:nth-child(3){animation-delay:.4s}.rphoto{flex:none;width:210px;height:150px;border-radius:14px;overflow:hidden;padding:0;border:0;background:var(--surface2)}.rphoto img{width:100%;height:100%;object-fit:cover;display:block}
 .feel{display:flex;gap:6px}.feel button{flex:1;height:40px;border-radius:12px;background:var(--surface2);color:var(--ink);font-weight:600;font-size:12px}.feel button.on{background:var(--bar);color:var(--volt)}
 .note{width:100%;min-height:64px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:14px;padding:10px 12px;resize:vertical}
 #sTitleIn{font:inherit;font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.03em;width:100%;background:transparent;border:0;border-bottom:2px solid var(--volt);color:var(--ink);padding:0}
@@ -170,6 +170,8 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="stretchModal" role="dialog" aria-modal="true" aria-label="Estiramientos y calentamiento guiados"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl" id="stStep">Estiramientos</span><button class="sub" id="stClose" style="font-size:13px;text-decoration:underline">Cerrar</button></div><h1 style="font-size:28px" id="stName">—</h1><p class="sub" id="stHow" style="margin:0;font-size:15px;line-height:1.45"></p><div style="display:flex;align-items:baseline;gap:6px"><span class="num" id="stLeft" style="font-size:72px;letter-spacing:-.04em">40</span><span class="unit">s</span></div><div class="track"><i id="stTrack" style="width:0"></i></div><div style="display:flex;gap:8px"><button class="btn sec" id="stPause" style="height:48px;font-size:15px;flex:1">Pausa</button><button class="btn sec" id="stSkip" style="height:48px;font-size:15px;flex:1">Siguiente</button></div><p class="sub" style="margin:0;font-size:11px">Suave y sin rebotes: tensión, nunca dolor.</p></div></div>
+<button id="zetaFab" aria-label="Abrir a Zeta, tu entrenador IA" style="display:none"><span class="zeta-av">Z</span><span class="zeta-dot" id="zetaDot" style="display:none"></span></button>
+<div class="modal" id="coachSheet" role="dialog" aria-modal="true" aria-label="Zeta, tu entrenador IA"><div class="card col" id="coachCard" style="gap:12px;width:100%;max-width:520px;margin:0 auto;height:min(82vh,720px);padding:16px 18px calc(var(--sab) + 14px)"><div class="between" style="gap:10px"><span class="zeta-av" style="width:42px;height:42px;font-size:23px;flex:none">Z</span><div style="flex:1;min-width:0"><b style="font-weight:700;font-family:var(--display);font-size:20px;display:block;line-height:1.1">Zeta</b><span class="sub" style="font-size:12px" id="zetaSub">Tu entrenador IA</span></div><button class="sub" id="coachNew" style="font-size:13px;text-decoration:underline;background:none;border:0;display:none">Nueva charla</button><button class="icon" id="coachClose" aria-label="Cerrar" style="width:40px;height:40px;flex:none"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div id="coachLog" class="col" style="gap:8px;flex:1;min-height:120px;overflow:auto;padding-bottom:4px"></div><div class="chips" id="aiQs" style="margin:0 -20px;padding:0 20px"><button class="chipb" data-q="¿Cómo afronto la semana que viene?">Semana que viene</button><button class="chipb" data-q="¿Estoy entrenando demasiado o demasiado poco?">¿Voy bien de carga?</button><button class="chipb" data-q="Me molesta algo al correr. ¿Qué hago?">Me duele algo</button><button class="chipb" data-q="Diseña mi próxima sesión de series con calentamiento y vuelta a la calma.">Series para el próximo día</button><button class="chipb" data-q="¿Qué tiempo realista puedo hacer en mi carrera y cómo la corro?">Estrategia de carrera</button><button class="chipb" data-q="¿Qué como antes y después de correr?">Comida</button></div><form id="coachForm" style="display:flex;gap:8px;margin:0"><input id="coachIn" maxlength="400" placeholder="Pregúntale lo que quieras" autocomplete="off" style="flex:1;min-width:0;height:48px;border-radius:14px;border:1px solid var(--line);padding:0 14px;background:var(--surface2);color:var(--ink);font:inherit;font-size:15px"><button class="btn" id="coachSend" type="submit" style="height:48px;font-size:15px;width:auto;flex:none;padding:0 18px">Enviar</button></form><p class="sub" style="margin:0;font-size:11px;line-height:1.4">Conoce tu plan, tus últimas carreras y tus récords. Es una IA gratuita (Pollinations): puede equivocarse, y si algo duele de verdad, consulta a un profesional.</p></div></div>
 <div class="modal" id="medalModal" role="dialog" aria-modal="true" aria-label="Insignia" style="align-items:center"><div class="card col" style="gap:10px;width:100%;max-width:360px;margin:0 auto;align-items:center;text-align:center;padding:28px 22px 22px;overflow:hidden"><div id="mmMedal" style="position:relative"></div><span class="lbl" id="mmTier"></span><h1 id="mmName" style="font-size:26px"></h1><p class="sub" id="mmWhen" style="margin:0;font-size:14px;line-height:1.45"></p><button class="btn" id="mmOk" style="height:48px;font-size:15px;margin-top:6px">Cerrar</button></div></div>
 <div class="modal" id="photoModal" role="dialog" aria-modal="true" aria-label="Foto del sitio" style="align-items:center;background:rgba(0,0,0,.92)"><div class="col" style="gap:10px;width:100%;max-width:720px;margin:0 auto"><img id="pmImg" alt="" style="width:100%;max-height:72vh;object-fit:contain;border-radius:12px"><p id="pmCredit" style="margin:0;font-size:12px;color:#ccc;text-align:center"></p><div style="display:flex;gap:8px"><button class="btn sec" id="pmPrev" style="height:46px;font-size:14px;flex:1">Anterior</button><button class="btn" id="pmClose" style="height:46px;font-size:14px;flex:1">Cerrar</button><button class="btn sec" id="pmNext" style="height:46px;font-size:14px;flex:1">Siguiente</button></div></div></div>
 <div class="modal" id="newsModal" role="dialog" aria-modal="true" aria-label="Novedades"><div class="card col" style="gap:12px;width:100%;max-width:520px;margin:0 auto;max-height:86vh;overflow:auto"><span class="lbl" id="newsVer">Novedades</span><h1 style="font-size:26px">Esta noche, Zancada ha cambiado mucho</h1><ul id="newsList" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px;font-size:15px;line-height:1.4"></ul><div style="display:flex;gap:8px"><a class="btn sec" id="newsAll" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="height:48px;font-size:14px;text-decoration:none;flex:1;width:auto;min-width:0;padding:0 8px">Ver todo</a><button class="btn" id="newsOk" style="height:48px;font-size:15px;flex:1;width:auto;min-width:0;padding:0 8px">A correr</button></div></div></div>
@@ -334,7 +336,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.56 · entrenador IA y medallas · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.57 · Zeta y recorrido animado · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -365,9 +367,9 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 
 <!-- FICHA DE RUTA -->
 <section class="screen scroll" id="routeDetail" style="padding:0">
-  <div id="rdMapWrap" style="position:relative;height:46vh;flex:none;transition:height .25s"><div id="rdMap" style="position:absolute;inset:0"></div>
+  <div id="rdMapWrap" style="position:relative;height:46vh;flex:none;transition:height .25s"><div id="rdMap" style="position:absolute;inset:0"></div><div id="rdFlyInfo" class="card dark" style="display:none;position:absolute;left:14px;top:72px;z-index:500;padding:8px 14px;border-radius:14px;font-size:13px;font-weight:600"></div>
     <div class="fab"><button class="icon" data-go="routes" aria-label="Volver a rutas"><svg class="i" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><button class="icon" id="rdSave" aria-label="Guardar en mis recorridos"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div>
-    <div style="position:absolute;right:14px;bottom:14px;z-index:500;display:flex;gap:8px"><button class="chipb" id="rdLayer" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--surface)">Satélite</button><button class="chipb" id="rdBig" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--surface)">Ampliar mapa</button></div>
+    <div style="position:absolute;right:14px;bottom:14px;z-index:500;display:flex;gap:8px"><button class="chipb" id="rdFly" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--bar);color:var(--on-bar)">▶ Recorrido</button><button class="chipb" id="rdLayer" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--surface)">Satélite</button><button class="chipb" id="rdBig" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--surface)">Ampliar mapa</button></div>
   </div>
   <div class="col" style="gap:14px;padding:18px 20px calc(var(--sab) + 100px)">
     <div><span class="lbl" id="rdZone"></span><h1 id="rdName" style="margin-top:4px;font-size:26px"></h1></div>
@@ -398,7 +400,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <p class="sub" style="margin:4px 0 0;font-size:12px" id="planRemindHint"></p>
       <button class="btn sec" id="planIcs" style="height:46px;font-size:14px;margin-top:10px">Añadir el plan a mi calendario</button>
     </div>
-    <div class="card col" id="coachCard" style="gap:12px;padding:18px 20px"><div class="between"><h2>Tu entrenador IA</h2><button class="sub" id="coachNew" style="font-size:13px;text-decoration:underline;background:none;border:0;display:none">Nueva charla</button></div><div id="coachLog" class="col" style="gap:8px;max-height:56vh;overflow:auto"></div><div class="chips" id="aiQs" style="margin:0 -20px;padding:0 20px"><button class="chipb" data-q="¿Cómo afronto la semana que viene?">Semana que viene</button><button class="chipb" data-q="¿Estoy entrenando demasiado o demasiado poco?">¿Voy bien de carga?</button><button class="chipb" data-q="Me molesta algo al correr. ¿Qué hago?">Me duele algo</button><button class="chipb" data-q="Diseña mi próxima sesión de series con calentamiento y vuelta a la calma.">Series para el próximo día</button><button class="chipb" data-q="¿Qué tiempo realista puedo hacer en mi carrera y cómo la corro?">Estrategia de carrera</button><button class="chipb" data-q="¿Qué como antes y después de correr?">Comida</button></div><form id="coachForm" style="display:flex;gap:8px;margin:0"><input id="coachIn" maxlength="400" placeholder="Pregúntale lo que quieras" autocomplete="off" style="flex:1;min-width:0;height:48px;border-radius:14px;border:1px solid var(--line);padding:0 14px;background:var(--surface2);color:var(--ink);font:inherit;font-size:15px"><button class="btn" id="coachSend" type="submit" style="height:48px;font-size:15px;width:auto;flex:none;padding:0 18px">Enviar</button></form><p class="sub" style="margin:0;font-size:11px;line-height:1.4">Conoce tu plan, tus últimas carreras y tus récords. Es una IA gratuita (Pollinations): puede equivocarse, y si algo duele de verdad, consulta a un profesional.</p></div>
+    <button class="card" id="coachOpenPlan" style="display:flex;align-items:center;gap:14px;padding:16px 18px;border:0;font:inherit;color:inherit;text-align:left;width:100%"><span class="zeta-av" style="width:44px;height:44px;font-size:24px">Z</span><span style="flex:1;min-width:0"><b style="font-weight:600;display:block">Pregúntale a Zeta</b><span class="sub" style="font-size:13px">Tu entrenador IA: conoce tu plan y tus carreras</span></span><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M9 6l6 6-6 6"/></svg></button>
     <button class="btn sec" id="planEdit">Cambiar objetivo, días o nivel</button>
     <button class="btn ghost" id="planDelete" style="color:var(--danger)">Eliminar el plan</button>
   </div>
@@ -641,6 +643,8 @@ function go(id, opts = {}) {
   window.scrollTo(0, 0);
   if (!opts.pop && history.state?.id !== id) history.pushState({ id }, '');
   if (!run.active && !['prep', 'count', 'run'].includes(id) && watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; } // no gastar batería fuera de la carrera
+  if (typeof zetaFabFor === 'function') zetaFabFor(id);
+  if (id !== 'routeDetail' && typeof fly !== 'undefined' && fly.on) stopFly();
   if (id === 'home') renderHome();
   if (id === 'history') renderHistory();
   if (id === 'profile') renderProfile();
@@ -1335,7 +1339,7 @@ function coachCtx() {
   lines.push('Hoy es ' + new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) + '.');
   return lines.join('\n');
 }
-const coachSys = () => 'Eres el entrenador de running de la app Zancada. Hablas en español de España, de tú, cercano y motivador pero honesto. Respuestas cortas (máximo 130 palabras), concretas y accionables: ritmos en min/km, distancias en km. Sin tablas ni títulos; como mucho una lista corta con guiones. Usa los datos del corredor. Si menciona dolor fuerte, punzante, que cojea o que no mejora, dile que pare y consulte a un profesional sanitario. No inventes datos que no tienes.\n\nDatos del corredor:\n' + coachCtx();
+const coachSys = () => 'Eres Zeta, el entrenador de running de la app Zancada. Hablas en español de España, de tú, cercano y motivador pero honesto. Respuestas cortas (máximo 130 palabras), concretas y accionables: ritmos en min/km, distancias en km. Sin tablas ni títulos; como mucho una lista corta con guiones. Usa los datos del corredor. Si menciona dolor fuerte, punzante, que cojea o que no mejora, dile que pare y consulte a un profesional sanitario. No inventes datos que no tienes.\n\nDatos del corredor:\n' + coachCtx();
 function coachHtml(t) {
   const e = String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return e.replace(/\*\*(.+?)\*\*/g, '<b style="font-weight:600">$1</b>').replace(/^#{1,4}\s*/gm, '').replace(/^\s*[-*•]\s+/gm, '• ').replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
@@ -1346,7 +1350,8 @@ function coachClean(t) {
 }
 function renderCoach() {
   const log = $('#coachLog'); if (!log) return;
-  const hello = `<div class="coach-b ai">Hola${profile.name ? ', ' + profile.name : ''}. Soy tu entrenador. Conozco tu plan y tus carreras: pregúntame lo que quieras o toca una de las sugerencias.</div>`;
+  const hello = `<div class="coach-b ai">Hola${profile.name ? ', ' + profile.name : ''}. Soy Zeta, tu entrenador. Conozco tu plan y tus carreras: pregúntame lo que quieras o toca una de las sugerencias.</div>`;
+  $('#zetaSub').textContent = coachBusy ? 'Escribiendo…' : 'Tu entrenador IA';
   log.innerHTML = hello + coach.map((m) => `<div class="coach-b ${m.role === 'user' ? 'me' : m.err ? 'ai err' : 'ai'}">${coachHtml(m.content)}</div>`).join('') + (coachBusy ? '<div class="coach-b ai coach-dots" id="coachTyping" aria-label="Escribiendo"><i></i><i></i><i></i></div>' : '');
   log.scrollTop = log.scrollHeight;
   $('#coachNew').style.display = coach.length ? '' : 'none';
@@ -1378,6 +1383,16 @@ async function coachAsk(q) {
 }
 $('#coachForm').onsubmit = (e) => { e.preventDefault(); const v = $('#coachIn').value; $('#coachIn').value = ''; $('#coachIn').blur(); coachAsk(v); };
 $$('#aiQs [data-q]').forEach((b) => b.onclick = () => coachAsk(b.dataset.q));
+function openCoach() { renderCoach(); $('#coachSheet').classList.add('on'); $('#zetaDot').style.display = 'none'; settings.zetaSeen = 1; save(SET, settings); setTimeout(() => { const l = $('#coachLog'); l.scrollTop = l.scrollHeight; }, 30); }
+const closeCoach = () => $('#coachSheet').classList.remove('on');
+$('#zetaFab').onclick = openCoach; $('#coachOpenPlan').onclick = openCoach; $('#coachClose').onclick = closeCoach;
+$('#coachSheet').onclick = (e) => { if (e.target.id === 'coachSheet') closeCoach(); };
+function zetaFabFor(id) {
+  const show = profile.done && ['home', 'history', 'profile', 'routes', 'plan', 'clubs'].includes(id), f = $('#zetaFab');
+  if (show && f.style.display === 'none') { f.classList.remove('pop'); void f.offsetWidth; f.classList.add('pop'); }
+  f.style.display = show ? '' : 'none'; f.classList.toggle('noTabs', id === 'plan');
+  if (!show) closeCoach(); if (!settings.zetaSeen) $('#zetaDot').style.display = '';
+}
 $('#coachNew').onclick = () => { if (coachBusy) return; coach = []; save(COACH, coach); renderCoach(); };
 function renderPlan() {
   if (!plan) return go('home');
@@ -1733,24 +1748,34 @@ function openRoute(r) { detailRoute = r; go('routeDetail'); }
 // Fotos del sitio: Wikimedia Commons (geosearch, sin clave, con CORS). Se buscan en la salida y en dos puntos del recorrido; caché 30 días.
 const PHOTO_KEY = 'zancada.photos.v1'; let photoCache = load(PHOTO_KEY, {}), rdPh = [], phIdx = 0;
 const stripHtml = (h) => String(h || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+// Solo paisaje del sitio: se puntúa por título y categorías; fuera fauna, arte, edificios, interiores y detalles.
+const PH_BAD = /\b(aves?|p[aá]jaros?|birds?|passer|columba|turdus|parus|cyanistes|pica|sturnus|anas|gaviota|gull|garza|heron|insect[oa]s?|insects?|mariposas?|butterfl|lepidoptera|abejas?|bees?|hormiga|ara[ñn]a|spider|ardillas?|squirrel|perros?|dogs?|gatos?|cats?|caballo|horse|animal|fauna|reptil|lagart|setas?|hongos?|fungi|mushroom|flor(es)?|flowers?|insecto|hoja|leaf|leaves|semilla|fruto|fruit|corteza|bark|planta|plant|species|especie|escultura|sculpture|estatua|statue|busto|monumento|monument|placa|plaque|cartel|sign(age)?|se[ñn]al|logo|escudo|mapa|maps?|plano|diagram|cuadro|painting|pintura|art(e|work)?|museo|museum|exposici[oó]n|exhibition|graffiti|grafiti|mural|interior|iglesia|church|ermita|capilla|chapel|edificio|building|casas|houses?|palacio|palace|fachada|facade|ventana|window|puerta|door|tejado|roof|torre|tower|hotel|hospital|colegio|school|universidad|facultad|estaci[oó]n|station|metro|autob[uú]s|bus|tren|train|coches?|cars?|tr[aá]fico|traffic|retrato|portrait|personas?|people|gente|selfie|evento|event|concierto|fiesta|manifestaci|deporte|f[uú]tbol|football|partido|match|noche|night|close-?up|macro|detalle|detail|bandera|flag|fuente ornamental|lamp|farola|banco|bench|papelera|grave|tumba|cementerio|cemetery)\b/i;
+const PH_GOOD = /\b(parque|park|jard[ií]n|garden|pinar|pinos?|pine|bosque|forest|wood(s|land)?|arbol(es|ado)|[aá]rboles|trees?|camino|path|sendero|trail|paseo|promenade|avenida arbolada|pradera|meadow|c[eé]sped|lawn|vista|view|panor[aá]mic|panorama|paisaje|landscape|skyline|r[ií]o|river|arroyo|stream|canal|lago|lake|estanque|pond|embalse|playa|beach|costa|coast|mar|sea|bah[ií]a|bay|marisma|salinas?|marsh|dunas?|monte|monta[ñn]a|mountain|sierra|cerro|hill|colina|valle|valley|oto[ñn]o|autumn|primavera|spring|invierno|nieve|snow|atardecer|sunset|amanecer|sunrise|pista|track|circuito|dehesa|retiro|casa de campo)\b/i;
+async function phQuery(u) {
+  try { const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 10000); const res = await fetch(u, { signal: ctl.signal }); clearTimeout(tm); if (!res.ok) return []; const j = await res.json(); return Object.values(j.query?.pages || {}); } catch (e) { return []; }
+}
+const PH_PROPS = '&prop=imageinfo%7Ccategories&cllimit=max&clshow=!hidden&iiprop=url%7Cmime%7Csize%7Cextmetadata&iiurlwidth=640&iiextmetadatafilter=Artist%7CLicenseShortName%7CImageDescription';
+function phScore(pg, place) {
+  const ii = pg.imageinfo?.[0]; if (!ii || !ii.thumburl || !/jpeg/.test(ii.mime || '')) return -99;
+  if (!ii.width || ii.width < 900 || ii.width < ii.height * 1.15) return -99; // paisaje: apaisada y con resolución
+  const cats = (pg.categories || []).map((c) => c.title).join(' · '), desc = stripHtml(ii.extmetadata?.ImageDescription?.value).slice(0, 300), txt = pg.title + ' · ' + cats + ' · ' + desc;
+  if (PH_BAD.test(pg.title) || PH_BAD.test(cats)) return -99;
+  let sc = 0; if (PH_GOOD.test(txt)) sc += 3; if (PH_GOOD.test(pg.title)) sc += 1; if (/Quality images|Featured pictures|Valued images/i.test(cats)) sc += 2;
+  if (place && txt.toLowerCase().includes(place.toLowerCase())) sc += 2;
+  return sc;
+}
 async function loadPhotos(r) {
-  const c = r.id && photoCache[r.id]; if (c && Date.now() - c.t < 30 * 864e5) return c.p;
-  const n = r.ll.length, pts = [r.ll[0], r.ll[Math.floor(n / 3)], r.ll[Math.floor(n * 2 / 3)]], seen = new Set(), out = [];
-  for (const p of pts) {
-    const u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=geosearch&ggsnamespace=6&ggslimit=15&ggsradius=450&ggscoord=' + p[0].toFixed(5) + '%7C' + p[1].toFixed(5) + '&prop=imageinfo&iiprop=url%7Cmime%7Cextmetadata&iiurlwidth=640&iiextmetadatafilter=Artist%7CLicenseShortName';
-    try {
-      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 10000);
-      const res = await fetch(u, { signal: ctl.signal }); clearTimeout(tm); if (!res.ok) continue;
-      const j = await res.json();
-      Object.values(j.query?.pages || {}).sort((a, b) => (a.index || 0) - (b.index || 0)).forEach((pg) => {
-        const ii = pg.imageinfo?.[0]; if (!ii || !ii.thumburl || !/jpeg/.test(ii.mime || '') || seen.has(pg.title)) return;
-        if (/\b(map|mapa|plano|logo|escudo|diagram|placa|plaque|cartel|sign|se[ñn]al|bus|metro|interior|retrato|portrait)\b/i.test(pg.title)) return;
-        seen.add(pg.title); out.push({ src: ii.thumburl, big: ii.thumburl.replace(/\/640px-/, '/1280px-'), by: stripHtml(ii.extmetadata?.Artist?.value).slice(0, 60), lic: ii.extmetadata?.LicenseShortName?.value || '', page: ii.descriptionurl || '' });
-      });
-    } catch (e) {}
-    if (out.length >= 10) break;
-  }
-  const p = out.slice(0, 10); if (r.id && p.length) { photoCache[r.id] = { t: Date.now(), p }; save(PHOTO_KEY, photoCache); }
+  const c = r.id && photoCache[r.id]; if (c && c.v === 2 && Date.now() - c.t < 30 * 864e5) return c.p;
+  const place = String(r.name || '').split(' · ')[0].replace(/\s*\(.*?\)\s*/g, '').trim(), base = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*';
+  let pages = [];
+  // 1) por nombre del sitio (lo más fiable), 2) alrededor de la salida y de dos puntos del trazado
+  if (place.length > 3) pages = pages.concat(await phQuery(base + '&generator=search&gsrnamespace=6&gsrlimit=40&gsrsearch=' + encodeURIComponent(`"${place}" filetype:bitmap`) + PH_PROPS));
+  const n = r.ll.length; for (const p of [r.ll[0], r.ll[Math.floor(n / 3)], r.ll[Math.floor(n * 2 / 3)]]) pages = pages.concat(await phQuery(base + '&generator=geosearch&ggsnamespace=6&ggslimit=30&ggsradius=500&ggscoord=' + p[0].toFixed(5) + '%7C' + p[1].toFixed(5) + PH_PROPS));
+  const seen = new Set(), scored = [];
+  pages.forEach((pg) => { if (seen.has(pg.title)) return; seen.add(pg.title); const sc = phScore(pg, place); if (sc >= 3) scored.push({ pg, sc }); });
+  scored.sort((a, b) => b.sc - a.sc);
+  const p = scored.slice(0, 8).map(({ pg }) => { const ii = pg.imageinfo[0]; return { src: ii.thumburl, big: ii.thumburl.replace(/\/640px-/, '/1280px-'), by: stripHtml(ii.extmetadata?.Artist?.value).slice(0, 60), lic: ii.extmetadata?.LicenseShortName?.value || '', page: ii.descriptionurl || '' }; });
+  if (r.id) { photoCache[r.id] = { t: Date.now(), v: 2, p }; save(PHOTO_KEY, photoCache); }
   return p;
 }
 function showPhoto(i) {
@@ -1762,9 +1787,43 @@ function showPhoto(i) {
 $('#pmClose').onclick = () => $('#photoModal').classList.remove('on');
 $('#pmPrev').onclick = () => showPhoto(phIdx - 1); $('#pmNext').onclick = () => showPhoto(phIdx + 1);
 $('#photoModal').onclick = (e) => { if (e.target.id === 'photoModal') $('#photoModal').classList.remove('on'); };
+// Recorrido animado por la ruta (como la repetición del resumen): ~7 s siguiendo el trazado, luego vista completa.
+const fly = { raf: 0, on: false, t0: 0, dur: 7000, cum: [], tot: 0 };
+function stopFly(fit) {
+  cancelAnimationFrame(fly.raf); const was = fly.on; fly.on = false;
+  ['trail', 'trail2', 'dot'].forEach((k) => { if (fly[k] && maps.rdMap) maps.rdMap.removeLayer(fly[k]); fly[k] = null; });
+  if (rdLayers[1]) rdLayers[1].setStyle({ opacity: 1 }); if (rdLayers[0]) rdLayers[0].setStyle({ opacity: ROUTE_HALO.opacity ?? 1 });
+  $('#rdFlyInfo').style.display = 'none'; $('#rdFly').textContent = '▶ Recorrido';
+  if (fit && was && maps.rdMap && detailRoute?.ll) maps.rdMap.flyToBounds(detailRoute.ll, { padding: [36, 36], duration: 1 });
+}
+function startFly() {
+  const r = detailRoute, m = maps.rdMap; if (!r || !m || !r.ll || r.ll.length < 2 || !$('#routeDetail').classList.contains('on')) return;
+  stopFly(); const ll = r.ll; fly.cum = [0]; for (let i = 1; i < ll.length; i++) fly.cum.push(fly.cum[i - 1] + haversine({ lat: ll[i - 1][0], lon: ll[i - 1][1] }, { lat: ll[i][0], lon: ll[i][1] }));
+  fly.tot = fly.cum[fly.cum.length - 1]; fly.dur = Math.min(9000, Math.max(5000, fly.tot * 0.9));
+  if (rdLayers[1]) rdLayers[1].setStyle({ opacity: 0.35 }); if (rdLayers[0]) rdLayers[0].setStyle({ opacity: 0.3 });
+  fly.trail = L.polyline([], ROUTE_HALO).addTo(m); fly.trail2 = L.polyline([], ROUTE_STYLE).addTo(m);
+  fly.dot = L.marker(ll[0], { icon: L.divIcon({ className: '', html: '<span style="display:block;width:22px;height:22px;border-radius:11px;background:#D4FF3A;border:4px solid #0B0C0B;box-shadow:0 0 0 9px rgba(212,255,58,.3)"></span>', iconSize: [22, 22], iconAnchor: [11, 11] }), zIndexOffset: 1000 }).addTo(m);
+  const z = fly.tot > 9000 ? 15 : 16; m.setView(ll[0], z, { animate: false });
+  fly.on = true; fly.t0 = performance.now() + 350; $('#rdFly').textContent = '■ Parar'; $('#rdFlyInfo').style.display = '';
+  const step = (now) => {
+    if (!fly.on) return; if (!$('#routeDetail').classList.contains('on')) return stopFly();
+    const k = Math.min(1, Math.max(0, (now - fly.t0) / fly.dur)), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, d = e * fly.tot;
+    let i = 1; while (i < fly.cum.length - 1 && fly.cum[i] < d) i++;
+    const a = ll[i - 1], b = ll[i], f = Math.min(1, Math.max(0, (d - fly.cum[i - 1]) / Math.max(1e-6, fly.cum[i] - fly.cum[i - 1]))), p = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+    const tr = ll.slice(0, i); tr.push(p); fly.trail.setLatLngs(tr); fly.trail2.setLatLngs(tr); fly.dot.setLatLng(p); m.panTo(p, { animate: false });
+    const ele = r.ele && r.ele.length > 3 ? r.ele[Math.min(r.ele.length - 1, Math.round(e * (r.ele.length - 1)))] : null;
+    $('#rdFlyInfo').textContent = `km ${(d / 1000).toFixed(1).replace('.', ',')} de ${(fly.tot / 1000).toFixed(1).replace('.', ',')}${ele != null ? ' · ' + Math.round(ele) + ' m' : ''}`;
+    if (k >= 1) { setTimeout(() => stopFly(true), 500); return; }
+    fly.raf = requestAnimationFrame(step);
+  };
+  fly.raf = requestAnimationFrame(step);
+}
+$('#rdFly').onclick = () => fly.on ? stopFly(true) : startFly();
+// si tocas el mapa durante el recorrido, se para y el mapa es tuyo
+['mousedown', 'touchstart', 'wheel'].forEach((ev) => $('#rdMap').addEventListener(ev, () => { if (fly.on) stopFly(false); }, { passive: true }));
 function rdBig(on) {
   rdBig.on = on; $('#rdMapWrap').style.height = on ? 'calc(100vh - 180px)' : '46vh'; $('#rdBig').textContent = on ? 'Reducir mapa' : 'Ampliar mapa';
-  const m = maps.rdMap; if (m) setTimeout(() => { m.invalidateSize(); if (detailRoute?.ll) m.fitBounds(detailRoute.ll, { padding: [36, 36] }); }, 280);
+  const m = maps.rdMap; if (m) setTimeout(() => { m.invalidateSize(); if (detailRoute?.ll && !fly.on) m.fitBounds(detailRoute.ll, { padding: [36, 36] }); }, 280);
 }
 $('#rdBig').onclick = () => { rdBig(!rdBig.on); $('#routeDetail').scrollTop = 0; };
 let rdSat = false;
@@ -1798,6 +1857,7 @@ function renderRouteDetail() {
   setTimeout(() => { map.invalidateSize(); map.fitBounds(r.ll, { padding: [36, 36] }); }, 80);
   $('#rdPois').style.display = 'none';
   $('#rdTransit').style.display = 'none';
+  stopFly(); setTimeout(() => { if (detailRoute === r) startFly(); }, 650);
   rdBig(false); if (rdSat) { setLayer(map, 'calles'); rdSat = false; } $('#rdLayer').textContent = 'Satélite';
   $('#rdPhotosCard').style.display = 'none';
   if (r.ll && r.ll.length > 1) loadPhotos(r).then((ph) => {
@@ -2439,10 +2499,12 @@ $('#repClose').onclick = () => { cancelAnimationFrame(rep.raf); openSummary(curr
 applyTheme(); reviewPlan();
 history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
+zetaFabFor(profile.done ? 'home' : 'welcome');
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
-const NEWS_VER = '0.56', NEWS = [
-  ['Entrenador IA de verdad', 'en Plan: chatea con él dentro de la app. Conoce tu plan, tus carreras y tus récords.'],
-  ['Fotos de cada ruta', 'mira cómo es el sitio antes de ir, y explora el mapa en grande o en satélite.'],
+const NEWS_VER = '0.57', NEWS = [
+  ['Zeta, tu entrenador IA', 'el botón redondo de la esquina: tócalo y pregúntale lo que quieras. Conoce tu plan, tus carreras y tus récords.'],
+  ['Recorrido animado', 'al abrir una ruta, el mapa te la recorre en unos segundos para que veas por dónde vas a ir. Tócalo para moverte tú.'],
+  ['Fotos de cada ruta', 'solo paisaje: cómo es el parque, el camino, la montaña o el río.'],
   ['Medallas', 'las insignias ahora son medallas de bronce, plata y oro. Tócalas para verlas de cerca.'],
   ['Rutas arregladas', 'ya salen todas las rutas recomendadas en la app. Filtros más simples: zona y tiempo; suelo y orden en «Más filtros».'],
   ['Rutas', 'Para hoy según tu plan, filtro por tiempo, ordenar, fuentes y aseos en el mapa, metro cercano, tu historial en cada ruta e importar GPX.'],
