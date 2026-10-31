@@ -13,6 +13,14 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.8 (madrugada del 31 de octubre)
+- **Insignias** (Perfil): 16 logros calculados a partir de tus carreras: primera carrera, 5K, 10K, media, 10 y 50 carreras, 100/500/1000 km, 3 y 10 semanas seguidas, madrugador, nocturno, sesión del plan, primera ruta y 5 rutas distintas. Al terminar una carrera, la pantalla final y la voz te dicen si has ganado alguna.
+- **Clima al preparar** (open-meteo, sin cuenta): temperatura y sensación, viento y probabilidad de lluvia, con **consejo de ropa**. El tiempo que hacía se guarda en la carrera y sale en el resumen.
+- **Objetivo de km al mes** (ajuste en Perfil): tarjeta en Actividad con progreso, lo que falta y los km por semana que necesitas.
+- **Actividad**: filtros Todas · Del plan · Con ruta · Largas · Con notas. Arreglada la gráfica de 12 semanas, que salía vacía.
+- **Resumen**: nombre editable (lápiz), sensación de 1 a 5 (Muy duro → Volando) y notas libres por carrera.
+- **Guía por ruta**: los avisos de giro por voz se espacian (mínimo 25 s salvo giros cerrados o inminentes) para que no te hable sin parar en caminos sinuosos.
+
 ## Novedades 0.7 (noche del 31 de octubre)
 - **Rutas v2**: la pestaña es ahora una lista con filtros (cerca de ti / Madrid / San Fernando, distancia, suelo) y un minimapa del trazado en cada tarjeta. Cada ruta tiene **ficha completa**: mapa grande, km, desnivel, tiempo a tu ritmo, nivel, **perfil de desnivel**, suelo, por qué ir y cómo llegar (a cuánto estás de la salida, transporte público). 16 rutas con **trazado fijo** calculado sobre OpenStreetMap (BRouter) y guardado en la app (`routes-data.js`): ya no dependen de ningún servicio externo. "Bucle desde aquí" sigue usando el enrutador en línea.
 - **Compartir la carrera como imagen** (botón compartir del resumen): tarjeta 1080×1350 con el trazado y los datos, lista para Telegram, WhatsApp o Instagram.

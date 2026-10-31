@@ -120,6 +120,10 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .setrow{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:500;padding:6px 0}
 .pr{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
 .pr:first-of-type{border-top:0}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.badge{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px 10px;border-radius:18px;background:var(--surface2);text-align:center;position:relative}.badge .num{font-size:18px;line-height:1}.badge small{font-size:10px;line-height:1.25;color:var(--muted)}.badge.on{background:var(--bar);color:var(--on-bar)}.badge.on .num{color:var(--volt)}.badge.on small{color:var(--on-bar-muted)}.badge .new{position:absolute;top:-6px;right:-4px}
+.feel{display:flex;gap:6px}.feel button{flex:1;height:40px;border-radius:12px;background:var(--surface2);color:var(--ink);font-weight:600;font-size:12px}.feel button.on{background:var(--bar);color:var(--volt)}
+.note{width:100%;min-height:64px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:14px;padding:10px 12px;resize:vertical}
+#sTitleIn{font:inherit;font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.03em;width:100%;background:transparent;border:0;border-bottom:2px solid var(--volt);color:var(--ink);padding:0}
 .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:32px 32px 0 0;padding:12px 20px calc(var(--sab) + 24px);z-index:1000;box-shadow:0 -8px 32px rgba(0,0,0,.12)}
 .handle{width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 18px}
 .fab{position:absolute;z-index:1000;display:flex;justify-content:space-between;align-items:center;left:20px;right:20px;top:calc(var(--sat) + 14px)}
@@ -231,7 +235,9 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     </div>
     <div class="col" style="gap:8px"><div class="monthbars" id="monthBars"></div><div class="between sub" style="font-size:11px" id="monthAxis"></div></div>
     <div class="stats" id="monthStats"></div>
-    <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weekBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
+    <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weeksBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
+    <div id="monthGoal" class="card col" style="gap:10px;padding:16px 20px;display:none"></div>
+    <div class="chips fl" id="histChips" style="margin:0 -20px;padding:0 20px"><button class="chipb on" data-hf="all">Todas</button><button class="chipb" data-hf="plan">Del plan</button><button class="chipb" data-hf="route">Con ruta</button><button class="chipb" data-hf="long">Largas</button><button class="chipb" data-hf="note">Con notas</button></div>
     <div class="list" id="histList"></div>
   </div>
   <nav class="tabs" data-tab="history"></nav>
@@ -261,8 +267,10 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     </div>
     <div class="card stats" id="profStats" style="padding:18px 20px"></div>
     <div class="card col" style="gap:0;padding:18px 20px 8px"><div class="between" style="padding-bottom:6px"><h2>Mejores marcas</h2><span class="sub">en esta beta</span></div><div id="prList"></div></div>
+    <div class="card col" style="gap:12px;padding:18px 20px"><div class="between"><h2>Insignias</h2><span class="sub" id="badgeCount"></span></div><div class="badges" id="badgeGrid"></div></div>
     <div class="card col" style="gap:4px">
       <h2 style="margin-bottom:6px">Ajustes</h2>
+      <label class="setrow">Objetivo de km al mes<select class="sel" id="setMonthkm"><option value="0">Sin objetivo</option><option value="30">30 km</option><option value="50">50 km</option><option value="80">80 km</option><option value="100">100 km</option><option value="150">150 km</option><option value="200">200 km</option></select></label>
       <label class="setrow">Avisos de voz<select class="sel" id="setVoice"><option value="1">Cada km</option><option value="0">Sin voz</option></select></label>
       <label class="setrow">Modo noche<select class="sel" id="setNight"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
       <label class="setrow">Mapa del resumen<select class="sel" id="setMap"><option value="calles">Calles</option><option value="sat">Satélite</option></select></label>
@@ -282,7 +290,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.7 · rutas v2 · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.8 · insignias, clima y notas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -382,7 +390,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
   </div>
   <div class="sheet col" style="gap:16px">
     <div><div class="handle"></div><div class="seg" id="prepMode" style="display:none"><button class="on" data-pm="plan">Sesión del plan</button><button data-pm="libre">Carrera libre</button></div></div>
-    <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p></div>
+    <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p><p class="sub" id="prepWx" style="display:none;margin:8px 0 0;font-size:13px;line-height:1.45;white-space:pre-line"></p></div>
     <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
     <button class="btn" id="startBtn" disabled>Empezar</button>
@@ -455,12 +463,13 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
   </div>
   <div class="col" style="gap:12px;padding:0 12px calc(var(--sab) + 24px);margin-top:-36px;position:relative;z-index:1001">
     <div class="card col" style="gap:18px;padding:22px">
-      <div><div class="sub" id="sDate"></div><h1 style="font-size:28px;margin-top:4px" id="sTitle">Carrera</h1></div>
+      <div><div class="sub" id="sDate"></div><h1 style="font-size:28px;margin-top:4px;display:flex;align-items:center;gap:8px"><span id="sTitle">Carrera</span><button class="icon" id="sRename" aria-label="Cambiar el nombre" style="width:32px;height:32px;background:var(--surface2);flex:none"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16v4Z"/></svg></button></h1></div>
       <div><span class="num" id="sKm" style="font-size:76px;letter-spacing:-.05em">0</span><span class="unit" style="font-size:22px;font-weight:600">km</span></div>
       <div class="stats" id="sStats"></div>
       <div id="sPlan" class="sub" style="display:none;font-size:13px;border-top:1px solid var(--line);padding-top:12px;line-height:1.6"></div>
     </div>
     <div class="card dark col" id="sInsight" style="gap:8px;padding:20px 22px;display:none"><span class="lbl">Lectura de la carrera</span><p id="sInsightText" style="margin:0;font-size:15px;line-height:1.5"></p></div>
+    <div class="card col" style="gap:12px;padding:20px 22px"><div class="between"><h2>¿Cómo fue?</h2><span class="sub" style="font-size:12px" id="sFeelLbl"></span></div><div class="feel" id="sFeel"><button data-feel="1">Muy duro</button><button data-feel="2">Duro</button><button data-feel="3">Normal</button><button data-feel="4">Bien</button><button data-feel="5">Volando</button></div><textarea class="note" id="sNote" placeholder="Notas: dónde, con quién, cómo te sentiste…"></textarea></div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
     <button class="btn ghost" id="gpxBtn">Exportar GPX (Strava, Garmin…)</button>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
@@ -498,7 +507,8 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1', PROF = 'zancada.profile.v1', PLAN = 'zancada.plan.v1', ROUTES = 'zancada.routes.v1';
-const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat', autopause: '1', shoe: null }, load(SET, {}));
+const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat', autopause: '1', shoe: null, monthkm: '0' }, load(SET, {}));
+const BADGES = 'zancada.badges.v1'; let badgeSeen = load(BADGES, []);
 const SHOES = 'zancada.shoes.v1'; let shoes = load(SHOES, []);
 let runs = load(KEY, []);
 let plan = load(PLAN, null), savedRoutes = load(ROUTES, []);
@@ -691,20 +701,31 @@ function renderHistory() {
   $('#monthAxis').innerHTML = [1, 8, 15, 22, days].map((d) => `<span>${d}</span>`).join('');
   const ws0 = weekStart(Date.now()), weeks = Array.from({ length: 12 }, (_, i) => { const from = ws0 - (11 - i) * 7 * 864e5, rs = runs.filter((r) => r.start >= from && r.start < from + 7 * 864e5); return { from, km: rs.reduce((a, r) => a + r.dist, 0) / 1000, n: rs.length }; });
   const wmx = Math.max(5, ...weeks.map((w) => w.km)), last4 = weeks.slice(-4).reduce((a, w) => a + w.km, 0) / 4, prev4 = weeks.slice(-8, -4).reduce((a, w) => a + w.km, 0) / 4;
-  $('#weekBars').innerHTML = weeks.map((w, i) => `<span>${w.km ? Math.round(w.km) : ''}<i class="${w.km ? '' : 'z'} ${i === 11 ? 't' : ''}" style="height:${Math.max(3, Math.round(w.km / wmx * 64))}px"></i></span>`).join('');
+  $('#weeksBars').innerHTML = weeks.map((w, i) => `<span>${w.km ? Math.round(w.km) : ''}<i class="${w.km ? '' : 'z'} ${i === 11 ? 't' : ''}" style="height:${Math.max(3, Math.round(w.km / wmx * 64))}px"></i></span>`).join('');
   $('#weekAxis').innerHTML = [weeks[0], weeks[4], weeks[8], weeks[11]].map((w) => `<span>${new Date(w.from).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>`).join('');
   $('#weeksSub').textContent = last4 ? `media ${last4.toFixed(1).replace('.', ',')} km/sem${prev4 ? ` · ${last4 >= prev4 ? '+' : '−'}${Math.round(Math.abs(last4 - prev4) / prev4 * 100)} %` : ''}` : 'sin carreras aún';
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
+  renderMonthGoal(dist, now, days);
   const best = runs.length ? Math.max(...runs.map((r) => r.dist)) : 0;
-  $('#histList').innerHTML = runs.length ? runs.map((r) => `<button class="hist" data-run="${r.id}">
+  const HF = { all: () => true, plan: (r) => r.session, route: (r) => r.route, long: (r) => r.dist >= 8000, note: (r) => r.note || r.feel };
+  const shown = runs.filter(HF[histFilter] || HF.all);
+  $$('#histChips [data-hf]').forEach((b) => b.classList.toggle('on', b.dataset.hf === histFilter));
+  $('#histList').innerHTML = shown.length ? shown.map((r) => `<button class="hist" data-run="${r.id}">
     <div class="thumb"><svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">${thumbSvg(r, 5)}</svg></div>
     <div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:center"><b style="font-size:15px;font-weight:600">${r.name}</b>${r.dist === best && runs.length > 1 ? '<span class="chip" style="font-size:9px;padding:2px 7px">Récord</span>' : ''}</div>
-    <div class="sub" style="font-size:12px">${fmtDate(r.start)} · ${fmtPace(r.dur / (r.dist / 1000))} /km</div></div>
+    <div class="sub" style="font-size:12px">${fmtDate(r.start)} · ${fmtPace(r.dur / (r.dist / 1000))} /km${r.feel ? ' · ' + FEEL_L[r.feel].toLowerCase() : ''}${r.note ? ' · 📝' : ''}</div></div>
     <span><span class="num" style="font-size:22px">${fmtKm(r.dist)}</span><span class="unit" style="font-size:12px">km</span></span></button>`).join('')
-    : `<div class="sub" style="padding:28px 4px;text-align:center">Sin carreras todavía.</div>`;
+    : `<div class="sub" style="padding:28px 4px;text-align:center">${runs.length ? 'Ninguna carrera con ese filtro.' : 'Sin carreras todavía.'}</div>`;
   $$('#histList [data-run]').forEach((b) => b.onclick = () => openSummary(b.dataset.run));
+}
+let histFilter = 'all';
+$$('#histChips [data-hf]').forEach((b) => b.onclick = () => { histFilter = b.dataset.hf; renderHistory(); });
+function renderMonthGoal(dist, now, days) {
+  const goal = Number(settings.monthkm) || 0, box = $('#monthGoal'); box.style.display = goal ? '' : 'none'; if (!goal) return;
+  const km = dist / 1000, left = Math.max(0, goal - km), daysLeft = days - now.getDate() + 1, perWeek = left / Math.max(1, daysLeft / 7), pct = Math.min(100, km / goal * 100), onTrack = km / goal >= (now.getDate() - 1) / days;
+  box.innerHTML = `<div class="between"><h2>Objetivo del mes</h2><span class="sub">${Math.round(km)} de ${goal} km</span></div><div class="track" style="background:var(--line)"><i style="width:${pct}%"></i></div><p class="sub" style="margin:0;font-size:13px">${left <= 0 ? '¡Objetivo del mes cumplido! Lo que corras ahora es extra.' : `Faltan ${left.toFixed(1).replace('.', ',')} km: unos ${perWeek.toFixed(1).replace('.', ',')} km por semana.${onTrack ? ' Vas bien.' : ' Vas algo por detrás.'}`}</p>`;
 }
 function renderClubs() {
   const w = weekStats(), ws = weekStart(Date.now());
@@ -740,10 +761,62 @@ function renderProfile() {
   });
   const newest = marks.filter((x) => isFinite(x.best)).reduce((a, x) => (!a || x.when > a.when ? x : a), null);
   $('#prList').innerHTML = marks.map((x) => `<div class="pr"><div style="flex:1"><div style="font-weight:600">${x.name}</div><div class="sub" style="font-size:12px">${isFinite(x.best) ? new Date(x.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Aún sin marca'}</div></div>${newest === x && runs.length > 1 ? '<span class="chip" style="font-size:9px">Nueva</span>' : ''}<span class="num" style="font-size:22px;${isFinite(x.best) ? '' : 'color:var(--muted)'}">${isFinite(x.best) ? fmtTime(x.best) : '—'}</span></div>`).join('');
-  $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map; $('#setAutopause').value = settings.autopause;
-  renderShoes();
+  $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map; $('#setAutopause').value = settings.autopause; $('#setMonthkm').value = String(settings.monthkm || '0');
+  renderShoes(); renderBadges();
 }
-['setVoice', 'setNight', 'setMap', 'setAutopause'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
+['setVoice', 'setNight', 'setMap', 'setAutopause', 'setMonthkm'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
+// ---------- insignias ----------
+// Se calculan siempre a partir de las carreras guardadas (nada que sincronizar); solo se guarda cuáles has visto ya.
+const BADGE_DEFS = [
+  ['primera', '1.ª', 'Primera carrera', (R) => R.length ? R[R.length - 1].start : 0],
+  ['5k', '5K', '5 km de una vez', (R) => firstWhen(R, (r) => r.dist >= 5000)],
+  ['10k', '10K', '10 km de una vez', (R) => firstWhen(R, (r) => r.dist >= 10000)],
+  ['21k', '21K', 'Media maratón', (R) => firstWhen(R, (r) => r.dist >= 21097)],
+  ['x10', '10', '10 carreras', (R) => R.length >= 10 ? R[R.length - 10].start : 0],
+  ['x50', '50', '50 carreras', (R) => R.length >= 50 ? R[R.length - 50].start : 0],
+  ['km100', '100', '100 km en total', (R) => totalWhen(R, 100000)],
+  ['km500', '500', '500 km en total', (R) => totalWhen(R, 500000)],
+  ['km1000', '1000', '1000 km en total', (R) => totalWhen(R, 1000000)],
+  ['sem3', '3 sem', '3 semanas seguidas', (R) => streakWhen(R, 3)],
+  ['sem10', '10 sem', '10 semanas seguidas', (R) => streakWhen(R, 10)],
+  ['alba', '< 7 h', 'Madrugador', (R) => firstWhen(R, (r) => new Date(r.start).getHours() < 7)],
+  ['noche', '> 21 h', 'Nocturno', (R) => firstWhen(R, (r) => new Date(r.start).getHours() >= 21)],
+  ['plan', 'Plan', 'Sesión del plan cumplida', (R) => firstWhen(R, (r) => r.session && r.dist >= r.session.m * 0.9)],
+  ['ruta', 'Ruta', 'Una ruta recomendada', (R) => firstWhen(R, (r) => r.route)],
+  ['rutas5', '5 rutas', '5 rutas distintas', (R) => { const seen = new Set(); for (let i = R.length - 1; i >= 0; i--) { if (R[i].route) seen.add(R[i].route.id); if (seen.size >= 5) return R[i].start; } return 0; }],
+];
+function firstWhen(R, f) { for (let i = R.length - 1; i >= 0; i--) if (f(R[i])) return R[i].start; return 0; }
+function totalWhen(R, m) { let a = 0; for (let i = R.length - 1; i >= 0; i--) { a += R[i].dist; if (a >= m) return R[i].start; } return 0; }
+function streakWhen(R, n) {
+  // primera carrera con la que encadenaste n semanas con el objetivo cumplido
+  const byWeek = {}; R.forEach((r) => { const w = weekStart(r.start); byWeek[w] = (byWeek[w] || 0) + 1; });
+  const weeks = Object.keys(byWeek).map(Number).sort((a, b) => a - b); let run0 = 0;
+  for (let i = 0; i < weeks.length; i++) { const ok = byWeek[weeks[i]] >= GOAL_OF(); run0 = ok && i && weeks[i] - weeks[i - 1] === 7 * 864e5 && run0 ? run0 + 1 : ok ? 1 : 0; if (run0 >= n) { const rs = R.filter((r) => weekStart(r.start) === weeks[i]).sort((a, b) => a.start - b.start); return rs[Math.min(rs.length, GOAL_OF()) - 1].start; } }
+  return 0;
+}
+function badges(R = runs) { return BADGE_DEFS.map(([id, short, name, f]) => ({ id, short, name, when: f(R) || 0 })); }
+function renderBadges() {
+  const B = badges(), got = B.filter((b) => b.when);
+  $('#badgeCount').textContent = `${got.length} de ${B.length}`;
+  $('#badgeGrid').innerHTML = B.map((b) => `<div class="badge ${b.when ? 'on' : ''}" title="${b.name}">${b.when && !badgeSeen.includes(b.id) ? '<span class="chip new" style="font-size:9px;padding:2px 7px">Nueva</span>' : ''}<span class="num">${b.short}</span><small>${b.name}${b.when ? '<br>' + new Date(b.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : ''}</small></div>`).join('');
+  badgeSeen = got.map((b) => b.id); save(BADGES, badgeSeen);
+}
+// ---------- clima (open-meteo, sin clave) ----------
+const wx = { at: 0, data: null, p: null };
+async function loadWeather(lat, lon) {
+  if (wx.p || (wx.data && Date.now() - wx.at < 20 * 60e3 && haversine(wx.p0, { lat, lon }) < 3000)) return wx.data;
+  wx.p = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code&hourly=precipitation_probability&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(6000) })
+    .then((r) => r.json()).then((j) => { const c = j.current, h = new Date().getHours(), pp = j.hourly?.precipitation_probability || []; wx.data = { t: Math.round(c.temperature_2m), app: Math.round(c.apparent_temperature), wind: Math.round(c.wind_speed_10m), rain: Math.max(pp[h] || 0, pp[h + 1] || 0), now: c.precipitation > 0, code: c.weather_code }; wx.at = Date.now(); wx.p0 = { lat, lon }; return wx.data; })
+    .catch(() => null).finally(() => { wx.p = null; });
+  return wx.p;
+}
+function wxText(w) {
+  if (!w) return '';
+  const a = w.app, ropa = a < 5 ? 'manga larga, mallas y guantes' : a < 12 ? 'manga larga fina o camiseta con manguitos' : a < 19 ? 'camiseta técnica, perfecto para correr' : a < 25 ? 'camiseta ligera y lleva agua' : 'calor: lo más fresco posible, agua y ritmo tranquilo';
+  const extra = [w.now ? 'está lloviendo: chubasquero' : w.rain >= 50 ? `lluvia probable (${w.rain} %): cortavientos` : '', w.wind >= 25 ? `viento fuerte (${w.wind} km/h)` : ''].filter(Boolean).join(' · ');
+  return `${w.t} °C${w.app !== w.t ? ` (sensación ${w.app})` : ''} · viento ${w.wind} km/h · lluvia ${w.rain} %\n${ropa[0].toUpperCase() + ropa.slice(1)}${extra ? ' · ' + extra : ''}.`;
+}
+async function showWeather() { if (!lastFix) return; const w = await loadWeather(lastFix.lat, lastFix.lon); const el = $('#prepWx'); if (!el) return; el.style.display = w ? '' : 'none'; el.textContent = wxText(w); }
 // ---------- zapatillas ----------
 const SHOE_LIMIT = 700;  // km orientativos para cambiar de par
 function shoeKm(sh) { return (sh.km0 || 0) + runs.filter((r) => r.shoe === sh.id).reduce((a, r) => a + r.dist / 1000, 0); }
@@ -1204,7 +1277,7 @@ function updateNav(p) {
       target = navAt(n, here + 40);
       const t = n.turns.find((x) => x.i > n.idx), dt = t ? t.d - here : Infinity;
       if (left <= 40) { main = 'Fin de la ruta'; sub = 'lo que corras ahora suma'; if (!n.done) { n.done = true; toast('Ruta completada', 3000); speak('Fin de la ruta. Lo que corras ahora suma.'); } }
-      else if (t && dt <= 120) { main = `${t.dir === 'derecha' ? 'Derecha' : 'Izquierda'} en ${fmtM(dt)}`; sub = `quedan ${fmtKmS(left)} km`; if (dt <= 90 && n.turnSaid !== t.i) { n.turnSaid = t.i; speak(`En ${fmtM(dt).replace(' m', ' metros')}, ${t.sharp ? 'giro cerrado a la ' : 'a la '}${t.dir}.`); } }
+      else if (t && dt <= 120) { main = `${t.dir === 'derecha' ? 'Derecha' : 'Izquierda'} en ${fmtM(dt)}`; sub = `quedan ${fmtKmS(left)} km`; if (dt <= 90 && n.turnSaid !== t.i && (t.sharp || dt <= 45 || Date.now() - (n.saidAt || 0) > 25000)) { n.turnSaid = t.i; n.saidAt = Date.now(); speak(`En ${fmtM(dt).replace(' m', ' metros')}, ${t.sharp ? 'giro cerrado a la ' : 'a la '}${t.dir}.`); } }
       else { main = t ? `Sigue ${fmtM(dt)}, luego ${t.dir}` : 'Sigue por la ruta'; sub = `quedan ${fmtKmS(left)} km`; }
     }
   }
@@ -1265,6 +1338,7 @@ function onFix(pos) {
     $('#gpsText').textContent = good ? `GPS listo · ${Math.round(acc)} m` : `Afinando GPS · ${Math.round(acc)} m`;
     $('#prepHint').textContent = good ? 'Cuando quieras.' : 'Puedes empezar igual; el principio puede salir impreciso.';
     $('#startBtn').disabled = false;
+    if (!wx.shown || Date.now() - wx.shown > 60e3) { wx.shown = Date.now(); showWeather(); }
   }
   if (run.active) { if (run.paused && run.auto) checkAutoPause(); runFix(lastFix); }
 }
@@ -1397,14 +1471,17 @@ function finishRun() {
   if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light };
   if (run.route) r.route = { id: run.route.id, name: run.route.name };
   if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
-  runs.unshift(r); save(KEY, runs); pickedRoute = null; reviewPlan(); syncReminders();
+  if (wx.data && Date.now() - wx.at < 4 * 3600e3) r.wx = { t: wx.data.t, wind: wx.data.wind, rain: wx.data.now ? 1 : 0 };
+  const before = badges().filter((b) => b.when).map((b) => b.id);
+  runs.unshift(r); save(KEY, runs);
+  const newB = badges().filter((b) => b.when && !before.includes(b.id)); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
-  $('#cText').textContent = r.session && r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
+  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.session && r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   const okS = r.splits.filter((x) => !x.partial), bestS = okS.length ? okS.reduce((a, x) => (x.split < a.split ? x : a)) : null;
-  speak(`Carrera terminada. ${fmtKm(r.dist).replace(',', ' coma ')} kilómetros en ${fmtTime(r.dur).replace(/^(\d+):(\d+)$/, '$1 minutos $2').replace(/^(\d+):(\d+):(\d+)$/, '$1 horas $2 minutos')}. Ritmo ${fmtPace(r.dur / (r.dist / 1000)).replace(':', ' ')}.${bestS ? ` Tu mejor kilómetro, el ${bestS.km}.` : ''}`);
+  speak(`Carrera terminada. ${fmtKm(r.dist).replace(',', ' coma ')} kilómetros en ${fmtTime(r.dur).replace(/^(\d+):(\d+)$/, '$1 minutos $2').replace(/^(\d+):(\d+):(\d+)$/, '$1 horas $2 minutos')}. Ritmo ${fmtPace(r.dur / (r.dist / 1000)).replace(':', ' ')}.${bestS ? ` Tu mejor kilómetro, el ${bestS.km}.` : ''}${newB.length ? ` Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : ''}`);
   go('cele');
 }
 $('#shortSave').onclick = () => { $('#shortModal').classList.remove('on'); run.forceSave = true; finishRun(); };
@@ -1437,6 +1514,8 @@ function openSummary(id) {
   if (plan) { const ps1 = planStatus(plan).flat().find((x) => x.run && x.run.id === r.id); if (ps1) info.push(`Plan · semana ${ps1.week + 1} · ${ps1.title} ${fmtKmS(ps1.m)} km · ${r.dist >= ps1.m * 0.9 ? 'cumplida' : 'parcial'}${ps1.moved ? ' (otro día)' : ''}`); }
   if (r.route) info.push('Ruta: ' + r.route.name);
   if (r.shoe) { const sh = shoes.find((x) => x.id === r.shoe); if (sh) info.push('Zapatillas: ' + sh.name); }
+  if (r.wx) info.push(`Tiempo: ${r.wx.t} °C, viento ${r.wx.wind} km/h${r.wx.rain ? ', lluvia' : ''}`);
+  renderFeel(r);
   $('#sPlan').style.display = info.length ? '' : 'none'; $('#sPlan').innerHTML = info.map((x) => `<div>${x}</div>`).join('');
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
   const maxS = Math.max(...r.splits.map((s) => s.split));
@@ -1463,6 +1542,11 @@ function runInsights(r) {
   return out.slice(0, 3).join(' ');
 }
 $('#replayBtn').onclick = () => openReplay();
+const FEEL_L = ['', 'Muy duro', 'Duro', 'Normal', 'Bien', 'Volando'];
+function renderFeel(r) { $$('#sFeel [data-feel]').forEach((b) => b.classList.toggle('on', Number(b.dataset.feel) === r.feel)); $('#sFeelLbl').textContent = r.feel ? FEEL_L[r.feel] : 'sensación y notas'; $('#sNote').value = r.note || ''; }
+$$('#sFeel [data-feel]').forEach((b) => b.onclick = () => { if (!current) return; const v = Number(b.dataset.feel); current.feel = current.feel === v ? undefined : v; save(KEY, runs); renderFeel(current); });
+$('#sNote').oninput = () => { if (!current) return; current.note = $('#sNote').value.trim() || undefined; clearTimeout(renderFeel.t); renderFeel.t = setTimeout(() => save(KEY, runs), 400); };
+$('#sRename').onclick = () => { if (!current || $('#sTitleIn')) return; const h = $('#sTitle'), inp = document.createElement('input'); inp.id = 'sTitleIn'; inp.value = current.name; inp.maxLength = 40; h.replaceWith(inp); inp.focus(); inp.select(); const done = () => { const v = inp.value.trim(); if (v) current.name = v; save(KEY, runs); const sp = document.createElement('span'); sp.id = 'sTitle'; sp.textContent = current.name; inp.replaceWith(sp); }; inp.onblur = done; inp.onkeydown = (e) => { if (e.key === 'Enter') inp.blur(); }; };
 $('#gpxBtn').onclick = () => { if (current) shareOrDownload(new Blob([runGpx(current)], { type: 'application/gpx+xml' }), `zancada-${new Date(current.start).toISOString().slice(0, 10)}.gpx`, current.name); };
 $('#deleteBtn').onclick = () => { if (!current) return; runs = runs.filter((r) => r.id !== current.id); save(KEY, runs); toast('Carrera borrada'); go('home'); };
 $('#shareBtn').onclick = () => { if (current) shareImage(current); };
