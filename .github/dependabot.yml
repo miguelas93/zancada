@@ -1,20 +1,28 @@
 # Dependabot: revisa cada semana si alguna dependencia tiene un fallo de seguridad conocido o una versión nueva
-# y abre un PR para actualizarla. Las pruebas de tests/ deciden si se puede fusionar.
+# y abre UN PR por carpeta con todo junto (para no llenar la lista). Las pruebas deciden si se puede fusionar.
+# Las alertas y parches de seguridad llegan siempre, aunque la actualización sea grande.
 version: 2
 updates:
-  - package-ecosystem: npm          # Capacitor y plugins del APK
+  - package-ecosystem: npm          # Capacitor y plugins de la beta (web empaquetada, congelada: sin saltos de versión grande)
     directory: /
     schedule: { interval: weekly }
-    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      beta: { patterns: ["*"] }
   - package-ecosystem: npm          # Playwright de las pruebas
     directory: /tests
     schedule: { interval: weekly }
-    open-pull-requests-limit: 3
+    groups:
+      pruebas: { patterns: ["*"] }
   - package-ecosystem: github-actions
     directory: /
-    schedule: { interval: weekly }
-    open-pull-requests-limit: 3
+    schedule: { interval: monthly }
+    groups:
+      actions: { patterns: ["*"] }
   - package-ecosystem: gradle       # app nativa en Kotlin
     directory: /nativa
     schedule: { interval: weekly }
-    open-pull-requests-limit: 5
+    groups:
+      nativa: { patterns: ["*"] }
