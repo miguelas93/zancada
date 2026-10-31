@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.34 (31 oct 2026)
+
+- **Ordenar rutas**: en Recomendadas puedes ordenar por cercanía, más cortas, más largas, más llanas o las que aún no has corrido.
+- **Actividad**: el porcentaje de la semana frente a las anteriores solo sale cuando hay base suficiente y no se dispara con semanas casi vacías.
+
 ## Novedades 0.33 (31 oct 2026)
 - Actividad › Calendario del mes: cada día corrido lleva un círculo lima proporcional a los km; toca el día para abrir la carrera. Con las flechas ves los meses anteriores.
 

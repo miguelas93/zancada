@@ -327,7 +327,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.33 · calendario · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.34 · ordenar rutas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -340,7 +340,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <button class="chipb on" data-mode="rec">Recomendadas</button><button class="chipb" data-mode="mine">Mis recorridos</button><button class="chipb" data-mode="sug">Bucle desde aquí</button>
     </div>
     <div class="col" id="routesFilters" style="gap:8px">
-      <div class="chips fl" id="routesZone"></div>
+      <div style="display:flex;gap:8px;align-items:center"><div class="chips fl" id="routesZone" style="flex:1"></div><select class="sel" id="routesSort" aria-label="Ordenar rutas" style="flex:none"><option value="near">Más cerca</option><option value="short">Más corta</option><option value="long">Más larga</option><option value="flat">Más llana</option><option value="new">Sin estrenar</option></select></div>
       <div class="chips fl" id="routesDist"><span class="sub" style="font-size:12px;align-self:center;margin-right:2px">¿Cuánto tiempo tienes?</span><button class="chipb on" data-dist="all">Da igual</button><button class="chipb" data-dist="t20">20 min</button><button class="chipb" data-dist="t30">30 min</button><button class="chipb" data-dist="t45">45 min</button><button class="chipb" data-dist="t60">Más de 45</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
     </div>
     <div id="mineTools" style="display:none"><button class="btn ghost" id="routeGpxBtn" style="height:40px;font-size:13px">Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)</button><input type="file" id="routeGpx" accept=".gpx,application/gpx+xml" style="display:none"></div>
@@ -795,7 +795,7 @@ function renderHistory() {
   const wmx = Math.max(5, ...weeks.map((w) => w.km)), last4 = weeks.slice(-4).reduce((a, w) => a + w.km, 0) / 4, prev4 = weeks.slice(-8, -4).reduce((a, w) => a + w.km, 0) / 4;
   $('#weeksBars').innerHTML = weeks.map((w, i) => `<span>${w.km ? Math.round(w.km) : ''}<i class="${w.km ? '' : 'z'} ${i === 11 ? 't' : ''}" style="height:${Math.max(3, Math.round(w.km / wmx * 64))}px"></i></span>`).join('');
   $('#weekAxis').innerHTML = [weeks[0], weeks[4], weeks[8], weeks[11]].map((w) => `<span>${new Date(w.from).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>`).join('');
-  $('#weeksSub').textContent = last4 ? `media ${last4.toFixed(1).replace('.', ',')} km/sem${prev4 ? ` · ${last4 >= prev4 ? '+' : '−'}${Math.round(Math.abs(last4 - prev4) / prev4 * 100)} %` : ''}` : 'sin carreras aún';
+  $('#weeksSub').textContent = last4 ? `media ${last4.toFixed(1).replace('.', ',')} km/sem${prev4 >= 3 ? ` · ${last4 >= prev4 ? '+' : '−'}${Math.min(200, Math.round(Math.abs(last4 - prev4) / prev4 * 100))} %` : ''}` : 'sin carreras aún';
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
@@ -1310,7 +1310,7 @@ function updateGuide() {
 // Rutas v2: lista con filtros y minimapas, ficha completa y trazados fijos (routes-data.js, calculados con BRouter sobre OpenStreetMap).
 // El enrutador externo (Valhalla) solo se usa para "Bucle desde aquí".
 const ROUTER = 'https://valhalla1.openstreetmap.de';
-const rt = { view: 'list', mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
+const rt = { sort: 'near', view: 'list', mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
 let pickedRoute = null, detailRoute = null;
 function decodePoly6(str) {
   const out = []; let i = 0, lat = 0, lon = 0;
@@ -1382,8 +1382,11 @@ function recList() {
   const TB = { t20: [0, 25], t30: [22, 38], t45: [36, 50], t60: [48, 1e9] };
   if (TB[rt.dist]) { const [a, b] = TB[rt.dist]; list = list.filter((r) => { const t = routeMeta(r).time / 60; return t >= a && t <= b; }); }
   if (rt.surf !== 'all') list = list.filter((r) => r.surf === rt.surf);
-  return withAway(list.map((r) => Object.assign({}, r)));
+  const out = withAway(list.map((r) => Object.assign({}, r))), done = new Set(runs.map((x) => x.route?.id).filter(Boolean));
+  const S = { short: (a, b) => a.km - b.km, long: (a, b) => b.km - a.km, flat: (a, b) => (a.gain || 0) / a.km - (b.gain || 0) / b.km, new: (a, b) => (done.has(a.id) ? 1 : 0) - (done.has(b.id) ? 1 : 0) || (a.away ?? 0) - (b.away ?? 0) };
+  return S[rt.sort] ? out.sort(S[rt.sort]) : out;
 }
+$('#routesSort').onchange = (e) => { rt.sort = e.target.value; renderRoutes(); };
 function myRoutes() {
   const fromRuns = runs.filter((r) => r.points?.length > 5 && r.dist > 500).slice(0, 20).map((r) => ({ id: 'run-' + r.id, name: r.name, sub: fmtDate(r.start), ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: r.gain ?? null, src: 'run' }));
   return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
