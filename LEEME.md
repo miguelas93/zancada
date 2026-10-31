@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.41 (31 oct 2026)
+
+- **Revisión en móviles pequeños**: he pasado una revisión automática de todas las pantallas a 320, 360 y 390 px de ancho. Arreglados los botones de copia de seguridad en Perfil y el formulario de tramos a medida, que se salían de la pantalla.
+
 ## Novedades 0.40 (31 oct 2026)
 
 - **Plan en tu calendario**: en la pantalla del plan, "Añadir el plan a mi calendario" genera un archivo .ics con las sesiones pendientes a la hora del aviso y una alarma 30 minutos antes. Lo abren Google Calendar, Apple y Outlook.
