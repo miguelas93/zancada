@@ -1,0 +1,55 @@
+{
+ "track": "parque-5k",
+ "desc": "Dos vueltas a un parque, GPS bueno, 1 lectura/s",
+ "expected": {
+  "saved": true,
+  "screen": "cele",
+  "dist": 5149.33,
+  "dur": 1620.5,
+  "nPoints": 1538,
+  "gain": 20,
+  "splits": [
+   {
+    "km": 1,
+    "split": 315.62
+   },
+   {
+    "km": 2,
+    "split": 312.15
+   },
+   {
+    "km": 3,
+    "split": 312.66
+   },
+   {
+    "km": 4,
+    "split": 315.53
+   },
+   {
+    "km": 5,
+    "split": 318.57
+   },
+   {
+    "km": 6,
+    "split": 307.81,
+    "partial": true
+   }
+  ],
+  "best": {
+   "1000": 307.91,
+   "5000": 1569.92,
+   "10000": null,
+   "21097.5": null
+  },
+  "bestFor": {
+   "1000": 312.15,
+   "5000": 1574.53,
+   "10000": null
+  },
+  "cele": {
+   "dist": "5,15",
+   "time": "27:01",
+   "pace": "5:15"
+  }
+ }
+}

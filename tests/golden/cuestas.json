@@ -1,0 +1,51 @@
+{
+ "track": "cuestas",
+ "desc": "Ida y vuelta con 60 m de subida, ruido de altímetro ±3 m",
+ "expected": {
+  "saved": true,
+  "screen": "cele",
+  "dist": 4105.7,
+  "dur": 1377.5,
+  "nPoints": 1244,
+  "gain": 108,
+  "splits": [
+   {
+    "km": 1,
+    "split": 374.06
+   },
+   {
+    "km": 2,
+    "split": 373.38
+   },
+   {
+    "km": 3,
+    "split": 300.54
+   },
+   {
+    "km": 4,
+    "split": 297.6
+   },
+   {
+    "km": 5,
+    "split": 301.97,
+    "partial": true
+   }
+  ],
+  "best": {
+   "1000": 295.31,
+   "5000": null,
+   "10000": null,
+   "21097.5": null
+  },
+  "bestFor": {
+   "1000": 297.6,
+   "5000": null,
+   "10000": null
+  },
+  "cele": {
+   "dist": "4,11",
+   "time": "22:58",
+   "pace": "5:36"
+  }
+ }
+}

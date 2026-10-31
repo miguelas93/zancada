@@ -1,0 +1,43 @@
+{
+ "track": "semaforo-autopausa",
+ "desc": "Parado 30 s en un semáforo con autopausa activada",
+ "expected": {
+  "saved": true,
+  "screen": "cele",
+  "dist": 2500.12,
+  "dur": 840.87,
+  "nPoints": 827,
+  "gain": 0,
+  "splits": [
+   {
+    "km": 1,
+    "split": 333.25
+   },
+   {
+    "km": 2,
+    "split": 341.05
+   },
+   {
+    "km": 3,
+    "split": 333.06,
+    "partial": true
+   }
+  ],
+  "best": {
+   "1000": 329.47,
+   "5000": null,
+   "10000": null,
+   "21097.5": null
+  },
+  "bestFor": {
+   "1000": 333.25,
+   "5000": null,
+   "10000": null
+  },
+  "cele": {
+   "dist": "2,50",
+   "time": "14:01",
+   "pace": "5:36"
+  }
+ }
+}

@@ -1,0 +1,47 @@
+{
+ "track": "arboles-ruido",
+ "desc": "Bajo árboles: 10 % de lecturas con ±55-90 m y saltos de 80 m",
+ "expected": {
+  "saved": true,
+  "screen": "cele",
+  "dist": 3410.69,
+  "dur": 1105.5,
+  "nPoints": 858,
+  "gain": 0,
+  "splits": [
+   {
+    "km": 1,
+    "split": 321.69
+   },
+   {
+    "km": 2,
+    "split": 326.35
+   },
+   {
+    "km": 3,
+    "split": 324.36
+   },
+   {
+    "km": 4,
+    "split": 324.1,
+    "partial": true
+   }
+  ],
+  "best": {
+   "1000": 318.81,
+   "5000": null,
+   "10000": null,
+   "21097.5": null
+  },
+  "bestFor": {
+   "1000": 321.69,
+   "5000": null,
+   "10000": null
+  },
+  "cele": {
+   "dist": "3,41",
+   "time": "18:26",
+   "pace": "5:24"
+  }
+ }
+}
