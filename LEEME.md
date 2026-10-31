@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.24 (31 oct 2026)
+- Bienvenida: eliges "Empiezo de cero" o "Ya corro". Con "Ya corro" no aparece la tarjeta de corre/anda en Inicio.
+- Actividad › "Por meses": totales de los últimos 6 meses con carreras (km, número, tiempo) con barras comparables.
+
 ## Novedades 0.23 (31 oct 2026)
 - La imagen para compartir lleva una etiqueta "RÉCORD · …" cuando la carrera batió alguno y, abajo, la comparación con tu última carrera parecida. El texto que acompaña a la imagen también menciona el récord.
 
