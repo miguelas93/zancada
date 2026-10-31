@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.19 (31 oct 2026)
+- Entrenador IA (en Plan): preguntas sugeridas de un toque (semana que viene, carga, molestias, series, estrategia de carrera) y botones que abren ChatGPT o Claude con tu contexto y la pregunta ya escritos. El contexto incluye ahora tus récords. Sigue sin salir nada del móvil hasta que tú lo envíes.
+
 ## Novedades 0.18 (31 oct 2026)
 - Actividad › "Tus ritmos": previsión de 5 km, 10 km y media maratón (fórmula de Riegel sobre tu mejor 5 o 10 km, o tu ritmo reciente) y tus ritmos de entreno (suave, largo, tempo, series).
 - En carrera, toca el número grande para alternar Distancia → Tiempo → Ritmo medio; el dato desplazado baja al hueco pequeño. Se recuerda tu elección.

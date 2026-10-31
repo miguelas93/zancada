@@ -318,7 +318,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.18 · tus ritmos · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.19 · entrenador IA · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -370,7 +370,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <label class="setrow">Hora del aviso<select class="sel" id="planHour"></select></label>
       <p class="sub" style="margin:4px 0 0;font-size:12px" id="planRemindHint"></p>
     </div>
-    <div class="card col" style="gap:8px;padding:18px 20px"><h2>Pregúntale a tu entrenador IA</h2><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Preparo un resumen con tu plan y tus últimas carreras para que se lo pegues a ChatGPT, Gemini o Claude y le preguntes lo que quieras. No sale nada de tu móvil hasta que tú lo pegues.</p><button class="btn sec" id="askAiBtn" style="height:48px;font-size:15px">Copiar mi contexto para la IA</button></div>
+    <div class="card col" style="gap:8px;padding:18px 20px"><h2>Pregúntale a tu entrenador IA</h2><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Preparo un resumen con tu plan y tus últimas carreras para que se lo pegues a ChatGPT, Gemini o Claude y le preguntes lo que quieras. No sale nada de tu móvil hasta que tú lo pegues.</p><div class="chips" id="aiQs" style="margin:4px -20px 0;padding:0 20px"><button class="chipb on" data-q="">Sin pregunta</button><button class="chipb" data-q="¿Cómo afronto la semana que viene?">Semana que viene</button><button class="chipb" data-q="¿Estoy entrenando demasiado o demasiado poco?">¿Voy bien de carga?</button><button class="chipb" data-q="Me molesta un poco al correr (dime qué preguntarme para saber si debo parar).">Me duele algo</button><button class="chipb" data-q="Diseña mi próxima sesión de series con calentamiento y vuelta a la calma.">Series para el próximo día</button><button class="chipb" data-q="¿Qué tiempo realista puedo hacer en mi próxima carrera y cómo correrla?">Estrategia de carrera</button></div><div style="display:flex;gap:8px"><button class="btn sec" id="askAiBtn" style="height:48px;font-size:14px;flex:1">Copiar</button><button class="btn sec" id="aiChatGpt" style="height:48px;font-size:14px;flex:1">ChatGPT</button><button class="btn sec" id="aiClaude" style="height:48px;font-size:14px;flex:1">Claude</button></div><p class="sub" style="margin:0;font-size:11px">ChatGPT y Claude se abren con el texto ya escrito; solo tienes que enviarlo.</p></div>
     <button class="btn sec" id="planEdit">Cambiar objetivo, días o nivel</button>
     <button class="btn ghost" id="planDelete" style="color:var(--danger)">Eliminar el plan</button>
   </div>
@@ -1094,7 +1094,7 @@ function renderPlanCard() {
     <div class="track"><i style="width:${total ? done / total * 100 : 0}%"></i></div>${rev}</button>`;
   $('#planOpen').onclick = () => { planView = null; go('plan'); };
 }
-let planView = null;
+let planView = null, aiQ = '';
 function renderPlan() {
   if (!plan) return go('home');
   const weeks = planStatus(plan), wi = Math.min(plan.weeks - 1, Math.max(0, curWeek(plan))), g = GOALS[plan.goal];
@@ -1110,13 +1110,18 @@ function renderPlan() {
     <div class="track"><i style="width:${Math.min(100, km ? done / km * 100 : 0)}%"></i></div>`;
   $('#planWeeks').innerHTML = weeks.map((x, i) => `<button class="${i === w ? 'on' : ''} ${i < wi ? 'past' : ''}" data-w="${i}"><b>${i + 1}</b>${Math.round(x.reduce((a, s) => a + s.m, 0) / 1000)} km</button>`).join('');
   $$('#planWeeks [data-w]').forEach((b) => b.onclick = () => { planView = Number(b.dataset.w); renderPlan(); });
-  $('#askAiBtn').onclick = async () => {
+  const aiText = () => {
     const g = GOALS[plan.goal], wi = curWeek(plan), st = planStatus(plan), last = runs.slice(0, 6).map((r) => `- ${new Date(r.start).toLocaleDateString('es-ES')}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))}/km)${r.session ? ' · sesión: ' + r.session.title : ''}`).join('\n');
     const week = (st[wi] || []).map((x) => `${x.title} ${fmtKmS(x.m)} km (${x.state === 'done' ? 'hecha' : x.state === 'miss' ? 'no hecha' : 'pendiente'})`).join('; ');
-    const text = `Actúa como mi entrenador de running. Soy ${profile.name || 'corredor/a'}, nivel ${({ inicio: 'principiante', medio: 'intermedio', avanzado: 'avanzado' })[plan.level] || plan.level}. Objetivo: ${g.name} en ${plan.weeks} semanas (voy por la semana ${wi + 1}), corro ${plan.days.length} días por semana. Mi ritmo habitual es ${fmtPace(userPace())}/km.\nEsta semana: ${week || 'sin sesiones'}.\nÚltimas carreras:\n${last || '- ninguna todavía'}\n${plan.lastReview ? 'Última revisión del plan: ' + plan.lastReview.text + '\n' : ''}Pregunta: `;
-    try { await navigator.clipboard.writeText(text); toast('Contexto copiado. Pégalo en tu IA y añade la pregunta.', 3500); } catch (e) {}
-    if (navigator.share) { try { await navigator.share({ text }); } catch (e) {} }
+    const text = `Actúa como mi entrenador de running. Soy ${profile.name || 'corredor/a'}, nivel ${({ inicio: 'principiante', medio: 'intermedio', avanzado: 'avanzado' })[plan.level] || plan.level}. Objetivo: ${g.name} en ${plan.weeks} semanas (voy por la semana ${wi + 1}), corro ${plan.days.length} días por semana. Mi ritmo habitual es ${fmtPace(userPace())}/km.\nEsta semana: ${week || 'sin sesiones'}.\nÚltimas carreras:\n${last || '- ninguna todavía'}\n${plan.lastReview ? 'Última revisión del plan: ' + plan.lastReview.text + '\n' : ''}`;
+    const recs = personalRecords().filter((x) => x.r).map((x) => `${x.label}: ${x.val}`).join(', ');
+    return text + (recs ? `\nMis récords: ${recs}.` : '') + (aiQ ? `\n\nMi pregunta: ${aiQ}` : '\n\nMi pregunta: ');
   };
+  $$('#aiQs [data-q]').forEach((b) => { b.classList.toggle('on', b.dataset.q === aiQ); b.onclick = () => { aiQ = b.dataset.q; $$('#aiQs [data-q]').forEach((x) => x.classList.toggle('on', x === b)); }; });
+  $('#askAiBtn').onclick = async () => { const text = aiText(); try { await navigator.clipboard.writeText(text); toast(aiQ ? 'Copiado con tu pregunta. Pégalo en tu IA.' : 'Contexto copiado. Pégalo en tu IA y añade la pregunta.', 3500); } catch (e) {} if (navigator.share) { try { await navigator.share({ text }); } catch (e) {} } };
+  $('#aiChatGpt').onclick = () => openAi('https://chatgpt.com/?q=');
+  $('#aiClaude').onclick = () => openAi('https://claude.ai/new?q=');
+  async function openAi(base) { const text = aiText(); try { await navigator.clipboard.writeText(text); } catch (e) {} const url = base + encodeURIComponent(text); if (url.length > 7000) { toast('El texto es largo: lo he copiado, pégalo al abrir.', 3500); } window.open(url, '_blank', 'noopener'); }
   $('#planWeeks .on')?.scrollIntoView({ inline: 'center', block: 'nearest' });
   $('#planSessions').innerHTML = ss.map((s) => `<button class="sess" data-key="${s.key}"><span class="st ${s.state}">${sessIcon(s)}</span>
     <span style="flex:1;min-width:0"><b style="font-weight:600;display:block">${s.title}</b><span class="sub" style="font-size:12px">${new Date(s.date).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' })}${s.run ? ` · hecha${s.moved ? ' (otro día)' : ''}: ${fmtKm(s.run.dist)} km` : s.state === 'miss' ? ' · no hecha' : s.state === 'skip' ? ' · antes de crear el plan' : s.state === 'today' ? ' · hoy' : ''}</span></span>
