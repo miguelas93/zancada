@@ -43,10 +43,19 @@ jobs:
         env:
           ZANCADA_KEYSTORE_B64: ${{ secrets.ZANCADA_KEYSTORE_B64 }}
         run: |
-          # Misma clave de firma que la beta (Secret ZANCADA_KEYSTORE_B64, nunca en el repo).
-          if [ -n "$ZANCADA_KEYSTORE_B64" ]; then mkdir -p ~/.android && echo "$ZANCADA_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore; fi
+          # Misma clave de firma en TODOS los APK (Secret ZANCADA_KEYSTORE_B64, nunca en el repo), así cada
+          # versión se instala encima de la anterior. build.gradle.kts la usa de forma explícita (ZANCADA_KEYSTORE).
+          if [ -n "$ZANCADA_KEYSTORE_B64" ]; then
+            echo "$ZANCADA_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/zancada.keystore"
+            export ZANCADA_KEYSTORE="$RUNNER_TEMP/zancada.keystore"
+            keytool -list -keystore "$ZANCADA_KEYSTORE" -storepass android 2>&1 | grep -iv "warning" | head -6 || true
+          elif [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            echo "::error::Falta el Secret ZANCADA_KEYSTORE_B64: sin él cada APK sale con otra firma y no se puede actualizar"; exit 1
+          fi
           ./gradlew :app:assembleDebug --no-daemon
           cp app/build/outputs/apk/debug/app-debug.apk ../zancada-nativa.apk
+          # Huella de la firma en el registro, para comprobar que no cambia entre versiones.
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/apksigner verify --print-certs ../zancada-nativa.apk | grep -i "SHA-256" || true
 
       - name: Android Lint (errores y seguridad)
         run: ./gradlew :app:lintDebug --no-daemon
@@ -80,5 +89,5 @@ jobs:
           gh release delete apk-nativa --yes --cleanup-tag || true
           gh release create apk-nativa zancada-nativa.apk \
             --target "$GITHUB_SHA" --prerelease \
-            --title "Zancada nativa (Kotlin) · fase 1 · build ${{ github.run_number }}" \
-            --notes "App nativa en Kotlin, fase 1: grabar carreras con la pantalla apagada. Se instala al lado de la beta (icono «Zancada N») y no toca sus datos."
+            --title "Zancada nativa (Kotlin) · build ${{ github.run_number }}" \
+            --notes "App nativa en Kotlin. Se instala al lado de la beta (icono «Zancada N») y no toca sus datos. Cada versión se instala encima de la anterior."

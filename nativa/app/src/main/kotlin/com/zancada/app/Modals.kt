@@ -295,7 +295,7 @@ private fun ManualModal() {
                 Btn("Guardar", {
                     val r = Repo.app().manualRun(start, km, time, name)
                     if (r == null) { toast("Revisa la fecha, la distancia y el tiempo"); return@Btn }
-                    Repo.mutate { addRun(r) }; Reminders.sync(ctx); St.manualPrefill = null; closeModal(); toast("Carrera añadida")
+                    Repo.mutate { addRun(r) }; Reminders.sync(ctx); Hc.push(ctx); St.manualPrefill = null; closeModal(); toast("Carrera añadida")
                 }, Modifier.weight(1f), height = 46.dp)
             }
         }

@@ -100,6 +100,8 @@ data class Settings(
     val sosPhone: String? = null,
     val sosName: String? = null,
     val sosEvery: Int? = null,
+    /** Guardar las carreras en Health Connect (solo la nativa). */
+    val hc: String? = null,
 )
 
 @Serializable

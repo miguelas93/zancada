@@ -3,6 +3,7 @@ package com.zancada.app
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.health.connect.client.PermissionController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -150,6 +151,7 @@ fun ProfileScreen() {
         }
         ShoesCard(app)
         SosCard()
+        HcCard()
         // Tus datos
         ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
             H2("Tus datos")
@@ -185,6 +187,36 @@ fun ProfileScreen() {
             Repo.update { it.copy(runs = emptyList(), plan = null, savedRoutes = emptyList(), shoes = emptyList()) }; Reminders.sync(ctx); toast("Datos borrados"); Nav.go(HOME)
         }, kind = BtnKind.Ghost, color = c.danger)
         Sub("$APP_VER · $APP_DATE", size = 12.sp, align = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** Health Connect: guardar cada carrera como ejercicio para Google Fit, Samsung Health… */
+@Composable
+private fun HcCard() {
+    val ctx = LocalContext.current; val scope = rememberCoroutineScope()
+    val st = Repo.data.collectAsState().value.settings
+    val avail = remember { Hc.available(ctx) }
+    fun enable() {
+        Repo.settings { it.copy(hc = "1") }
+        Hc.push(ctx) { n -> scope.launch { toast(if (n > 0) "Enviadas $n ${pl(n, "carrera", "carreras")} a Health Connect" else "Health Connect activado", 3500) } }
+    }
+    val ask = rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { got: Set<String> ->
+        if (got.containsAll(Hc.PERMS)) enable() else toast("Sin permiso de Health Connect", 3000)
+    }
+    ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            H2("Health Connect"); if (st.hc == "1") Chip("Activado")
+        }
+        Sub(if (avail) "Guarda cada carrera (hora, duración y distancia) en Health Connect para verla en Google Fit, Samsung Health, Fitbit… Zancada solo escribe: no lee datos de tu salud."
+            else "Este móvil no tiene Health Connect instalado o actualizado. Instálalo desde Google Play para enviar ahí tus carreras.")
+        if (avail) {
+            if (st.hc == "1") {
+                Btn("Enviar todas mis carreras", { Hc.push(ctx, all = true) { n -> scope.launch { toast(if (n > 0) "Enviadas $n ${pl(n, "carrera", "carreras")}" else "Ya estaban todas", 3000) } } }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
+                Btn("Desactivar", { Repo.settings { it.copy(hc = "0") }; toast("Health Connect desactivado") }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
+            } else Btn("Activar Health Connect", {
+                scope.launch { if (Hc.granted(ctx)) enable() else ask.launch(Hc.PERMS) }
+            }, height = 46.dp, size = 15.sp)
+        } else Btn("Abrir Health Connect en Google Play", { Share.open(ctx, "https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata") }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
     }
 }
 
