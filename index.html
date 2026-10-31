@@ -331,7 +331,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.47 · zonas de esfuerzo · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.48 · ánimos por voz · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1838,7 +1838,7 @@ function onGeoError(err) {
 const run = { active: false, paused: false, points: [], dist: 0, start: 0, pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], wake: null, timer: null, map: null, line: null, marker: null };
 $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
-  Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1 });
+  Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1, cheer: {} });
   run.session = prep.session && prepMode === 'plan' ? prep.session : prepMode === 'tramos' ? prep.tramos : prepMode === 'libre' && prep.goal && prep.goal !== '0' ? goalSession(prep.goal) : null; run.guide = run.session?.goal && run.session.min ? null : buildGuide(run.session); run.route = pickedRoute; run.goalSaid = false; $('#gUnit').textContent = 'm'; applyBigLabels();
   run.nav = run.route ? buildNav(run.route.ll) : null; run.heading = null;
   run.ghostRef = run.route ? bestOnRoute(run.route.id) : null; $('#runGhost').classList.toggle('on', !!run.ghostRef); if (run.ghostRef) { $('#ghostBest').textContent = fmtTime(run.ghostRef.dur); updateGhost(); }
@@ -1955,7 +1955,17 @@ function tick() {
   $('#lockTime').textContent = fmtTime(el); $('#lockPace').textContent = $('#rPace').textContent; $('#lockNav').textContent = run.nav ? `${$('#navMain').textContent} · ${$('#navSub').textContent}` : run.guide ? `${$('#gLabel').textContent} · ${$('#gLeft').textContent} m` : '';
   if (settings.voice === 'min5' && !run.paused && el >= 300 && Math.floor(el / 300) > (run.min5Said || 0)) { run.min5Said = Math.floor(el / 300); speak(`${Math.round(el / 60)} minutos. ${fmtKm(run.dist).replace(',', ' coma ')} kilómetros. Ritmo ${run.dist > 100 ? fmtPace(el / (run.dist / 1000)).replace(':', ' ') : 'sin datos'}.`); }
   if (run.session?.goal && run.session.min) { const left = run.session.min * 60 - el; $('#runGuide').classList.add('on'); $('#gLabel').textContent = left > 0 ? `Objetivo ${run.session.min} min` : 'Objetivo cumplido'; $('#gLabel').className = 'num'; $('#gStep').textContent = left > 0 ? 'tiempo' : 'lo que corras ahora suma'; $('#gLeft').textContent = left > 0 ? fmtTime(left) : '0'; $('#gUnit').textContent = left > 0 ? '' : 'm'; $('#gTrack').style.width = Math.min(100, el / (run.session.min * 60) * 100) + '%'; if (left <= 0 && !run.goalSaid) { run.goalSaid = true; speak('Objetivo cumplido. Lo que corras ahora suma.'); } }
-  paceCheck(el); updateGhost(); checkAutoPause();
+  paceCheck(el); cheer(el); updateGhost(); checkAutoPause();
+}
+// Ánimos por voz (adidas/NRC): mitad del objetivo, último kilómetro y 200 m finales (desplazados 80 m para no pisar el aviso de cada km); en objetivos por tiempo, mitad y último minuto.
+function cheer(el) {
+  const ss = run.session; if (!ss || run.paused) return; run.cheer = run.cheer || {};
+  const say = (k, t) => { if (!run.cheer[k]) { run.cheer[k] = 1; speak(t); } }, avg = () => run.dist > 100 ? ` Ritmo medio ${fmtPace(el / (run.dist / 1000)).replace(':', ' ')}.` : '';
+  if (ss.min) { const T = ss.min * 60; if (T < 600) return; if (el >= T / 2 + 10) say('half', `Mitad del tiempo.${avg()} Sigue así.`); if (el >= T - 60 && el < T) say('last', 'Último minuto.'); return; }
+  const T = ss.m; if (!(T >= 2000)) return;
+  if (run.dist >= T / 2 + 80 && run.dist < T - 1000) say('half', `Mitad hecha.${avg()}`);
+  if (T >= 3000 && run.dist >= T - 920 && run.dist < T - 200) say('lastkm', 'Último kilómetro. A por él.');
+  if (run.dist >= T - 200 && run.dist < T) say('200', 'Doscientos metros. Aprieta si puedes.');
 }
 function pauseRun(auto) { if (run.paused) return; run.paused = true; run.auto = !!auto; run.pauseAt = Date.now(); run.pausePos = lastFix; $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = auto ? 'Autopausa · muévete para seguir' : 'En pausa'; speak(auto ? 'Pausa automática' : 'Pausa'); }
 function resumeRun() { if (!run.paused) return; run.pausedMs += Date.now() - run.pauseAt; run.paused = false; run.auto = false; run.gap = true; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = runStateText(); speak('Seguimos'); }
