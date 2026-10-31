@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.17 (31 oct 2026)
+- Actividad › "Tus récords": mejor km, mejor 5 km y 10 km (a partir de los parciales), carrera más larga, más desnivel y mejor racha de semanas. Toca uno para abrir la carrera.
+- Perfil › Datos: botón CSV que exporta todas tus carreras (fecha, km, tiempo, ritmo, desnivel, sensación, ruta, notas) para Excel o Sheets.
+
 ## Novedades 0.16 (31 oct 2026)
 - Rutas › Recomendadas: el filtro ya no es por km sino por el tiempo que tienes ("¿Cuánto tiempo tienes?": 20, 30, 45 o más de 45 min), calculado a tu ritmo real y con el desnivel.
 - Tarjeta "Para hoy" al principio de la lista: una propuesta razonada (cerca de ti, 25–50 min, que no hayas corrido esta semana) que cambia cada día, con "Correrla" y "Ver ficha".
