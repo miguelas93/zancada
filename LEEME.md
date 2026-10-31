@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.37 (31 oct 2026)
+
+- **Calentamiento guiado** al preparar la carrera: seis ejercicios dinámicos de 30 segundos con voz, antes de pulsar Empezar.
+
 ## Novedades 0.36 (31 oct 2026)
 
 - **Evolución del ritmo** en Actividad: tus últimas 20 carreras en una gráfica con la media móvil, y una frase que te dice si vas más rápido, igual o más lento que al principio.
