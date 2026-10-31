@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.10 (madrugada del 31 de octubre)
+- **Importar carreras GPX** (Perfil → Tus datos): trae tu historial de Strava, Garmin o cualquier app que exporte GPX (varios archivos a la vez). Se calculan parciales y mejores marcas como si fueran carreras propias; las repetidas se saltan.
+- **Añadir una carrera a mano** (Actividad): cinta o reloj sin GPS. Cuenta para la semana, el plan, las insignias y las zapatillas; sin mapa ni parciales.
+- **La semana pasada** en Inicio (de lunes a miércoles): carreras, km, tiempo, comparación con la anterior y la carrera más larga.
+- **Avisos de voz**: ahora cada km, cada 500 m o cada 5 minutos (tiempo, distancia y ritmo), o sin voz.
+
 ## Novedades 0.9 (madrugada del 31 de octubre)
 - **Fantasma**: al repetir una ruta (recomendada, guardada o una carrera tuya desde Mis recorridos), la pantalla de carrera te compara en directo con tu mejor tiempo en ella: metros por delante o por detrás y segundos de diferencia, y la voz lo dice en cada km. La ficha de la ruta muestra cuántas veces la has corrido y tu mejor tiempo; el resumen te dice si has batido tu marca en esa ruta.
 - **Mapa de todas tus carreras** (Actividad): todos tus recorridos superpuestos; donde más repites se ve más intenso. Calles o satélite.
