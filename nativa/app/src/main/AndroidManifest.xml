@@ -83,14 +83,6 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Widget de la pantalla de inicio. -->
-        <receiver android:name=".ZancadaWidget" android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />
-        </receiver>
-
         <!-- Compartir imágenes, GPX, CSV y copias: solo la carpeta temporal "share" de la app. -->
         <provider
             android:name="androidx.core.content.FileProvider"

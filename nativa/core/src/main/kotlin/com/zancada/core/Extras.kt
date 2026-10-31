@@ -38,22 +38,6 @@ fun cadenceTip(cad: Int?): String? = when {
 /** Media de pasos por minuto en movimiento. */
 fun cadenceOf(steps: Int, movingSec: Double): Int? = if (steps < 60 || movingSec < 60) null else (steps / (movingSec / 60)).roundToInt().takeIf { it in 60..260 }
 
-/** Lo que enseña el widget de la pantalla de inicio. */
-data class WidgetInfo(val km: String, val sub: String, val next: String)
-
-fun App.widgetInfo(): WidgetInfo {
-    val t = now(); val ws = weekStart(t)
-    val wk = runs.filter { it.start >= ws }
-    val km = fmtKmS(wk.sumOf { it.dist })
-    val sub = "${wk.size} de ${goalOf()} carreras esta semana"
-    val next = when (val p = planCard()) {
-        is PlanCard.Week -> listOfNotNull(p.chip, p.title).joinToString(" · ").ifEmpty { p.head }
-        is PlanCard.Finished -> "Plan terminado"
-        else -> loadWarn()?.let { "Semana fuerte: mejor suave" } ?: "Toca para salir a correr"
-    }
-    return WidgetInfo(km, sub, next)
-}
-
 /** Modo seguridad: textos de los SMS. */
 object Sos {
     fun mapUrl(lat: Double, lon: Double) = "https://maps.google.com/?q=${"%.5f".format(java.util.Locale.ROOT, lat)},${"%.5f".format(java.util.Locale.ROOT, lon)}"

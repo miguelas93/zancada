@@ -103,12 +103,6 @@ class MainActivity : ComponentActivity() {
 
     /** «Terminar» desde la notificación: abre la app en la carrera y la termina (sale la celebración o la pregunta de carrera corta). */
     private fun handle(i: Intent?) {
-        // «Correr» desde el widget: directo a preparar la carrera.
-        if (i?.action == Widget.RUN) {
-            i.action = null
-            if (Repo.data.value.profile.done && RunBus.state.value.phase != Phase.RUNNING) Nav.reset(Scr(HOME), Scr(PREP))
-            return
-        }
         if (i?.action == RunService.FINISH && RunBus.state.value.phase == Phase.RUNNING) {
             i.action = null
             if (Nav.cur.id != RUN) Nav.reset(Scr(HOME), Scr(RUN))

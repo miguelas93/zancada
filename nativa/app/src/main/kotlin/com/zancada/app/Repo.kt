@@ -81,7 +81,6 @@ object Repo {
             tmp.writeText(JsonObject(Store.toKeys(d)).toString())
             tmp.renameTo(file)   // atómico: o queda lo anterior o lo nuevo
         }
-        Widget.update(appCtx)
     }
 
     fun isNight(s: Settings = data.value.settings, systemDark: Boolean = false): Boolean {
