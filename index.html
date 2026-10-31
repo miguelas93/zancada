@@ -259,7 +259,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.4 · plan y rutas · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.5 · rutas recomendadas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -270,7 +270,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
   <div class="fab" style="flex-direction:column;align-items:stretch;gap:10px;left:12px;right:12px">
     <div class="between"><span class="pill" style="font-family:var(--display);font-size:18px;font-weight:700;padding:10px 18px">Rutas</span><button class="icon" id="routesLocate" aria-label="Centrar en mi posición"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></button></div>
     <div class="chips" id="routesChips">
-      <button class="chipb on" data-mode="sug">Para ti</button><button class="chipb" data-mode="mine">Mis recorridos</button>
+      <button class="chipb on" data-mode="rec">Recomendadas</button><button class="chipb" data-mode="mine">Mis recorridos</button><button class="chipb" data-mode="sug">Bucle desde aquí</button>
       <span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span>
       <button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button>
     </div>
@@ -906,7 +906,7 @@ function updateGuide() {
 // ---------- rutas ----------
 // Rutas "para ti": bucles desde donde estás, calculados con el enrutador peatonal de Valhalla (FOSSGIS, OpenStreetMap), con desnivel.
 const ROUTER = 'https://valhalla1.openstreetmap.de';
-const rt = { map: null, mode: 'sug', km: 5, list: [], layers: [], sel: 0, here: null, hereM: null, token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
+const rt = { map: null, mode: 'rec', km: 5, list: [], layers: [], sel: 0, here: null, hereM: null, token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
 let pickedRoute = null;
 function decodePoly6(str) {
   const out = []; let i = 0, lat = 0, lon = 0;
@@ -966,6 +966,52 @@ async function loadSuggestions() {
   if (!out.length) { $('#routesCards').innerHTML = `<div class="rcard"><b style="font-weight:600">No he podido calcular rutas ahora</b><span class="sub" style="font-size:13px">Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Prueba de nuevo en un momento.</span><button class="btn sec" style="height:46px" id="routesRetry">Reintentar</button></div>`; $('#routesRetry').onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); }; return; }
   rt.cache[key] = out; const keys = Object.keys(rt.cache); if (keys.length > 12) delete rt.cache[keys[0]]; save('zancada.routecache.v1', rt.cache);
 }
+// Rutas recomendadas: sitios investigados para correr tranquilo (parques, sendas, carriles sin coches). Ver 01_Investigacion/2026-10-31_rutas-correr-madrid-san-fernando_v01.md.
+// wp = puntos de paso aproximados; el trazado real lo calcula el enrutador peatonal y se guarda en caché. loop=false → ida y vuelta.
+const CURATED = [
+  { id: 'rec-dehesa', name: 'Dehesa de la Villa · vuelta', zone: 'Madrid · Tetuán/Moncloa', km: 5.2, gain: 90, surface: 'Tierra y pinar', why: 'El bosque de al lado de casa: sombra, fuentes y sube-baja constante. Entrada por Francos Rodríguez (metro L7).', loop: true, wp: [[40.4568,-3.7190],[40.4613,-3.7215],[40.4640,-3.7280],[40.4615,-3.7345],[40.4570,-3.7330],[40.4548,-3.7260]] },
+  { id: 'rec-dehesa-llano', name: 'Dehesa · llano del Cerro de los Locos', zone: 'Madrid · Tetuán/Moncloa', km: 3.6, gain: 20, surface: 'Tierra', why: 'Camino llano de 1,8 km bajo el cerro, ida y vuelta: el sitio de la Dehesa para hacer series sin cuestas.', loop: false, wp: [[40.4590,-3.7215],[40.4600,-3.7260],[40.4612,-3.7320]] },
+  { id: 'rec-sahagun', name: 'Parque Rodríguez Sahagún · pista', zone: 'Madrid · Tetuán', km: 1.6, gain: 10, surface: 'Pista de running', why: 'El parque grande del barrio, con circuito señalizado para correr. Llano, para calentar o rodajes cortos. Da varias vueltas.', loop: true, wp: [[40.4660,-3.7070],[40.4700,-3.7080],[40.4710,-3.7020],[40.4668,-3.7015]] },
+  { id: 'rec-santander', name: 'Parque de Santander · anillo del Canal', zone: 'Madrid · Chamberí', km: 1.2, gain: 0, surface: 'Tartán, marcas cada 100 m', why: 'Anillo de tartán de 1.200 m sobre el Tercer Depósito: series y tempos medidos sin coches. Metro Canal o Islas Filipinas.', loop: true, wp: [[40.4428,-3.7085],[40.4455,-3.7090],[40.4458,-3.7135],[40.4428,-3.7135]] },
+  { id: 'rec-cu', name: 'Ciudad Universitaria · ruta verde', zone: 'Madrid · Moncloa', km: 5.5, gain: 70, surface: 'Asfalto sin tráfico', why: 'Avenidas anchas del campus cerradas al tráfico de paso. Enlaza la Dehesa con el Parque del Oeste.', loop: true, wp: [[40.4435,-3.7275],[40.4490,-3.7290],[40.4540,-3.7300],[40.4500,-3.7345],[40.4420,-3.7345]] },
+  { id: 'rec-oeste', name: 'Parque del Oeste', zone: 'Madrid · Moncloa', km: 3.2, gain: 60, surface: 'Tierra y gravilla', why: 'Cuestas cortas para ganar fuerza, sombra y atardecer en Debod. Se alarga bajando a Madrid Río.', loop: true, wp: [[40.4240,-3.7175],[40.4300,-3.7245],[40.4345,-3.7230],[40.4290,-3.7195]] },
+  { id: 'rec-madridrio', name: 'Madrid Río · bucle', zone: 'Madrid · Arganzuela', km: 10.5, gain: 40, surface: 'Asfalto, marcas en el suelo', why: 'Diez kilómetros sin un semáforo, con fuentes y marcas de distancia. El sitio para tempos y tiradas largas.', loop: true, wp: [[40.4175,-3.7200],[40.4030,-3.7130],[40.3930,-3.6985],[40.4030,-3.7100],[40.4175,-3.7190]] },
+  { id: 'rec-casacampo', name: 'Casa de Campo · lago', zone: 'Madrid · Moncloa', km: 4.5, gain: 50, surface: 'Tierra y pinar', why: 'El mejor trail dentro de la ciudad. Esta vuelta rodea el lago; el perímetro completo son 16 km.', loop: true, wp: [[40.4215,-3.7285],[40.4175,-3.7320],[40.4185,-3.7380],[40.4225,-3.7345]] },
+  { id: 'rec-retiro', name: 'El Retiro · Paseo de Coches', zone: 'Madrid · Retiro', km: 4.5, gain: 30, surface: 'Tierra y asfalto', why: 'El clásico. A primera hora entre semana está vacío; los fines de semana, lleno.', loop: true, wp: [[40.4195,-3.6835],[40.4165,-3.6790],[40.4095,-3.6805],[40.4105,-3.6895],[40.4170,-3.6880]] },
+  { id: 'rec-pardo', name: 'El Pardo · senda del Manzanares', zone: 'Madrid · El Pardo', km: 6, gain: 40, surface: 'Tierra y pasarelas', why: 'Río, encinas y ciervos: lo más salvaje cerca de Madrid. Bus 179 desde Plaza de Castilla. Lleva agua.', loop: false, wp: [[40.5185,-3.7745],[40.5070,-3.7690],[40.4960,-3.7620]] },
+  { id: 'rec-jc1', name: 'Parque Juan Carlos I', zone: 'Madrid · Barajas', km: 4, gain: 20, surface: 'Asfalto', why: 'Llano y abierto, con fuentes y baños. Bueno para tiradas largas de domingo. Metro Feria de Madrid.', loop: true, wp: [[40.4640,-3.6160],[40.4670,-3.6060],[40.4600,-3.6020],[40.4590,-3.6120]] },
+  { id: 'rec-valdebebas', name: 'Valdebebas · senda de los Montes', zone: 'Madrid · Hortaleza', km: 5.5, gain: 50, surface: 'Tierra', why: 'Parque forestal nuevo con 32 km de caminos y casi nadie. Sin sombra: mejor temprano.', loop: true, wp: [[40.4820,-3.6160],[40.4900,-3.6180],[40.4930,-3.6060],[40.4860,-3.6000],[40.4810,-3.6080]] },
+  { id: 'rec-boqueron', name: 'Camposoto · Punta del Boquerón', zone: 'San Fernando · playa', km: 5.8, gain: 10, surface: 'Pasarela y arena', why: 'La joya de la Isla: pasarela de madera y sendero entre dunas y el caño hasta la Batería de Urrutia. Sin coches.', loop: false, wp: [[36.4420,-6.2270],[36.4300,-6.2190],[36.4150,-6.2120]] },
+  { id: 'rec-carrascon', name: 'Sendero del Carrascón', zone: 'San Fernando · salinas', km: 5.6, gain: 0, surface: 'Albero', why: 'Por los muros de las salinas, del molino del Zaporito al puerto de Gallineras. Cinco entradas desde la Ronda del Estero.', loop: false, wp: [[36.4625,-6.1945],[36.4530,-6.1930],[36.4440,-6.2000]] },
+  { id: 'rec-tresamigos', name: 'Tres Amigos · río Arillo', zone: 'San Fernando · Camposoto', km: 3.2, gain: 0, surface: 'Albero', why: 'Salina tradicional, observatorios de aves y molino de mareas. Corto: ideal para calentar antes de la pasarela.', loop: false, wp: [[36.4500,-6.2290],[36.4560,-6.2400]] },
+  { id: 'rec-chiclana', name: 'Vía San Fernando – Chiclana', zone: 'San Fernando · parque natural', km: 10.8, gain: 10, surface: 'Pasarelas y camino', why: 'Cinco kilómetros por dentro del parque natural cruzando el caño por cuatro pasarelas. La tirada larga sin coches de la Isla.', loop: false, wp: [[36.4520,-6.1900],[36.4350,-6.1720],[36.4200,-6.1530]] },
+  { id: 'rec-dolores', name: 'Salina Dolores', zone: 'San Fernando · río Arillo', km: 3.5, gain: 0, surface: 'Albero', why: 'Bucle por el muro de la salina junto al río Arillo. A veces lo cierran: comprueba antes.', loop: true, wp: [[36.4740,-6.2320],[36.4700,-6.2250],[36.4680,-6.2300]] },
+];
+function curatedPath(c) { const ll = c.wp.slice(); return c.loop ? ll.concat([ll[0]]) : ll.concat(ll.slice(0, -1).reverse()); }
+function curatedList() {
+  const list = CURATED.map((c) => { const k = rt.cache[c.id]; return Object.assign({ src: 'rec', ll: curatedPath(c), routed: false, start: { lat: c.wp[0][0], lon: c.wp[0][1] } }, c, k ? { ll: k.ll, km: k.km, gain: k.gain == null ? c.gain : k.gain, routed: true } : {}); });
+  if (rt.here) list.forEach((r) => { r.away = haversine(rt.here, r.start) / 1000; });
+  return rt.here ? list.sort((a, b) => a.away - b.away) : list;
+}
+let recBusy = false;
+// Calcula el trazado real de las recomendadas que aún no están en caché: primero la seleccionada, luego las más cercanas, de una en una.
+async function routeCurated() {
+  if (recBusy || rt.mode !== 'rec') return; recBusy = true;
+  try {
+    for (let n = 0; n < 40 && rt.mode === 'rec'; n++) {
+      const list = rt.list, pend = list.filter((r) => !r.routed && !r.failed); if (!pend.length) break;
+      const r = list[rt.sel] && !list[rt.sel].routed && !list[rt.sel].failed ? list[rt.sel] : pend[0], c = CURATED.find((x) => x.id === r.id);
+      try {
+        const res = await routeThrough(curatedPath(c).map(([lat, lon]) => ({ lat, lon }))), gain = await elevGain(res.ll);
+        rt.cache[c.id] = { ll: res.ll, km: Math.round(res.km * 10) / 10, gain }; save('zancada.routecache.v1', rt.cache);
+      } catch (e) { r.failed = true; }
+      if (rt.mode !== 'rec') break;
+      const sel = rt.list[rt.sel]?.id, failed = rt.list.filter((x) => x.failed).map((x) => x.id);
+      rt.list = curatedList(); rt.list.forEach((x) => { if (failed.includes(x.id)) x.failed = true; }); rt.sel = Math.max(0, rt.list.findIndex((x) => x.id === sel)); drawRoutes();
+    }
+  } finally { recBusy = false; }
+}
+const fmtAway = (km) => km < 1 ? `a ${Math.round(km * 1000)} m` : km < 100 ? `a ${km < 10 ? (Math.round(km * 10) / 10).toString().replace('.', ',') : Math.round(km)} km` : `a ${Math.round(km)} km`;
 function myRoutes() {
   const fromRuns = runs.filter((r) => r.points?.length > 5 && r.dist > 500).slice(0, 20).map((r) => ({ id: 'run-' + r.id, name: r.name, sub: fmtDate(r.start), ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: null, src: 'run' }));
   return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
@@ -978,12 +1024,13 @@ function drawRoutes() {
   list.forEach((r, i) => { if (i !== rt.sel) rt.layers.push(L.polyline(r.ll, { color: INK, weight: 3, opacity: .3, lineCap: 'round' }).addTo(rt.map)); });
   const s = list[rt.sel];
   rt.layers.push(L.polyline(s.ll, ROUTE_HALO).addTo(rt.map), L.polyline(s.ll, ROUTE_STYLE).addTo(rt.map), L.marker(s.ll[0], { icon: dotIcon('#fff', INK) }).addTo(rt.map));
-  rt.map.fitBounds(s.ll, { paddingTopLeft: [30, 150], paddingBottomRight: [30, 300] });
+  rt.map.fitBounds(s.ll, { paddingTopLeft: [30, 150], paddingBottomRight: [30, rt.mode === 'rec' ? 350 : 300] });
   $('#routesCards').innerHTML = list.map((r, i) => { const m = routeMeta(r), saved = savedRoutes.some((x) => x.id === r.id); return `<div class="rcard ${i === rt.sel ? 'on' : ''}" data-i="${i}">
-    <div class="between"><div style="min-width:0"><b style="font-weight:600;font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</b><span class="sub" style="font-size:12px">${r.src === 'sug' ? 'Desde tu ubicación · Generada para ti' : r.sub || ''}</span></div>
+    <div class="between"><div style="min-width:0"><b style="font-weight:600;font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</b><span class="sub" style="font-size:12px">${r.src === 'sug' ? 'Desde tu ubicación · Generada para ti' : r.src === 'rec' ? `${r.zone}${r.away != null ? ' · ' + fmtAway(r.away) : ''}` : r.sub || ''}</span></div>
       <button class="icon" data-save="${i}" aria-label="${saved ? 'Quitar de guardadas' : 'Guardar'}" style="width:40px;height:40px;background:${saved ? 'var(--volt)' : 'var(--surface2)'};color:var(--on-volt)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;${saved ? 'fill:currentColor' : ''}"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="chip ${m.diff[1]}">${m.diff[0]}</span><span><span class="num" style="font-size:22px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span></span><span class="sub">·</span><span class="sub" style="font-weight:600;color:var(--ink)">${r.gain == null ? '— ' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span class="sub" style="font-weight:600;color:var(--ink)">${fmtTime(m.time).replace(/^(\d+):(\d+):\d+$/, '$1 h $2 min').replace(/^(\d+):\d+$/, '$1 min')}</span></div>
-    <button class="btn" data-runroute="${i}" style="height:48px;font-size:15px">Correr esta ruta</button></div>`; }).join('') + (rt.mode === 'sug' ? `<div class="rcard" style="justify-content:center;align-items:center;text-align:center"><b style="font-weight:600">¿Otras opciones?</b><span class="sub" style="font-size:13px">Genero tres bucles nuevos de ${rt.km} km.</span><button class="btn sec" style="height:46px" id="routesMore">Generar otras</button></div>` : '');
+    ${r.src === 'rec' ? `<p style="margin:0;font-size:13px;line-height:1.35" class="sub"><b style="color:var(--ink);font-weight:600">${r.surface}.</b> ${r.why}${r.routed ? '' : r.failed ? ' <i>Trazado orientativo: no he podido calcular el camino real.</i>' : ' <i>Calculando el camino real…</i>'}</p>` : ''}
+    <div style="display:flex;gap:8px"><button class="btn" data-runroute="${i}" style="height:48px;font-size:15px;flex:1 1 auto;width:auto;min-width:0;padding:0 12px;white-space:nowrap">Correr esta ruta</button>${r.src === 'rec' ? `<a class="btn sec" href="https://www.google.com/maps/dir/?api=1&destination=${r.start.lat},${r.start.lon}&travelmode=transit" target="_blank" rel="noopener" style="height:48px;width:auto;padding:0 14px;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;flex:none;white-space:nowrap">Cómo llegar</a>` : ''}</div></div>`; }).join('') + (rt.mode === 'sug' ? `<div class="rcard" style="justify-content:center;align-items:center;text-align:center"><b style="font-weight:600">¿Otras opciones?</b><span class="sub" style="font-size:13px">Genero tres bucles nuevos de ${rt.km} km.</span><button class="btn sec" style="height:46px" id="routesMore">Generar otras</button></div>` : '');
   $$('#routesCards [data-i]').forEach((c) => c.onclick = (e) => { if (e.target.closest('button')) return; rt.sel = Number(c.dataset.i); drawRoutes(); });
   $$('#routesCards [data-save]').forEach((b) => b.onclick = () => { const r = list[Number(b.dataset.save)]; if (savedRoutes.some((x) => x.id === r.id)) { savedRoutes = savedRoutes.filter((x) => x.id !== r.id); toast('Quitada de tus recorridos'); } else { savedRoutes.unshift({ id: r.id, name: r.name, ll: r.ll, km: r.km, gain: r.gain, created: Date.now() }); toast('Guardada en Mis recorridos'); } save(ROUTES, savedRoutes); drawRoutes(); });
   $$('#routesCards [data-runroute]').forEach((b) => b.onclick = () => { pickedRoute = list[Number(b.dataset.runroute)]; go('prep'); });
@@ -997,6 +1044,11 @@ function renderRoutes() {
   const place = (p) => { rt.here = p; if (!rt.hereM) rt.hereM = L.marker([p.lat, p.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(rt.map); else rt.hereM.setLatLng([p.lat, p.lon]); };
   if (lastFix) place(lastFix);
   if (rt.mode === 'mine') { rt.list = myRoutes(); rt.sel = 0; drawRoutes(); if (!rt.list.length && rt.here) rt.map.setView([rt.here.lat, rt.here.lon], 14); return; }
+  if (rt.mode === 'rec') {
+    rt.list = curatedList(); rt.sel = 0; drawRoutes(); routeCurated();
+    if (!rt.here && 'geolocation' in navigator) navigator.geolocation.getCurrentPosition((pos) => { place({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }); if (rt.mode === 'rec' && $('#routes').classList.contains('on')) { const id = rt.list[rt.sel]?.id; rt.list = curatedList(); rt.sel = Math.max(0, rt.list.findIndex((x) => x.id === id)); drawRoutes(); } }, () => {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+    return;
+  }
   if (rt.here) { loadSuggestions(); return; }
   $('#routesCards').innerHTML = '<div class="rcard"><b style="font-weight:600">Buscando tu posición…</b><span class="sub" style="font-size:13px">Las rutas se calculan desde donde estás.</span></div>';
   if (!('geolocation' in navigator)) return;
