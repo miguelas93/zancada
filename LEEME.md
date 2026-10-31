@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.54 (31 oct 2026)
+
+- **Predicción en el plan**: si tu plan es para un 5K, 10K o media, la pantalla del plan te dice en qué tiempo saldría tu carrera con tu forma de hoy y a qué ritmo, con la misma fórmula que "Tus ritmos".
+- La pantalla de novedades incluye la mejor hora para correr y la predicción.
+
 ## Novedades 0.53 (31 oct 2026)
 
 - **Mejor hora para correr hoy**: el clima de Inicio te sugiere la hora con menos lluvia y temperatura más agradable de lo que queda de día, siempre con luz. Si ahora ya es buen momento, no dice nada.

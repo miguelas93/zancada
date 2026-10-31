@@ -332,7 +332,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.53 · mejor hora para correr · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.54 · predicción en el plan · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -378,7 +378,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 <section class="screen scroll" id="plan">
   <div class="col" style="gap:18px">
     <div class="between"><button class="icon" data-go="home" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><span class="chip" id="planGoalChip"></span><span style="width:44px"></span></div>
-    <div><span class="lbl" id="planSub"></span><h1 id="planTitle" style="margin-top:4px">Tu plan</h1></div>
+    <div><span class="lbl" id="planSub"></span><h1 id="planTitle" style="margin-top:4px">Tu plan</h1><p class="sub" id="planPred" style="display:none;margin:8px 0 0;font-size:14px;line-height:1.45"></p></div>
     <div class="card dark col" style="gap:14px" id="planWeekCard"></div>
     <div class="wk" id="planWeeks"></div>
     <div class="list" id="planSessions"></div>
@@ -946,10 +946,15 @@ function personalRecords() {
   return out;
 }
 // Previsiones de carrera con la fórmula de Riegel (t2 = t1 · (d2/d1)^1.06) a partir de tu mejor 5 km o 10 km; si no hay, del ritmo medio reciente.
-function renderPaces() {
-  const box = $('#paces'); if (runs.length < 2) { box.style.display = 'none'; return; }
+// Base para predecir tiempos (Riegel): tu mejor 10 km o 5 km dentro de cualquier carrera; si no hay, tu ritmo reciente.
+function raceBase() {
   let base = null; runs.forEach((r) => { const f5 = bestFor(r, 5000), f10 = bestFor(r, 10000); if (f10 && (!base || base.d < 10000 || f10 < base.t)) base = { d: 10000, t: f10 }; else if (f5 && (!base || (base.d === 5000 && f5 < base.t))) base = { d: 5000, t: f5 }; });
   const srcTxt = base ? `según tu mejor ${base.d / 1000} km` : 'según tu ritmo reciente'; if (!base) base = { d: 5000, t: userPace() * 5 };
+  return { base, srcTxt };
+}
+function renderPaces() {
+  const box = $('#paces'); if (runs.length < 2) { box.style.display = 'none'; return; }
+  const { base, srcTxt } = raceBase();
   const pred = (d) => fmtTime(base.t * Math.pow(d / base.d, 1.06)); box.style.display = '';
   $('#pacesSub').textContent = srcTxt;
   $('#pacesPred').innerHTML = [['5 km', pred(5000)], ['10 km', pred(10000)], ['Media', pred(21097)]].map(([l, v]) => `<div><span class="lbl">${l}</span><span class="num" style="font-size:22px">${v}</span></div>`).join('');
@@ -1281,6 +1286,8 @@ function renderPlan() {
   $('#planGoalChip').textContent = g.name === 'Constancia' ? 'Hábito' : g.name;
   $('#planSub').textContent = `${plan.weeks} semanas · ${listEs(plan.days.map((d) => DAY_N[d]))}`;
   $('#planTitle').textContent = curWeek(plan) >= plan.weeks ? 'Plan terminado' : `Semana ${wi + 1} de ${plan.weeks}`;
+  // Predicción para tu carrera objetivo con tu forma de hoy (Runna/Garmin "race predictor").
+  if (g.race && runs.length >= 2) { const { base, srcTxt } = raceBase(), t = base.t * Math.pow(g.race / base.d, 1.06); $('#planPred').innerHTML = `Con tu forma de hoy, tu ${g.name} saldría en <b style="color:var(--ink);font-weight:600">${fmtTime(t)}</b> (${fmtPace(t / (g.race / 1000))}/km), ${srcTxt}. Se irá ajustando con cada carrera.`; $('#planPred').style.display = ''; } else $('#planPred').style.display = 'none';
   const title = w === wi ? 'Esta semana' : w < wi ? `Semana ${w + 1}` : `Semana ${w + 1}`;
   const note = plan.factor?.[w] && Math.abs(plan.factor[w] - 1) > 0.01 ? `<span class="sub" style="font-size:12px">${plan.factor[w] > 1 ? 'Subida' : 'Bajada'} del ${Math.round(Math.abs(plan.factor[w] - 1) * 100)} % tras la revisión</span>` : (GOALS[plan.goal].race && w === plan.weeks - 1 ? '<span class="sub" style="font-size:12px">Semana de carrera: afinar</span>' : (w % 4 === 3 && w < plan.weeks - 1 ? '<span class="sub" style="font-size:12px">Semana de descarga</span>' : ''));
   $('#planWeekCard').innerHTML = `<div class="between"><span class="lbl">${title}</span>${note}</div>
@@ -2292,7 +2299,8 @@ const NEWS_VER = '0.50', NEWS = [
   ['Correr', 'objetivo en carrera libre, avisos de ritmo, ánimos por voz, calentamiento guiado, modo cinta sin GPS y avisar a alguien antes de salir.'],
   ['Al terminar', 'estiramientos guiados, récords y comparación, ritmo en el mapa y cómo repartiste el esfuerzo.'],
   ['Actividad', 'calendario, retos del mes, evolución del ritmo, tus ritmos, récords, buscador y compartir tu semana.'],
-  ['Plan', 'añádelo a tu calendario con alarma, y corre/anda para empezar de cero.'],
+  ['Plan', 'predicción de tu tiempo de carrera, añádelo a tu calendario con alarma, y corre/anda para empezar de cero.'],
+  ['Inicio', 'el clima te sugiere la mejor hora para correr lo que queda de día.'],
 ];
 function showNews() { if (!profile.done || settings.newsSeen === NEWS_VER) return; $('#newsVer').textContent = `Novedades · beta ${NEWS_VER}`; $('#newsList').innerHTML = NEWS.map(([t, d]) => `<li><b style="font-weight:600">${t}</b>: ${d}</li>`).join(''); $('#newsModal').classList.add('on'); }
 const newsDone = () => { settings.newsSeen = NEWS_VER; save(SET, settings); $('#newsModal').classList.remove('on'); };
