@@ -63,7 +63,7 @@ jobs:
           done
           # GPS en segundo plano (servicio en primer plano): icono, color y nombre de la notificación
           S=android/app/src/main/res/values/strings.xml
-          sed -i 's#</resources>#    <string name="capacitor_background_geolocation_notification_channel_name">Grabación de carreras</string>\n    <string name="capacitor_background_geolocation_notification_icon">drawable/ic_stat_zancada</string>\n    <string name="capacitor_background_geolocation_notification_color">#D4F53C</string>\n</resources>#' "$S"
+          sed -i 's|</resources>|    <string name="capacitor_background_geolocation_notification_channel_name">Grabación de carreras</string>\n    <string name="capacitor_background_geolocation_notification_icon">drawable/ic_stat_zancada</string>\n    <string name="capacitor_background_geolocation_notification_color">#D4F53C</string>\n</resources>|' "$S"
           grep -q background-geolocation android/capacitor.settings.gradle || { echo "::error::Falta el plugin de GPS en segundo plano"; exit 1; }
           cat "$M" "$S"
 
