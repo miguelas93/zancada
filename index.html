@@ -63,7 +63,7 @@ h1{font-size:30px}h2{font-size:17px;font-family:var(--body);font-weight:600;lett
 .dot{width:8px;height:8px;border-radius:4px;background:var(--on-bar-muted)}
 .dot.ok{background:var(--volt)}.dot.bad{background:var(--danger)}
 .stats{display:flex;gap:10px}.stats>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.tabs{position:absolute;left:16px;right:16px;bottom:calc(var(--sab) + 14px);height:68px;background:var(--bar);border-radius:34px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:1000;box-shadow:0 10px 30px -6px rgba(0,0,0,.25)}
+.tabs{position:fixed;left:16px;right:16px;bottom:calc(var(--sab) + 14px);height:68px;background:var(--bar);border-radius:34px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:1000;box-shadow:0 10px 30px -6px rgba(0,0,0,.25)}
 .tabs button{width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--on-bar-muted);font-size:10px;font-weight:500}
 .tabs button.on{color:var(--on-bar);font-weight:600}
 .tabs button.on::after{content:"";width:4px;height:4px;border-radius:2px;background:var(--volt)}
@@ -137,6 +137,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .wk{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}.wk::-webkit-scrollbar{display:none}
 .wk button{flex:none;width:46px;height:58px;border-radius:14px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted)}
 .wk button b{font-family:var(--display);font-size:17px;color:var(--ink)}.wk button.on{background:var(--bar);color:var(--on-bar-muted)}.wk button.on b{color:var(--volt)}.wk button.past{opacity:.55}
+.nav{display:none;align-items:center;gap:14px;border-top:1px solid rgba(244,245,240,.12);padding-top:14px}.nav.on{display:flex}
 .guide{display:none;border-top:1px solid rgba(244,245,240,.12);padding-top:14px;gap:8px}
 .guide.on{display:flex;flex-direction:column}
 .guide .fuerte{color:var(--volt)}
@@ -259,7 +260,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.5 · rutas recomendadas · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.6 · guía por la ruta · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -364,6 +365,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <div style="align-items:flex-end"><span class="lbl">Tiempo</span><span class="num" id="rTime" style="font-size:40px">00:00</span></div>
     </div>
     <div class="guide" id="runGuide"><div class="between"><span class="lbl">Ahora</span><span class="sub" id="gStep"></span></div><div class="between" style="align-items:baseline"><span class="num" id="gLabel" style="font-size:24px">—</span><span style="flex:none"><span class="num" id="gLeft" style="font-size:24px">0</span><span class="unit">m</span></span></div><div class="track"><i id="gTrack" style="width:0"></i></div></div>
+    <div class="nav" id="runNav"><svg id="navArrow" viewBox="0 0 24 24" style="width:36px;height:36px;flex:none;transition:transform .4s;color:var(--volt)" aria-hidden="true"><path d="M12 3l7 18-7-4-7 4z" fill="currentColor"/></svg><div style="min-width:0"><b id="navMain" style="display:block;font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</b><span class="sub" id="navSub" style="font-size:13px"></span></div></div>
   </div>
   <div class="stats" style="padding:4px 10px">
     <div><span class="lbl">Ritmo medio</span><span><span class="num" id="rAvg" style="font-size:28px">–:––</span><span class="unit">/km</span></span></div>
@@ -1058,11 +1060,69 @@ $$('#routesChips [data-mode]').forEach((b) => b.onclick = () => { rt.mode = b.da
 $$('#routesChips [data-km]').forEach((b) => b.onclick = () => { rt.km = Number(b.dataset.km); renderRoutes(); });
 $('#routesLocate').onclick = () => { if (rt.here) rt.map.setView([rt.here.lat, rt.here.lon], 15); else renderRoutes(); };
 // Distancia de un punto a la ruta elegida (al vértice más cercano; las rutas vienen densas).
+// ---------- guía ligera por la ruta ----------
+// Te lleva hasta la salida si estás lejos, y en carrera indica hacia dónde sigue el camino. Voz solo en cruces claros y si te sales.
+function bearing(a, b) { const r = Math.PI / 180, la1 = a.lat * r, la2 = b.lat * r, dl = (b.lon - a.lon) * r; const y = Math.sin(dl) * Math.cos(la2), x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(dl); return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360; }
+const angDiff = (a, b) => ((b - a + 540) % 360) - 180;   // de a hacia b, −180..180; positivo = a la derecha
+const fmtM = (m) => m < 950 ? `${Math.max(10, Math.round(m / 10) * 10)} m` : `${fmtKmS(m)} km`;
+function buildNav(ll) {
+  const pts = ll.map(([lat, lon]) => ({ lat, lon })), cum = [0];
+  for (let i = 1; i < pts.length; i++) cum[i] = cum[i - 1] + haversine(pts[i - 1], pts[i]);
+  const total = cum[cum.length - 1], turns = [];
+  let lo = 0, hi = 0;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const d = cum[i]; if (d < 20 || total - d < 20) continue;
+    while (cum[lo + 1] < d - 20) lo++;                 // punto ~20 m antes
+    while (hi < pts.length - 1 && cum[hi] < d + 20) hi++;   // punto ~20 m después
+    const dv = angDiff(bearing(pts[lo], pts[i]), bearing(pts[i], pts[hi]));
+    if (Math.abs(dv) < 55) continue;
+    const last = turns[turns.length - 1];
+    if (last && d - last.d < 40) { if (Math.abs(dv) > Math.abs(last.dv)) Object.assign(last, { i, d, dv }); } else turns.push({ i, d, dv });
+  }
+  turns.forEach((t) => { t.dir = t.dv > 0 ? 'derecha' : 'izquierda'; t.sharp = Math.abs(t.dv) > 120; });
+  return { pts, cum, total, turns, idx: 0, turnSaid: -1, phase: 'route', done: false };
+}
+function navAt(n, d) { let i = n.idx; while (i < n.pts.length - 1 && n.cum[i + 1] < d) i++; return n.pts[i]; }
+function navProgress(n, p, dry) {
+  let best = Infinity, bi = n.idx;
+  for (let i = n.idx, hi = Math.min(n.pts.length - 1, n.idx + 80); i <= hi; i++) { const d = haversine(p, n.pts[i]); if (d < best) { best = d; bi = i; } }
+  if (best > 60) {
+    for (let i = 0; i < n.pts.length; i++) { const d = haversine(p, n.pts[i]); if (d < best) { best = d; bi = i; } }
+    for (let i = 0; i < bi; i++) if (haversine(p, n.pts[i]) <= best + 15) { bi = i; break; }   // en bucles y en ida y vuelta, el punto más temprano
+  }
+  if (best <= 60 && !dry) n.idx = bi;
+  return { off: best, i: bi };
+}
+function updateNav(p) {
+  const n = run.nav; if (!n) return;
+  let target = null, main = '', sub = '';
+  if (n.phase === 'start') {
+    const d = haversine(p, n.pts[0]), joined = d > 50 && (n.joinN = navProgress(n, p, true).off <= 30 ? (n.joinN || 0) + 1 : 0) >= 4;   // o llevas un rato corriendo por la ruta: te has incorporado a mitad
+    if (d <= 50 || joined) { n.phase = 'route'; toast('Ya estás en la salida', 3000); speak('Ya estás en la salida. Empieza la ruta.'); if (run.toStart) { run.map.removeLayer(run.toStart); run.toStart = null; } }
+    else { target = n.pts[0]; main = 'Hacia la salida'; sub = `${fmtM(d)} · calentamiento`; if (run.toStart) run.toStart.setLatLngs([[p.lat, p.lon], [target.lat, target.lon]]); }
+  }
+  if (n.phase === 'route') {
+    const pr = navProgress(n, p), here = n.cum[n.idx], left = n.total - here;
+    if (pr.off > 60) {
+      target = n.pts[pr.i]; main = 'Fuera de la ruta'; sub = `la ruta está a ${fmtM(pr.off)}`;
+      run.off++; if (run.off >= 2 && Date.now() - run.offSaid > 60000) { run.offSaid = Date.now(); const side = run.heading == null ? '' : angDiff(run.heading, bearing(p, target)) > 0 ? ' a tu derecha' : ' a tu izquierda'; toast('Te has salido de la ruta', 3000); speak(`Te has salido de la ruta. Está a ${fmtM(pr.off)}${side}.`); }
+    } else {
+      if (run.off >= 2) toast('De vuelta en la ruta', 2000); run.off = 0;
+      target = navAt(n, here + 40);
+      const t = n.turns.find((x) => x.i > n.idx + 1), dt = t ? t.d - here : Infinity;
+      if (left <= 40) { main = 'Fin de la ruta'; sub = 'lo que corras ahora suma'; if (!n.done) { n.done = true; toast('Ruta completada', 3000); speak('Fin de la ruta. Lo que corras ahora suma.'); } }
+      else if (t && dt <= 120) { main = `${t.dir === 'derecha' ? 'Derecha' : 'Izquierda'} en ${fmtM(dt)}`; sub = `quedan ${fmtKmS(left)} km`; if (dt <= 90 && n.turnSaid !== t.i) { n.turnSaid = t.i; speak(`En ${fmtM(dt).replace(' m', ' metros')}, ${t.sharp ? 'giro cerrado a la ' : 'a la '}${t.dir}.`); } }
+      else { main = t ? `Sigue ${fmtM(dt)}, luego ${t.dir}` : 'Sigue por la ruta'; sub = `quedan ${fmtKmS(left)} km`; }
+    }
+  }
+  $('#navMain').textContent = main; $('#navSub').textContent = sub;
+  if (target) { const b = bearing(p, target), rot = run.heading == null ? 0 : angDiff(run.heading, b); $('#navArrow').style.transform = `rotate(${rot}deg)`; }
+}
 function offRouteMeters(p, ll) { let best = Infinity; for (let i = 0; i < ll.length; i += 2) { const d = haversine(p, { lat: ll[i][0], lon: ll[i][1] }); if (d < best) best = d; } return best; }
 
 // ---------- preparación ----------
 let watchId = null, prepMap, prepMarker, lastFix = null, prepMode = 'plan';
-const prep = { session: null, routeLayer: null };
+const prep = { session: null, routeLayer: null, toStart: null };
 function startPrep() {
   prepMap = makeMap('prepMap', 'calles'); prepMap.dragging.disable(); prepMap.touchZoom.disable(); prepMap.doubleClickZoom.disable();
   $('#startBtn').disabled = true; $('#gpsDot').className = 'dot'; $('#gpsText').textContent = 'Buscando GPS…';
@@ -1082,9 +1142,20 @@ function renderPrepSheet() {
   $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : 'Carrera libre';
   $('#prepDesc').textContent = usePlan ? s.desc + (s.struct ? ' Te guío por voz en cada tramo.' : '') : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
   $('#prepRoute').style.display = pickedRoute ? 'flex' : 'none';
-  if (pickedRoute) { $('#prepRouteName').textContent = pickedRoute.name; $('#prepRouteSub').textContent = `${String(pickedRoute.km).replace('.', ',')} km · te aviso si te sales`; }
+  if (pickedRoute) { $('#prepRouteName').textContent = pickedRoute.name; prepStartHint(); }
   if (prep.routeLayer) { prepMap.removeLayer(prep.routeLayer); prep.routeLayer = null; }
+  if (prep.toStart) { prepMap.removeLayer(prep.toStart); prep.toStart = null; }
   if (pickedRoute) { prep.routeLayer = L.polyline(pickedRoute.ll, { color: INK, weight: 4, opacity: .55, dashArray: '2 9', lineCap: 'round' }).addTo(prepMap); setTimeout(() => { prepMap.invalidateSize(); prepMap.fitBounds(pickedRoute.ll, { paddingTopLeft: [30, 90], paddingBottomRight: [30, 340] }); }, 80); }
+}
+// Cuánto falta hasta la salida de la ruta elegida; si estás lejos, la app te lleva (línea lima) y ese tramo es calentamiento.
+function prepStartHint() {
+  if (!pickedRoute) return;
+  const km = `${String(pickedRoute.km).replace('.', ',')} km`, st = { lat: pickedRoute.ll[0][0], lon: pickedRoute.ll[0][1] };
+  if (!lastFix) { $('#prepRouteSub').textContent = `${km} · te guío por el camino`; return; }
+  const d = haversine(lastFix, st);
+  $('#prepRouteSub').textContent = d <= 50 ? `${km} · estás en la salida` : d <= 2500 ? `${km} · salida a ${fmtM(d)}, te llevo hasta allí` : `${km} · salida a ${fmtM(d)}: mejor ve en transporte (Cómo llegar, en Rutas)`;
+  if (d > 50 && d <= 2500) { const ll = [[lastFix.lat, lastFix.lon], [st.lat, st.lon]]; if (prep.toStart) prep.toStart.setLatLngs(ll); else prep.toStart = L.polyline(ll, { color: VOLT, weight: 4, opacity: .9, dashArray: '1 8', lineCap: 'round' }).addTo(prepMap); }
+  else if (prep.toStart) { prepMap.removeLayer(prep.toStart); prep.toStart = null; }
 }
 $$('#prepMode [data-pm]').forEach((b) => b.onclick = () => { prepMode = b.dataset.pm; renderPrepSheet(); });
 $('#prepRouteDrop').onclick = () => { pickedRoute = null; renderPrepSheet(); if (lastFix) prepMap.setView([lastFix.lat, lastFix.lon], 16); };
@@ -1092,7 +1163,7 @@ function onFix(pos) {
   const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
   lastFix = { lat, lon, acc, t: pos.timestamp };
   if ($('#prep').classList.contains('on')) {
-    if (!pickedRoute) prepMap.setView([lat, lon], 16);
+    if (!pickedRoute) prepMap.setView([lat, lon], 16); else prepStartHint();
     if (!prepMarker) prepMarker = L.marker([lat, lon], { icon: dotIcon(VOLT, INK) }).addTo(prepMap); else prepMarker.setLatLng([lat, lon]);
     const good = acc <= 25;
     $('#gpsDot').className = 'dot ' + (good ? 'ok' : acc <= 60 ? '' : 'bad');
@@ -1114,7 +1185,9 @@ $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textCont
 function startRun() {
   Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1 });
   run.session = prep.session && prepMode === 'plan' ? prep.session : null; run.guide = buildGuide(run.session); run.route = pickedRoute;
-  $('#runGuide').classList.toggle('on', !!run.guide);
+  run.nav = run.route ? buildNav(run.route.ll) : null; run.heading = null;
+  if (run.nav && lastFix && haversine(lastFix, run.nav.pts[0]) > 50) run.nav.phase = 'start';
+  $('#runGuide').classList.toggle('on', !!run.guide); $('#runNav').classList.toggle('on', !!run.nav); $('#navMain').textContent = run.nav?.phase === 'start' ? 'Hacia la salida' : 'Sigue por la ruta'; $('#navSub').textContent = ''; $('#navArrow').style.transform = '';
   applyTheme();
   $('#pausePanel').style.display = 'none'; $('#runCtl').style.display = 'grid'; $('#runState').textContent = runStateText();
   ['#rDist', '#lockDist'].forEach((q) => $(q).textContent = '0,00'); $('#rTime').textContent = '00:00'; ['#rPace', '#rAvg', '#rBest'].forEach((q) => $(q).textContent = '–:––');
@@ -1124,6 +1197,8 @@ function startRun() {
   run.halo = L.polyline([], ROUTE_HALO).addTo(run.map); run.line = L.polyline([], ROUTE_STYLE).addTo(run.map); run.marker = null;
   if (run.ghost) run.map.removeLayer(run.ghost);
   run.ghost = run.route ? L.polyline(run.route.ll, { color: INK, weight: 5, opacity: .45, dashArray: '2 10', lineCap: 'round' }).addTo(run.map) : null;
+  if (run.toStart) { run.map.removeLayer(run.toStart); run.toStart = null; }
+  if (run.nav?.phase === 'start') run.toStart = L.polyline([[lastFix.lat, lastFix.lon], run.route.ll[0]], { color: VOLT, weight: 4, opacity: .9, dashArray: '1 8', lineCap: 'round' }).addTo(run.map);
   if (run.guide) updateGuide();
   if (lastFix) runFix(lastFix);
   clearInterval(run.timer); tick(); run.timer = setInterval(tick, 500);
@@ -1145,6 +1220,7 @@ function runFix(f) {
     if (dt <= 0) return;
     if (d / dt > 8) return;          // salto imposible para un corredor
     if (d < 2) return;               // ruido estando quieto
+    if (d >= 5) run.heading = bearing(prev, p);
     run.dist += d;
     while (run.dist >= (run.lastKm + 1) * 1000) {
       run.lastKm++;
@@ -1157,11 +1233,7 @@ function runFix(f) {
   }
   run.points.push(p);
   updateGuide();
-  if (run.route && run.points.length % 5 === 0) {
-    const off = offRouteMeters(p, run.route.ll);
-    if (off > 60) { run.off++; if (run.off >= 2 && Date.now() - run.offSaid > 60000) { run.offSaid = Date.now(); toast('Te has salido de la ruta', 3000); speak('Te has salido de la ruta.'); } }
-    else { if (run.off >= 2) toast('De vuelta en la ruta', 2000); run.off = 0; }
-  }
+  if (run.nav) updateNav(p);
   run.halo.addLatLng([p.lat, p.lon]); run.line.addLatLng([p.lat, p.lon]);
   if (!run.marker) run.marker = L.marker([p.lat, p.lon], { icon: dotIcon(VOLT, INK) }).addTo(run.map); else run.marker.setLatLng([p.lat, p.lon]);
   run.map.panTo([p.lat, p.lon], { animate: true });
