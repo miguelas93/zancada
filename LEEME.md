@@ -13,6 +13,13 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.56 (31 oct 2026)
+
+- **Entrenador IA dentro de la app.** En Plan hay un chat de verdad: escribes o tocas una sugerencia y te contesta ahí mismo, sabiendo tu plan, tus últimas carreras y tus récords. Usa Pollinations, una IA gratuita sin cuenta ni clave; sin registro solo admite una pregunta cada ~30 s por conexión, y si hay cola la app espera y reintenta sola. La conversación se guarda en el móvil. Ya no hay botones para ir a ChatGPT o Claude.
+- **Cómo es el sitio.** La ficha de cada ruta enseña fotos reales de la zona (Wikimedia Commons, buscadas en la salida y a lo largo del recorrido), que se amplían al tocarlas con su autor y licencia.
+- **Mapa para explorar.** En la ficha, «Ampliar mapa» lo pone casi a pantalla completa y «Satélite» cambia a vista aérea.
+- **Medallas.** Las insignias son ahora medallas con cinta: bronce para las primeras, plata para 10 km, 100 km, 5 rutas y 10 semanas, oro para media maratón, 50 carreras, 500 y 1000 km. Al tocarlas se ven en grande con brillo, y al terminar una carrera en la que ganas una, aparece la medalla.
+
 ## Novedades 0.55 (31 oct 2026)
 
 - **Rutas arregladas en la APK.** El archivo con las rutas recomendadas (`routes-data.js`) no se copiaba al paquete Android, así que en la app la lista y el mapa salían vacíos con cualquier filtro. En la web sí funcionaba. Ya se copia, y el build de la APK falla si falta cualquier script o estilo que pida la app.
