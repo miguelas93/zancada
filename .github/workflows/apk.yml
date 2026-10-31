@@ -53,7 +53,7 @@ jobs:
           mkdir -p android/app/src/main/res/drawable && cp android-ci/ic_stat_zancada.png android/app/src/main/res/drawable/ic_stat_zancada.png
           G=android/app/build.gradle
           sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" "$G"
-          sed -i "s/versionName \"1.0\"/versionName \"0.57.${{ github.run_number }}\"/" "$G"
+          sed -i "s/versionName \"1.0\"/versionName \"0.58.${{ github.run_number }}\"/" "$G"
           R=android/app/src/main/res
           rm -rf "$R/mipmap-anydpi-v26"
           for d in "$R"/mipmap-*; do
@@ -61,7 +61,11 @@ jobs:
               [ -f "$d/$f" ] && cp icon-192.png "$d/$f"
             done
           done
-          cat "$M"
+          # GPS en segundo plano (servicio en primer plano): icono, color y nombre de la notificación
+          S=android/app/src/main/res/values/strings.xml
+          sed -i 's#</resources>#    <string name="capacitor_background_geolocation_notification_channel_name">Grabación de carreras</string>\n    <string name="capacitor_background_geolocation_notification_icon">drawable/ic_stat_zancada</string>\n    <string name="capacitor_background_geolocation_notification_color">#D4F53C</string>\n</resources>#' "$S"
+          grep -q background-geolocation android/capacitor.settings.gradle || { echo "::error::Falta el plugin de GPS en segundo plano"; exit 1; }
+          cat "$M" "$S"
 
       - name: Compilar APK
         env:

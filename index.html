@@ -336,7 +336,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.57 · Zeta y recorrido animado · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.58 · GPS con pantalla apagada · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -512,7 +512,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <p style="margin:0;font-size:17px;font-weight:500" id="cText">Carrera guardada.</p>
   </div>
   <div class="stats" style="border-top:1px solid rgba(244,245,240,.12);padding-top:18px">
-    <div><span class="lbl">Tiempo</span><span class="num" id="cTime" style="font-size:26px">0:00</span></div>
+    <div><span class="lbl">Tiempo</span><span class="num" id="celeTime" style="font-size:26px">0:00</span></div>
     <div><span class="lbl">Ritmo</span><span class="num" id="cPace" style="font-size:26px">–:––</span></div>
     <div><span class="lbl">Semana</span><span class="num" id="cWeek" style="font-size:26px">1 de 3</span></div>
   </div>
@@ -642,7 +642,7 @@ function go(id, opts = {}) {
   $$('.screen').forEach((s) => s.classList.toggle('on', s.id === id));
   window.scrollTo(0, 0);
   if (!opts.pop && history.state?.id !== id) history.pushState({ id }, '');
-  if (!run.active && !['prep', 'count', 'run'].includes(id) && watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; } // no gastar batería fuera de la carrera
+  if (!run.active && !['prep', 'count', 'run'].includes(id) && watchId !== null) geoStop(); // no gastar batería fuera de la carrera
   if (typeof zetaFabFor === 'function') zetaFabFor(id);
   if (id !== 'routeDetail' && typeof fly !== 'undefined' && fly.on) stopFly();
   if (id === 'home') renderHome();
@@ -1974,8 +1974,33 @@ function startPrep() {
   renderPrepSheet();
   if (!('geolocation' in navigator)) { $('#prepHint').textContent = 'Este navegador no tiene GPS disponible.'; return; }
   if (!window.isSecureContext) { $('#prepHint').textContent = 'El GPS solo funciona en una web con https.'; return; }
-  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-  watchId = navigator.geolocation.watchPosition(onFix, onGeoError, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+  if (run.active) return;   // carrera en marcha (volviste a esta pantalla): el GPS de la carrera sigue como está
+  geoStart(false);
+}
+// ---------- GPS ----------
+// Web y preparación: Geolocation API del navegador (watchPosition, GPS de alta precisión, ~1 lectura/s).
+// Solo funciona con la pantalla encendida y la app delante: con el móvil bloqueado el navegador deja de dar posiciones.
+// En el APK, durante la carrera: plugin nativo @capacitor-community/background-geolocation, que abre un servicio en
+// primer plano (la notificación "Zancada está grabando") y sigue dando posiciones con la pantalla apagada o en otra app.
+const BGeo = window.Capacitor?.Plugins?.BackgroundGeolocation || null;
+let geoKind = null;
+function geoStart(bg) {
+  geoStop();
+  if (bg && BGeo) {
+    geoKind = 'bg'; const myId = watchId = BGeo.addWatcher({ backgroundTitle: 'Zancada está grabando tu carrera', backgroundMessage: 'Toca para volver a la app.', requestPermissions: true, stale: false, distanceFilter: 0 }, (loc, err) => {
+      if (err) { if (err.code === 'NOT_AUTHORIZED') onGeoError({ code: 1 }); return; }
+      if (loc) onFix({ coords: { latitude: loc.latitude, longitude: loc.longitude, accuracy: loc.accuracy, altitude: loc.altitude }, timestamp: loc.time || Date.now() });
+    });
+    myId.catch?.(() => { if (watchId === myId) geoStart(false); });   // si el plugin falla, al menos el GPS del navegador
+    return;
+  }
+  geoKind = 'web'; watchId = navigator.geolocation.watchPosition(onFix, onGeoError, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+}
+function geoStop() {
+  if (watchId === null) return;
+  if (geoKind === 'bg') { const p = watchId; Promise.resolve(p).then((id) => BGeo.removeWatcher({ id })).catch(() => {}); }
+  else navigator.geolocation.clearWatch(watchId);
+  watchId = null; geoKind = null;
 }
 // Entreno por tramos sin plan: plantillas clásicas o "a mi gusto". Usa la misma guía por voz que las sesiones del plan.
 const TRAMOS = [
@@ -2057,7 +2082,7 @@ $('#prepLight').onclick = () => { prep.light = !prep.light; renderPrepSheet(); t
 $('#prepRouteDrop').onclick = () => { pickedRoute = null; renderPrepSheet(); if (lastFix) prepMap.setView([lastFix.lat, lastFix.lon], 16); };
 function onFix(pos) {
   const { latitude: lat, longitude: lon, accuracy: acc, altitude: alt } = pos.coords;
-  lastFix = { lat, lon, acc, t: pos.timestamp, alt: isFinite(alt) && alt != null ? alt : undefined };
+  lastFix = { lat, lon, acc, t: Date.now(), ft: pos.timestamp || Date.now(), alt: isFinite(alt) && alt != null ? alt : undefined };
   if ($('#prep').classList.contains('on')) {
     if (!pickedRoute) prepMap.setView([lat, lon], 16); else prepStartHint();
     if (!prepMarker) prepMarker = L.marker([lat, lon], { icon: dotIcon(VOLT, INK) }).addTo(prepMap); else prepMarker.setLatLng([lat, lon]);
@@ -2080,7 +2105,7 @@ function onGeoError(err) {
 const run = { active: false, paused: false, points: [], dist: 0, start: 0, pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], wake: null, timer: null, map: null, line: null, marker: null };
 $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
-  Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1, cheer: {} });
+  Object.assign(run, { active: true, paused: false, points: [], dist: 0, clk: null, endT: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1, cheer: {} });
   run.session = prep.session && prepMode === 'plan' ? prep.session : prepMode === 'tramos' ? prep.tramos : prepMode === 'libre' && prep.goal && prep.goal !== '0' ? goalSession(prep.goal) : null; run.guide = run.session?.goal && run.session.min ? null : buildGuide(run.session); run.route = pickedRoute; run.goalSaid = false; $('#gUnit').textContent = 'm'; applyBigLabels();
   run.nav = run.route ? buildNav(run.route.ll) : null; run.heading = null;
   run.ghostRef = run.route ? bestOnRoute(run.route.id) : null; $('#runGhost').classList.toggle('on', !!run.ghostRef); if (run.ghostRef) { $('#ghostBest').textContent = fmtTime(run.ghostRef.dur); updateGhost(); }
@@ -2101,6 +2126,8 @@ function startRun() {
   if (lastFix) runFix(lastFix);
   clearInterval(run.timer); tick(); run.timer = setInterval(tick, 500);
   requestWake();
+  if (BGeo) { geoStart(true); try { LocalNotif?.requestPermissions?.(); } catch (e) {} }   // APK: seguir grabando con la pantalla apagada
+  else toast('En la web, deja la pantalla encendida: si bloqueas el móvil, el navegador deja de darme el GPS.', 5000);
 }
 const KeepAwake = window.Capacitor?.Plugins?.KeepAwake; // solo existe dentro del APK
 // Si corriste libre pero el trazado coincide con una ruta recomendada o guardada, se etiqueta sola (así el fantasma funciona la próxima vez).
@@ -2138,13 +2165,16 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function elapsed() { return (Date.now() - run.start - run.pausedMs - (run.paused ? Date.now() - run.pauseAt : 0)) / 1000; }
 function runFix(f) {
   if (!run.active || run.paused) return;
-  if (f.acc > 40) return;
-  const p = { lat: f.lat, lon: f.lon, t: Date.now() - run.start - run.pausedMs }; if (f.alt != null) p.a = Math.round(f.alt);
+  if (f.acc > 50) return;
+  // Hora del punto = hora de la lectura GPS (no la de llegada): cuando Android entrega varias lecturas de golpe,
+  // con la hora de llegada parecían simultáneas y se descartaban todas. clk = desfase reloj del móvil vs. reloj del GPS.
+  const ft = f.ft || f.t || Date.now(), lag = Date.now() - ft; if (run.clk == null || lag < run.clk) run.clk = lag;
+  const p = { lat: f.lat, lon: f.lon, t: Math.max(0, Math.min(Date.now(), ft + run.clk) - run.start - run.pausedMs) }; if (f.alt != null) p.a = Math.round(f.alt);
   const prev = run.points[run.points.length - 1];
   if (prev && run.gap) { run.gap = false; p.gap = true; }   // primer punto tras una pausa: lo andado no cuenta
   else if (prev) {
     const d = haversine(prev, p), dt = (p.t - prev.t) / 1000;
-    if (dt <= 0) return;
+    if (dt <= 0.2) return;
     if (d / dt > 8) return;          // salto imposible para un corredor
     if (d < 2) return;               // ruido estando quieto
     if (d >= 5) run.heading = bearing(prev, p);
@@ -2246,11 +2276,11 @@ function holdButton(btn, ms, done) {
 function finishRun() {
   if (run.paused) run.pausedMs += Date.now() - run.pauseAt;
   run.active = false; clearInterval(run.timer); try { run.wake?.release(); KeepAwake?.allowSleep(); } catch (e) {}
-  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  geoStop(); run.endT = elapsed();
   if (run.points.length < 2) { toast('Sin recorrido: no hay nada que guardar'); go('home'); return; }
   if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }
   run.forceSave = false;
-  const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
+  const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs, end: run.endT });
   if (run.session?.goal) r.goal = run.session.min ? `${run.session.min} min` : `${fmtKmS(run.session.m)} km`;
   if (run.session && !run.session.goal) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom, ...(run.session.timed ? { min: run.session.min } : {}) };
   if (run.route) { r.route = { id: run.route.id, name: run.route.name }; if (run.ghostRef) r.ghost = { ref: run.ghostRef.id, refDur: run.ghostRef.dur }; }
@@ -2264,7 +2294,7 @@ function finishRun() {
   $('#cDist').textContent = fmtKm(r.dist);
   $('#cMedals').innerHTML = newB.slice(0, 3).map((b, i) => `<div class="medal-pop" style="animation-delay:${0.25 + i * 0.2}s">${medalSvg(b, newB.length > 1 ? 96 : 140, true)}</div>`).join(''); $('#cMedals').style.display = newB.length ? 'flex' : 'none';
   $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.route?.auto ? `Has corrido ${r.route.name}: la próxima vez te comparo con este tiempo.` : r.session && sessDone(r) ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
-  $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
+  $('#celeTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   const okS = r.splits.filter((x) => !x.partial), bestS = okS.length ? okS.reduce((a, x) => (x.split < a.split ? x : a)) : null;
   speak(`Carrera terminada. ${fmtKm(r.dist).replace(',', ' coma ')} kilómetros en ${fmtTime(r.dur).replace(/^(\d+):(\d+)$/, '$1 minutos $2').replace(/^(\d+):(\d+):(\d+)$/, '$1 horas $2 minutos')}. Ritmo ${fmtPace(r.dur / (r.dist / 1000)).replace(':', ' ')}.${bestS ? ` Tu mejor kilómetro, el ${bestS.km}.` : ''}${newB.length ? ` Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : ''}`);
@@ -2280,7 +2310,7 @@ function finalizeRun(r) {
     pts[i].d = dist;
   }
   pts[0].d = 0;
-  const dur = pts[pts.length - 1].t / 1000;
+  const dur = Math.max(pts[pts.length - 1].t / 1000, r.end || 0);   // tiempo de reloj (sin pausas), aunque el último punto llegue antes
   const gain = elevGain(pts);
   if (dist - lastKm * 1000 > 100) splits.push({ km: lastKm + 1, split: (dur - prevT) / ((dist - lastKm * 1000) / 1000), partial: true });
   return { id: r.id, start: r.start, name: runName(r.start), points: pts, dist, dur, splits, gain };
@@ -2501,7 +2531,9 @@ history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
 zetaFabFor(profile.done ? 'home' : 'welcome');
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
-const NEWS_VER = '0.57', NEWS = [
+const NEWS_VER = '0.58', NEWS = [
+  ['GPS arreglado', 'en la app de Android la carrera sigue grabando con la pantalla apagada o en otra app (verás la notificación «Zancada está grabando»). En la web, deja la pantalla encendida.'],
+  ['Tiempo final', 'la pantalla de fin de carrera ya enseña el tiempo de verdad, no 0:00.'],
   ['Zeta, tu entrenador IA', 'el botón redondo de la esquina: tócalo y pregúntale lo que quieras. Conoce tu plan, tus carreras y tus récords.'],
   ['Recorrido animado', 'al abrir una ruta, el mapa te la recorre en unos segundos para que veas por dónde vas a ir. Tócalo para moverte tú.'],
   ['Fotos de cada ruta', 'solo paisaje: cómo es el parque, el camino, la montaña o el río.'],

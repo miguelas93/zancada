@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.58 (31 oct 2026)
+
+- **GPS con la pantalla apagada (APK).** Hasta ahora la app pedía la ubicación con el GPS del navegador (Geolocation API, `watchPosition`), que deja de dar posiciones en cuanto se bloquea el móvil o pasas a otra app: por eso salían rectas largas y faltaban kilómetros. Durante la carrera, el APK usa ahora un servicio de Android en primer plano (plugin `@capacitor-community/background-geolocation`) que sigue grabando con la pantalla apagada; se ve la notificación «Zancada está grabando tu carrera». En la web no es posible: hay que dejar la pantalla encendida, y la app lo avisa al empezar.
+- **Puntos más fiables.** La hora de cada punto es la de la lectura del GPS, no la de llegada (antes, cuando Android entregaba varias lecturas de golpe, se tiraban por "simultáneas"). Se aceptan lecturas hasta ±50 m (antes ±40, que en parques con árboles tiraba muchas).
+- **Tiempo de la carrera.** El tiempo es el del cronómetro al terminar (sin pausas), no el del último punto GPS. Y la pantalla final enseñaba TIEMPO 0:00 por un fallo (escribía en el cronómetro de cinta oculto): arreglado.
+
 ## Novedades 0.57 (31 oct 2026)
 
 - **Recorrido animado en cada ruta.** Al abrir la ficha, el mapa se acerca a la salida y recorre el trazado en unos segundos (5–9 s según la longitud), con el km y la altura en una etiqueta; al acabar enseña la ruta entera. Se repite con «▶ Recorrido». Si tocas o arrastras el mapa, la animación se para y el mapa es tuyo (zoom, mover, satélite, ampliar).
