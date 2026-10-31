@@ -330,7 +330,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.42 · fuentes y aseos en la ruta · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.43 · Para hoy según tu plan · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1494,9 +1494,16 @@ let rtList = [], rtToday = null;
 function pickToday(list) {
   if (list.length < 2) return null;
   const week = Date.now() - 7 * 864e5, recent = new Set(runs.filter((r) => r.start > week && r.route?.id).map((r) => r.route.id));
+  // Si hoy toca sesión del plan, la propuesta se ajusta a sus km (una ruta de esa distancia o un bucle a 2–3 vueltas).
+  let ses = null; try { ses = plan ? planStatus(plan).flat().find((x) => x.state === 'today' && !x.run && x.type !== 'carrera') : null; } catch (e) {}
+  const goalKm = ses ? ses.m / 1000 : 0;
   const scored = list.map((r) => { const t = routeMeta(r).time / 60, why = []; let sc = 0;
+    if (goalKm) { const n = Math.round(goalKm / r.km);
+      if (Math.abs(r.km - goalKm) <= Math.max(0.6, goalKm * 0.15)) { sc += 3.5; why.push(`encaja con tu ${ses.title.toLowerCase()} de ${fmtKmS(ses.m)} km`); }
+      else if (r.loop !== false && n >= 2 && n <= 3 && Math.abs(n * r.km - goalKm) <= Math.max(0.6, goalKm * 0.12)) { sc += 2.5; why.push(`${n} vueltas = ${fmtKmS(n * r.km * 1000)} km, tu sesión de hoy`); }
+      else sc -= 1; }
     if (r.away != null) { if (r.away < 2) { sc += 3; why.push(fmtAway(r.away)); } else if (r.away < 6) { sc += 1.5; why.push(fmtAway(r.away)); } else sc -= r.away / 10; }
-    if (t >= 25 && t <= 50) { sc += 2; } why.push(`${Math.round(t)} min a tu ritmo`);
+    if (!goalKm && t >= 25 && t <= 50) { sc += 2; } why.push(`${Math.round(t)} min a tu ritmo`);
     if (recent.has(r.id)) sc -= 3; else if (!runs.some((x) => x.route?.id === r.id)) { sc += 1; why.push('aún no la has corrido'); } else why.push('ya la conoces');
     if (r.surf === 'tierra' || r.surf === 'mixto') { sc += .5; } if (r.surf) why.push(SURF[r.surf].toLowerCase());
     return { r, sc, why }; }).sort((a, b) => b.sc - a.sc);
