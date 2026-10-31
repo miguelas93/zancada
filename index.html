@@ -1288,11 +1288,13 @@ function renderList(list, empty) {
   const m = makeMap('routesMap', 'calles'); routesMapLayers.forEach((l) => m.removeLayer(l)); routesMapLayers = [];
   const all = [];
   list.forEach((r) => { if (!r.ll || r.ll.length < 2) return; const st = r.start ? [r.start.lat, r.start.lon] : r.ll[0]; all.push(st);
-    const line = L.polyline(r.ll, { color: INK, weight: 3, opacity: .55 }).addTo(m), mk = L.marker(st, { icon: L.divIcon({ className: '', html: `<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 6px;border-radius:15px;background:${INK};color:${VOLT};font:600 12px/1 ${getComputedStyle(document.body).fontFamily};white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35)"><span style="width:10px;height:10px;border-radius:5px;background:${VOLT}"></span>${String(r.km).replace('.', ',')} km</span>`, iconSize: [0, 30], iconAnchor: [15, 15] }), title: r.name }).addTo(m);
+    const big = L.divIcon({ className: '', html: `<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 6px;border-radius:15px;background:${INK};color:${VOLT};font:600 12px/1 ${getComputedStyle(document.body).fontFamily};white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35)"><span style="width:10px;height:10px;border-radius:5px;background:${VOLT}"></span>${String(r.km).replace('.', ',')} km</span>`, iconSize: [0, 30], iconAnchor: [15, 15] });
+    const line = L.polyline(r.ll, { color: INK, weight: 3, opacity: .55 }).addTo(m), mk = L.marker(st, { icon: m.getZoom() >= 13 ? big : dotIcon(VOLT, INK), title: r.name }).addTo(m); mk._big = big;
     mk.on('click', () => openRoute(r)); line.on('click', () => openRoute(r)); mk.bindTooltip(r.name, { direction: 'top', offset: [0, -14] }); routesMapLayers.push(line, mk); });
+  if (!m._zoomHook) { m._zoomHook = true; m.on('zoomend', () => { const z = m.getZoom() >= 13; routesMapLayers.forEach((l) => { if (l._big) l.setIcon(z ? l._big : dotIcon(VOLT, INK)); }); }); }
   if (rt.here) { routesMapLayers.push(L.marker([rt.here.lat, rt.here.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(m)); }
   $('#routesMapHint').textContent = list.length ? `${list.length} ruta${list.length === 1 ? '' : 's'} · toca un punto para ver la ficha` : 'Nada con esos filtros';
-  setTimeout(() => { m.invalidateSize(); if (all.length) m.fitBounds(all, { padding: [40, 40], maxZoom: 14 }); }, 80);
+  setTimeout(() => { m.invalidateSize(); if (all.length) m.fitBounds(all, { padding: [40, 40], maxZoom: 14 }); m.fire('zoomend'); }, 80);
 }
 $$('#routesView [data-view]').forEach((b) => b.onclick = () => { rt.view = b.dataset.view; renderRoutes(); });
 async function loadSuggestions() {
