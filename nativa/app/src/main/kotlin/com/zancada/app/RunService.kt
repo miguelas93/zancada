@@ -186,6 +186,7 @@ class RunService : LifecycleService() {
                 steps.stop(); sos.end(cele.run.dist, cele.run.dur)
                 clearLive()   // solo después de guardarla de verdad
                 Reminders.sync(this)
+                Hc.push(this)
                 RunBus.cele.value = cele
                 RunBus.state.value = RunUi(phase = Phase.DONE)
                 if (listening) { fused.removeLocationUpdates(callback); listening = false }

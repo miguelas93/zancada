@@ -50,4 +50,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     // Mapas: OpenStreetMap (calles) y Esri (satélite), sin clave ni cuenta.
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    // Health Connect: guardar las carreras como ejercicio (solo escritura).
+    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
 }
