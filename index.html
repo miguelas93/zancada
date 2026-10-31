@@ -329,7 +329,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.36 · evolución del ritmo · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.37 · calentamiento guiado · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -440,6 +440,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
     <button class="btn" id="startBtn" disabled>Empezar</button>
     <p id="prepHint" class="sub" style="margin:-6px 0 0;text-align:center;font-size:12px">Necesito permiso de ubicación para medir tu carrera.</p>
+    <button class="sub" id="warmBtn" style="font-size:13px;text-decoration:underline;align-self:center;margin-top:-4px">Calentar 3 min antes, guiado</button>
   </div>
 </section>
 
@@ -827,12 +828,21 @@ const STRETCHES = [
   ['Isquio derecho', 'Cambia: talón derecho arriba, espalda recta, sin forzar.'],
   ['Glúteo y cadera', 'Sentado o tumbado, cruza un tobillo sobre la rodilla contraria y acércala al pecho. Cambia de lado a la mitad.'],
 ];
-const stz = { i: 0, left: 40, timer: null, paused: false };
-function stShow() { const [n, h] = STRETCHES[stz.i]; $('#stStep').textContent = `Estiramiento ${stz.i + 1} de ${STRETCHES.length}`; $('#stName').textContent = n; $('#stHow').textContent = h; $('#stLeft').textContent = stz.left; $('#stTrack').style.width = ((40 - stz.left) / 40 * 100) + '%'; }
-function stGo(i) { if (i >= STRETCHES.length) { stStop(); speak('Listo. Buen trabajo.'); toast('Estiramientos hechos', 2500); return; } stz.i = i; stz.left = 40; stShow(); speak(`${STRETCHES[i][0]}. ${STRETCHES[i][1]}`); try { navigator.vibrate?.(120); } catch (e) {} }
+// Calentamiento dinámico antes de correr (NRC/Runna): 6 ejercicios de 30 s, sin estiramientos estáticos.
+const WARMUP = [
+  ['Andar rápido', 'Camina con brazos activos y zancada amplia para subir pulsaciones.'],
+  ['Elevación de rodillas', 'En el sitio, sube rodillas a la altura de la cadera con ritmo suave.'],
+  ['Talones al glúteo', 'Trota en el sitio llevando los talones hacia atrás, sin forzar.'],
+  ['Balanceo de piernas', 'Apóyate y balancea una pierna adelante y atrás; cambia a la mitad.'],
+  ['Círculos de cadera', 'Manos en la cintura, círculos amplios hacia un lado y luego al otro.'],
+  ['Skipping suave', 'Pasitos cortos y rápidos, apoyando la parte delantera del pie.'],
+];
+const stz = { i: 0, left: 40, timer: null, paused: false, list: STRETCHES, sec: 40, warm: false };
+function stShow() { const [n, h] = stz.list[stz.i]; $('#stStep').textContent = `${stz.warm ? 'Calentamiento' : 'Estiramiento'} ${stz.i + 1} de ${stz.list.length}`; $('#stName').textContent = n; $('#stHow').textContent = h; $('#stLeft').textContent = stz.left; $('#stTrack').style.width = ((stz.sec - stz.left) / stz.sec * 100) + '%'; }
+function stGo(i) { if (i >= stz.list.length) { stStop(); speak(stz.warm ? 'Calentamiento hecho. Cuando quieras, empieza.' : 'Listo. Buen trabajo.'); toast(stz.warm ? 'Calentamiento hecho' : 'Estiramientos hechos', 2500); return; } stz.i = i; stz.left = stz.sec; stShow(); speak(`${stz.list[i][0]}. ${stz.list[i][1]}`); try { navigator.vibrate?.(120); } catch (e) {} }
 function stStop() { clearInterval(stz.timer); stz.timer = null; $('#stretchModal').classList.remove('on'); }
-function stStart() { stz.paused = false; $('#stPause').textContent = 'Pausa'; $('#stretchModal').classList.add('on'); stGo(0); clearInterval(stz.timer); stz.timer = setInterval(() => { if (stz.paused) return; stz.left--; if (stz.left === 10 && stz.i === STRETCHES.length - 1) speak('Cambia de lado.'); if (stz.left <= 0) return stGo(stz.i + 1); stShow(); }, 1000); }
-$('#stretchBtn').onclick = stStart; $('#stretchBtn2').onclick = stStart;
+function stStart(warm) { stz.warm = warm === true; stz.list = stz.warm ? WARMUP : STRETCHES; stz.sec = stz.warm ? 30 : 40; stz.paused = false; $('#stPause').textContent = 'Pausa'; $('#stretchModal').classList.add('on'); stGo(0); clearInterval(stz.timer); stz.timer = setInterval(() => { if (stz.paused) return; stz.left--; if (!stz.warm && stz.left === 10 && stz.i === STRETCHES.length - 1) speak('Cambia de lado.'); if (stz.warm && stz.left === 15 && stz.i === 3) speak('Cambia de pierna.'); if (stz.left <= 0) return stGo(stz.i + 1); stShow(); }, 1000); }
+$('#stretchBtn').onclick = () => stStart(); $('#stretchBtn2').onclick = () => stStart(); $('#warmBtn').onclick = () => stStart(true);
 $('#stClose').onclick = stStop;
 $('#stSkip').onclick = () => stGo(stz.i + 1);
 $('#stPause').onclick = () => { stz.paused = !stz.paused; $('#stPause').textContent = stz.paused ? 'Seguir' : 'Pausa'; };
