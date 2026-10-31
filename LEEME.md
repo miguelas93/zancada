@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.11 (madrugada del 31 de octubre)
+- **Texto más grande** (ajuste en Perfil) para leer mejor en carrera o con sol. Tamaños mínimos subidos (pestañas, insignias) y contorno visible al navegar con teclado o lector.
+- **Desnivel en tus carreras**: la app guarda la altitud del GPS (y el `<ele>` de los GPX importados) y calcula el desnivel positivo con filtro de ruido; sale en el resumen y en Mis recorridos.
+- **Aviso de carga**: si una semana llevas más de un 35 % de km sobre tu media de las cuatro anteriores, la lectura de la carrera te lo dice (regla del 10 %).
+- El resumen se abre siempre desde arriba.
+
 ## Novedades 0.10 (madrugada del 31 de octubre)
 - **Importar carreras GPX** (Perfil → Tus datos): trae tu historial de Strava, Garmin o cualquier app que exporte GPX (varios archivos a la vez). Se calculan parciales y mejores marcas como si fueran carreras propias; las repetidas se saltan.
 - **Añadir una carrera a mano** (Actividad): cinta o reloj sin GPS. Cuenta para la semana, el plan, las insignias y las zapatillas; sin mapa ni parciales.
