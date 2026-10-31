@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.55 (31 oct 2026)
+
+- **Rutas arregladas en la APK.** El archivo con las rutas recomendadas (`routes-data.js`) no se copiaba al paquete Android, así que en la app la lista y el mapa salían vacíos con cualquier filtro. En la web sí funcionaba. Ya se copia, y el build de la APK falla si falta cualquier script o estilo que pida la app.
+- **Filtros más simples.** Arriba solo zona y tiempo disponible. Suelo y orden van en «Más filtros» (el enlace muestra cuántos tienes puestos).
+- **Nunca más una lista vacía sin salida.** Si un filtro no da resultados, la tarjeta dice cuántas rutas hay en la zona y trae el botón «Quitar filtros» (también en el mapa). Si las rutas no cargan, lo dice claramente.
+
 ## Novedades 0.54 (31 oct 2026)
 
 - **Predicción en el plan**: si tu plan es para un 5K, 10K o media, la pantalla del plan te dice en qué tiempo saldría tu carrera con tu forma de hoy y a qué ritmo, con la misma fórmula que "Tus ritmos".

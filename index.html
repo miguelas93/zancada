@@ -332,7 +332,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.54 · predicción en el plan · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.55 · rutas arregladas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -345,8 +345,13 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <button class="chipb on" data-mode="rec">Recomendadas</button><button class="chipb" data-mode="mine">Mis recorridos</button><button class="chipb" data-mode="sug">Bucle desde aquí</button>
     </div>
     <div class="col" id="routesFilters" style="gap:8px">
-      <div style="display:flex;gap:8px;align-items:center"><div class="chips fl" id="routesZone" style="flex:1"></div><select class="sel" id="routesSort" aria-label="Ordenar rutas" style="flex:none"><option value="near">Más cerca</option><option value="short">Más corta</option><option value="long">Más larga</option><option value="flat">Más llana</option><option value="new">Sin estrenar</option></select></div>
-      <div class="chips fl" id="routesDist"><span class="sub" style="font-size:12px;align-self:center;margin-right:2px">¿Cuánto tiempo tienes?</span><button class="chipb on" data-dist="all">Da igual</button><button class="chipb" data-dist="t20">20 min</button><button class="chipb" data-dist="t30">30 min</button><button class="chipb" data-dist="t45">45 min</button><button class="chipb" data-dist="t60">Más de 45</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
+      <div class="chips" id="routesZone" style="margin:0 -20px;padding:0 20px"></div>
+      <div class="chips" id="routesDist" style="margin:0 -20px;padding:0 20px"><button class="chipb on" data-dist="all">Cualquier tiempo</button><button class="chipb" data-dist="t20">20 min</button><button class="chipb" data-dist="t30">30 min</button><button class="chipb" data-dist="t45">45 min</button><button class="chipb" data-dist="t60">Más de 45</button></div>
+      <button class="sub" id="routesMoreF" style="align-self:flex-start;background:none;border:0;padding:2px 0;font:inherit;font-size:13px;text-decoration:underline;color:var(--sub)">Más filtros</button>
+      <div id="routesMoreBox" class="col" style="gap:8px;display:none">
+        <div class="chips fl" id="routesSurf"><button class="chipb on" data-surf="all">Cualquier suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></div>
+        <select class="sel" id="routesSort" aria-label="Ordenar rutas" style="align-self:flex-start"><option value="near">Más cerca primero</option><option value="short">Más corta</option><option value="long">Más larga</option><option value="flat">Más llana</option><option value="new">Sin estrenar</option></select>
+      </div>
     </div>
     <div id="mineTools" style="display:none"><button class="btn ghost" id="routeGpxBtn" style="height:40px;font-size:13px">Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)</button><input type="file" id="routeGpx" accept=".gpx,application/gpx+xml" style="display:none"></div>
     <div class="chips fl" id="routesKm" style="display:none"><button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button></div>
@@ -1435,7 +1440,7 @@ function updateGuide() {
 // Rutas v2: lista con filtros y minimapas, ficha completa y trazados fijos (routes-data.js, calculados con BRouter sobre OpenStreetMap).
 // El enrutador externo (Valhalla) solo se usa para "Bucle desde aquí".
 const ROUTER = 'https://valhalla1.openstreetmap.de';
-const rt = { sort: 'near', view: 'list', mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
+const rt = { sort: 'near', view: 'list', mode: 'rec', km: 5, zone: null, dist: 'all', surf: 'all', more: false, here: null, sug: [], token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
 let pickedRoute = null, detailRoute = null;
 function decodePoly6(str) {
   const out = []; let i = 0, lat = 0, lon = 0;
@@ -1512,6 +1517,8 @@ function recList() {
   return S[rt.sort] ? out.sort(S[rt.sort]) : out;
 }
 $('#routesSort').onchange = (e) => { rt.sort = e.target.value; renderRoutes(); };
+$('#routesMoreF').onclick = () => { rt.more = !rt.more; renderRoutes(); };
+function clearRouteFilters() { rt.dist = 'all'; rt.surf = 'all'; rt.sort = 'near'; $('#routesSort').value = 'near'; renderRoutes(); }
 function myRoutes() {
   const fromRuns = runs.filter((r) => r.points?.length > 5 && r.dist > 500).slice(0, 20).map((r) => ({ id: 'run-' + r.id, name: r.name, sub: fmtDate(r.start), ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: r.gain ?? null, src: 'run' }));
   return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
@@ -1568,7 +1575,13 @@ function renderRoutes() {
     $$('#routesSurf [data-surf]').forEach((b) => b.classList.toggle('on', b.dataset.surf === rt.surf));
     rtList = recList();
     rtToday = rt.view === 'list' && rt.dist === 'all' && rt.surf === 'all' ? pickToday(rtList) : null;
-    renderList(rtList, rtList.length ? '' : '<div class="card col" style="gap:6px"><b style="font-weight:600">Nada con esos filtros</b><span class="sub">Prueba otra distancia o suelo. Las rutas están investigadas para Madrid y San Fernando; si quieres otra zona, dímelo.</span></div>');
+    const extra = (rt.surf !== 'all' ? 1 : 0) + (rt.sort !== 'near' ? 1 : 0);
+    $('#routesMoreBox').style.display = rt.more ? '' : 'none'; $('#routesMoreF').textContent = rt.more ? 'Menos filtros' : 'Más filtros' + (extra ? ` (${extra})` : '');
+    const empty = !ZR.length ? '<div class="card col" style="gap:6px"><b style="font-weight:600">No se han podido cargar las rutas</b><span class="sub">Cierra la app y vuelve a abrirla. Si sigue igual, avísame desde Perfil › Avisar de un fallo.</span></div>'
+      : '<div class="card col" style="gap:10px"><b style="font-weight:600">Ninguna ruta con esos filtros</b><span class="sub">Hay ' + ZR.filter((r) => zone === 'cerca' ? rt.here && haversine(rt.here, r.start) < 40000 : r.city === zone).length + ' rutas en esta zona con otro tiempo o suelo.</span><button class="btn" id="routesClear" style="height:44px;font-size:14px">Quitar filtros</button></div>';
+    renderList(rtList, rtList.length ? '' : empty);
+    const cb = $('#routesClear'); if (cb) cb.onclick = clearRouteFilters;
+    if (rt.view === 'map' && !rtList.length) $('#routesMapHint').innerHTML = 'Ninguna ruta con esos filtros · <u id="routesClear2">quitar filtros</u>', $('#routesClear2').onclick = clearRouteFilters;
     return;
   }
   if (rt.mode === 'mine') { rtList = withAway(myRoutes()); renderList(rtList, '<div class="card col" style="gap:6px"><b style="font-weight:600">Aún no tienes recorridos</b><span class="sub">Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.</span></div>'); return; }
@@ -2293,7 +2306,8 @@ applyTheme(); reviewPlan();
 history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
-const NEWS_VER = '0.50', NEWS = [
+const NEWS_VER = '0.55', NEWS = [
+  ['Rutas arregladas', 'ya salen todas las rutas recomendadas en la app. Filtros más simples: zona y tiempo; suelo y orden en «Más filtros».'],
   ['Rutas', 'Para hoy según tu plan, filtro por tiempo, ordenar, fuentes y aseos en el mapa, metro cercano, tu historial en cada ruta e importar GPX.'],
   ['Entrenador IA', 'eliges una pregunta en el plan y se abre ChatGPT o Claude con tu contexto ya escrito.'],
   ['Correr', 'objetivo en carrera libre, avisos de ritmo, ánimos por voz, calentamiento guiado, modo cinta sin GPS y avisar a alguien antes de salir.'],
