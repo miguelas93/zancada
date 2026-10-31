@@ -268,6 +268,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div id="paces" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus ritmos</h2><span class="sub" style="font-size:12px" id="pacesSub"></span></div><div class="stats" id="pacesPred"></div><div class="stats" id="pacesTrain"></div></div>
     <div id="records" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus récords</h2><span class="sub" style="font-size:12px">toca uno para ver la carrera</span></div><div id="recGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
     <button class="btn ghost" id="manualBtn" style="height:44px;font-size:14px">Añadir una carrera a mano (cinta, reloj…)</button>
+    <button class="card between" id="weekShareBtn" style="width:100%;text-align:left;padding:16px 18px 16px 20px"><span><span style="display:block;font-weight:600;font-size:16px">Compartir tu semana</span><span class="sub" style="font-size:12px">Una imagen con tus km, salidas y días de esta semana</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></button>
     <button class="card between" id="heatBtn" style="width:100%;text-align:left;padding:16px 18px 16px 20px"><span><span style="display:block;font-weight:600;font-size:16px">Mapa de todas tus carreras</span><span class="sub" style="font-size:12px" id="heatBtnSub">Tus recorridos superpuestos: donde más corres</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></button>
     <div class="chips fl" id="histChips" style="margin:0 -20px;padding:0 20px"><button class="chipb on" data-hf="all">Todas</button><button class="chipb" data-hf="plan">Del plan</button><button class="chipb" data-hf="route">Con ruta</button><button class="chipb" data-hf="long">Largas</button><button class="chipb" data-hf="note">Con notas</button></div>
     <input id="histSearch" type="search" placeholder="Buscar por nombre, ruta o notas" aria-label="Buscar carreras" style="display:none;height:44px;border-radius:14px;border:1px solid var(--line);padding:0 14px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px">
@@ -329,7 +330,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.38 · rutas con tu historial · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.39 · compartir tu semana · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -857,6 +858,36 @@ $('#manualForm').onsubmit = (e) => {
   runs.push(r); runs.sort((a, b) => b.start - a.start); save(KEY, runs); reviewPlan(); syncReminders();
   $('#manualModal').classList.remove('on'); $('#manualForm').reset(); toast('Carrera añadida'); renderHistory();
 };
+// Compartir la semana como imagen (Strava/NRC "resumen semanal"): km, salidas, tiempo, desnivel y barras por día.
+async function shareWeek() {
+  const ws = weekStart(Date.now()), wr = runs.filter((r) => r.start >= ws);
+  if (!wr.length) return toast('Cuando corras esta semana, podrás compartirla');
+  try { await document.fonts.ready; } catch (e) {}
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const disp = '"Space Grotesk", "Inter", system-ui, sans-serif', body = '"Inter", system-ui, sans-serif', fg = '#F4F5F0', mut = 'rgba(244,245,240,.6)';
+  const dist = wr.reduce((a, r) => a + r.dist, 0), dur = wr.reduce((a, r) => a + r.dur, 0), gain = wr.reduce((a, r) => a + (r.gain || 0), 0);
+  const day = [0, 0, 0, 0, 0, 0, 0]; wr.forEach((r) => { day[(new Date(r.start).getDay() + 6) % 7] += r.dist / 1000; });
+  const fmtD = (t) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  x.fillStyle = INK; x.fillRect(0, 0, W, H); x.textBaseline = 'alphabetic';
+  x.fillStyle = fg; x.font = `700 44px ${disp}`; x.fillText('Zancada', 90, 130);
+  x.fillStyle = mut; x.font = `500 30px ${body}`; x.fillText(`Mi semana · ${fmtD(ws)} – ${fmtD(ws + 6 * 864e5)}`, 90, 180);
+  x.fillStyle = fg; x.font = `700 230px ${disp}`; const kmTxt = fmtKm(dist); x.fillText(kmTxt, 80, 480);
+  const kw = x.measureText(kmTxt).width; x.fillStyle = mut; x.font = `600 64px ${body}`; x.fillText('km', 96 + kw + 12, 480);
+  const mx = Math.max(1, ...day), bw = 96, gap = (900 - 7 * bw) / 6, base = 960, bh = 340;
+  'LMXJVSD'.split('').forEach((l, i) => {
+    const bx = 90 + i * (bw + gap), h = day[i] ? Math.max(16, day[i] / mx * bh) : 8;
+    x.fillStyle = day[i] ? VOLT : 'rgba(244,245,240,.14)'; x.beginPath(); if (x.roundRect) x.roundRect(bx, base - h, bw, h, 14); else x.rect(bx, base - h, bw, h); x.fill();
+    if (day[i]) { x.fillStyle = fg; x.font = `700 30px ${disp}`; const t = day[i].toFixed(1).replace('.', ','); x.fillText(t, bx + (bw - x.measureText(t).width) / 2, base - h - 16); }
+    x.fillStyle = mut; x.font = `600 28px ${body}`; x.fillText(l, bx + (bw - x.measureText(l).width) / 2, base + 46);
+  });
+  const cells = [['Salidas', String(wr.length)], ['Tiempo', fmtTime(dur)], ['Desnivel', Math.round(gain) + ' m']];
+  cells.forEach(([l, v], i) => { const cx = 90 + i * 310; x.fillStyle = 'rgba(244,245,240,.5)'; x.font = `600 24px ${body}`; x.fillText(l.toUpperCase(), cx, 1140); x.fillStyle = i === 0 ? VOLT : fg; x.font = `700 64px ${disp}`; x.fillText(v, cx, 1215); });
+  x.fillStyle = mut; x.font = `500 26px ${body}`; x.fillText(`Ritmo medio ${fmtPace(dur / (dist / 1000))} /km`, 90, 1300);
+  const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
+  await shareOrDownload(blob, `zancada-semana-${new Date(ws).toISOString().slice(0, 10)}.png`, `Mi semana con Zancada: ${fmtKm(dist)} km en ${wr.length} salida${wr.length === 1 ? '' : 's'} 🏃`);
+  return c.toDataURL('image/png');
+}
+$('#weekShareBtn').onclick = () => shareWeek();
 $('#heatBtn').onclick = () => { if (!runs.some((r) => r.points?.length > 1)) return toast('Cuando tengas carreras, aquí verás todas juntas'); go('heat'); };
 function renderHeat() {
   const m = makeMap('heatMap', 'calles'); heatLayers.forEach((l) => m.removeLayer(l)); heatLayers = [];
