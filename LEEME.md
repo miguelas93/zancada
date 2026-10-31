@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.31 (31 oct 2026)
+- Avisos de ritmo en sesiones guiadas (plan y tramos): la tarjeta de guía muestra el ritmo objetivo del tramo ("~6:03/km") y, si llevas 20 s fuera de margen, la voz te dice "Vas rápido, afloja a…" o "Un poco lento, sube a…" (como mucho una vez por minuto). Se puede desactivar en Perfil. No se usa en corre/anda.
+
 ## Novedades 0.30 (31 oct 2026)
 - Arreglos tras una revisión a fondo:
   - Los tramos por tiempo (corre/anda, fartlek) se daban por "a medias" si no llegabas a unos km estimados; ahora cuentan por minutos ("12 de 29 min").
