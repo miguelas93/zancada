@@ -170,6 +170,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="stretchModal" role="dialog" aria-modal="true" aria-label="Estiramientos y calentamiento guiados"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl" id="stStep">Estiramientos</span><button class="sub" id="stClose" style="font-size:13px;text-decoration:underline">Cerrar</button></div><h1 style="font-size:28px" id="stName">—</h1><p class="sub" id="stHow" style="margin:0;font-size:15px;line-height:1.45"></p><div style="display:flex;align-items:baseline;gap:6px"><span class="num" id="stLeft" style="font-size:72px;letter-spacing:-.04em">40</span><span class="unit">s</span></div><div class="track"><i id="stTrack" style="width:0"></i></div><div style="display:flex;gap:8px"><button class="btn sec" id="stPause" style="height:48px;font-size:15px;flex:1">Pausa</button><button class="btn sec" id="stSkip" style="height:48px;font-size:15px;flex:1">Siguiente</button></div><p class="sub" style="margin:0;font-size:11px">Suave y sin rebotes: tensión, nunca dolor.</p></div></div>
+<div class="modal" id="newsModal" role="dialog" aria-modal="true" aria-label="Novedades"><div class="card col" style="gap:12px;width:100%;max-width:520px;margin:0 auto;max-height:86vh;overflow:auto"><span class="lbl" id="newsVer">Novedades</span><h1 style="font-size:26px">Esta noche, Zancada ha cambiado mucho</h1><ul id="newsList" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px;font-size:15px;line-height:1.4"></ul><div style="display:flex;gap:8px"><a class="btn sec" id="newsAll" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="height:48px;font-size:14px;text-decoration:none;flex:1;width:auto;min-width:0;padding:0 8px">Ver todo</a><button class="btn" id="newsOk" style="height:48px;font-size:15px;flex:1;width:auto;min-width:0;padding:0 8px">A correr</button></div></div></div>
 <div class="modal" id="cintaModal" role="dialog" aria-modal="true" aria-label="Cronómetro de cinta"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl">Cinta · sin GPS</span><button class="sub" id="cClose" style="font-size:13px;text-decoration:underline">Cancelar</button></div><span class="num" id="cTime" style="font-size:84px;letter-spacing:-.04em;text-align:center">0:00</span><p class="sub" id="cHint" style="margin:0;text-align:center;font-size:14px">Te aviso por voz cada 5 minutos. Al terminar, apunta los km que marca la cinta.</p><div style="display:flex;gap:8px"><button class="btn sec" id="cPause" style="height:52px;font-size:15px;flex:1">Pausa</button><button class="btn" id="cEnd" style="height:52px;font-size:15px;flex:1">Terminar</button></div></div></div>
 <div class="modal" id="manualModal" role="dialog" aria-modal="true" aria-label="Añadir carrera a mano"><form class="card col" style="gap:12px" id="manualForm">
     <h2>Carrera a mano</h2><p class="sub" style="margin:0;font-size:13px">Para la cinta o una carrera medida con el reloj. Sin mapa ni parciales, pero cuenta para la semana, el plan, las insignias y las zapatillas.</p>
@@ -331,7 +332,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.49 · revisión y accesibilidad · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.50 · novedades al abrir · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -701,7 +702,7 @@ function showWStep() {
   if (wStep === 3) { $('#wDone').textContent = n ? `Listo, ${n}.` : 'Listo.'; $('#wDoneText').textContent = `Objetivo: ${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana seguida. Pulsa el botón lima cuando quieras salir; en Perfil tienes insignias, zapatillas y copia de seguridad.`; }
   $('#wNext').textContent = wStep === 0 ? 'Continuar' : wStep === 1 ? 'Ese es mi objetivo' : wStep === 2 ? 'Vale' : 'Empezar';
 }
-$('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 3) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); go('home'); };
+$('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 3) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); settings.newsSeen = NEWS_VER; save(SET, settings); go('home'); };
 $('#wName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#wNext').click(); });
 $$('#wLevel [data-lvl]').forEach((b) => b.onclick = () => { $$('#wLevel [data-lvl]').forEach((x) => x.classList.toggle('on', x === b)); settings.startSeen = b.dataset.lvl === 'corro' ? '1' : '0'; save(SET, settings); });
 $$('#welcome [data-goal]').forEach((b) => b.onclick = () => { profile.goal = Number(b.dataset.goal); $$('#welcome [data-goal]').forEach((x) => x.classList.toggle('on', x === b)); });
@@ -2256,6 +2257,19 @@ $('#repClose').onclick = () => { cancelAnimationFrame(rep.raf); openSummary(curr
 applyTheme(); reviewPlan();
 history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
+// "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
+const NEWS_VER = '0.50', NEWS = [
+  ['Rutas', 'Para hoy según tu plan, filtro por tiempo, ordenar, fuentes y aseos en el mapa, tu historial en cada ruta e importar GPX.'],
+  ['Entrenador IA', 'eliges una pregunta en el plan y se abre ChatGPT o Claude con tu contexto ya escrito.'],
+  ['Correr', 'objetivo en carrera libre, avisos de ritmo, ánimos por voz, calentamiento guiado y modo cinta sin GPS.'],
+  ['Al terminar', 'estiramientos guiados, récords y comparación, ritmo en el mapa y cómo repartiste el esfuerzo.'],
+  ['Actividad', 'calendario, retos del mes, evolución del ritmo, tus ritmos, récords, buscador y compartir tu semana.'],
+  ['Plan', 'añádelo a tu calendario con alarma, y corre/anda para empezar de cero.'],
+];
+function showNews() { if (!profile.done || settings.newsSeen === NEWS_VER) return; $('#newsVer').textContent = `Novedades · beta ${NEWS_VER}`; $('#newsList').innerHTML = NEWS.map(([t, d]) => `<li><b style="font-weight:600">${t}</b>: ${d}</li>`).join(''); $('#newsModal').classList.add('on'); }
+const newsDone = () => { settings.newsSeen = NEWS_VER; save(SET, settings); $('#newsModal').classList.remove('on'); };
+$('#newsOk').onclick = newsDone; $('#newsAll').addEventListener('click', newsDone);
+setTimeout(showNews, 700);
 syncReminders();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
