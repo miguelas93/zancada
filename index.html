@@ -316,7 +316,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.15 · objetivo en carrera libre · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.16 · rutas por tiempo · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -330,7 +330,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     </div>
     <div class="col" id="routesFilters" style="gap:8px">
       <div class="chips fl" id="routesZone"></div>
-      <div class="chips fl" id="routesDist"><button class="chipb on" data-dist="all">Todas</button><button class="chipb" data-dist="s">&lt; 4 km</button><button class="chipb" data-dist="m">4 – 8 km</button><button class="chipb" data-dist="l">&gt; 8 km</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
+      <div class="chips fl" id="routesDist"><span class="sub" style="font-size:12px;align-self:center;margin-right:2px">¿Cuánto tiempo tienes?</span><button class="chipb on" data-dist="all">Da igual</button><button class="chipb" data-dist="t20">20 min</button><button class="chipb" data-dist="t30">30 min</button><button class="chipb" data-dist="t45">45 min</button><button class="chipb" data-dist="t60">Más de 45</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
     </div>
     <div class="chips fl" id="routesKm" style="display:none"><button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button></div>
     <div id="routesMapWrap" class="map" style="display:none;height:58vh;border-radius:24px;flex:none"><div id="routesMap" style="position:absolute;inset:0"></div><p class="sub" id="routesMapHint" style="position:absolute;left:12px;right:12px;bottom:10px;margin:0;z-index:1000;background:var(--surface);border-radius:12px;padding:8px 12px;font-size:12px;text-align:center">Toca un punto para ver la ruta</p></div>
@@ -1247,7 +1247,9 @@ function withAway(list) { if (rt.here) list.forEach((r) => { r.away = haversine(
 function recList() {
   const zone = rt.zone || nearCity() || 'madrid';
   let list = ZR.filter((r) => zone === 'cerca' ? rt.here && haversine(rt.here, r.start) < 40000 : r.city === zone);
-  if (rt.dist === 's') list = list.filter((r) => r.km < 4); else if (rt.dist === 'm') list = list.filter((r) => r.km >= 4 && r.km <= 8); else if (rt.dist === 'l') list = list.filter((r) => r.km > 8);
+  // Filtro por tiempo disponible a tu ritmo (Komoot/Runna): 20 → hasta 25 min, 30 → 25–38, 45 → 38–55, 60 → más de 55.
+  const TB = { t20: [0, 25], t30: [22, 38], t45: [36, 50], t60: [48, 1e9] };
+  if (TB[rt.dist]) { const [a, b] = TB[rt.dist]; list = list.filter((r) => { const t = routeMeta(r).time / 60; return t >= a && t <= b; }); }
   if (rt.surf !== 'all') list = list.filter((r) => r.surf === rt.surf);
   return withAway(list.map((r) => Object.assign({}, r)));
 }
@@ -1260,7 +1262,24 @@ function routeCard(r, i) {
   const m = routeMeta(r), sub = r.src === 'rec' ? `${r.zone}${r.away != null ? ' · ' + fmtAway(r.away) : ''}` : r.src === 'sug' ? `Desde tu ubicación${r.away != null && r.away > 0.05 ? ' · ' + fmtAway(r.away) : ''}` : r.sub || '';
   return `<button class="rlist" data-open="${i}"><span class="rmini">${routeSvg(r.ll)}</span><span class="rbody"><b>${r.name}</b><span class="sub">${sub}</span><span class="rmeta"><span class="num" style="font-size:20px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span><span class="sub">·</span><span>${r.gain == null ? '—' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span>${fmtDur(m.time)}</span></span><span class="rtags"><span class="chip ${m.diff[1]}">${m.diff[0]}</span>${r.surf ? `<span class="tag">${SURF[r.surf] || r.surface}</span>` : ''}${r.loop === false ? '<span class="tag">Ida y vuelta</span>' : ''}</span></span></button>`;
 }
-let rtList = [];
+let rtList = [], rtToday = null;
+// "Para hoy": una propuesta razonada entre las recomendadas (cerca, 25–50 min a tu ritmo, que no hayas corrido esta semana); cambia cada día.
+function pickToday(list) {
+  if (list.length < 2) return null;
+  const week = Date.now() - 7 * 864e5, recent = new Set(runs.filter((r) => r.start > week && r.route?.id).map((r) => r.route.id));
+  const scored = list.map((r) => { const t = routeMeta(r).time / 60, why = []; let sc = 0;
+    if (r.away != null) { if (r.away < 2) { sc += 3; why.push(fmtAway(r.away)); } else if (r.away < 6) { sc += 1.5; why.push(fmtAway(r.away)); } else sc -= r.away / 10; }
+    if (t >= 25 && t <= 50) { sc += 2; } why.push(`${Math.round(t)} min a tu ritmo`);
+    if (recent.has(r.id)) sc -= 3; else if (!runs.some((x) => x.route?.id === r.id)) { sc += 1; why.push('aún no la has corrido'); } else why.push('ya la conoces');
+    if (r.surf === 'tierra' || r.surf === 'mixto') { sc += .5; } if (r.surf) why.push(SURF[r.surf].toLowerCase());
+    return { r, sc, why }; }).sort((a, b) => b.sc - a.sc);
+  const day = Math.floor(Date.now() / 864e5), top = scored.slice(0, Math.min(3, scored.length)).filter((x) => x.sc >= scored[0].sc - 1.5);
+  return top[day % top.length];
+}
+function todayCard(t) {
+  const r = t.r;
+  return `<div class="card col dark" style="gap:12px"><div class="between"><span class="lbl" style="color:${VOLT}">Para hoy</span><span class="sub" style="opacity:.65;color:inherit">${r.zone}</span></div><div style="display:flex;gap:14px;align-items:center"><span class="rmini" style="background:rgba(127,127,127,.18);color:inherit">${routeSvg(r.ll)}</span><div class="col" style="gap:4px;min-width:0"><b style="font-size:19px;font-weight:600;line-height:1.15">${r.name}</b><span class="sub" style="opacity:.7;color:inherit;font-size:13px">${t.why.join(' · ')}</span></div></div><div style="display:flex;gap:8px"><button class="btn" id="todayRun" style="height:44px;font-size:14px;flex:1">Correrla</button><button class="btn ghost" id="todayOpen" style="height:44px;font-size:14px;flex:none;width:auto;padding:0 18px;background:rgba(127,127,127,.18);color:inherit">Ver ficha</button></div></div>`;
+}
 function renderRoutes() {
   $$('#routesChips [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rt.mode));
   $('#routesFilters').style.display = rt.mode === 'rec' ? '' : 'none';
@@ -1274,6 +1293,7 @@ function renderRoutes() {
     $$('#routesDist [data-dist]').forEach((b) => b.classList.toggle('on', b.dataset.dist === rt.dist));
     $$('#routesSurf [data-surf]').forEach((b) => b.classList.toggle('on', b.dataset.surf === rt.surf));
     rtList = recList();
+    rtToday = rt.view === 'list' && rt.dist === 'all' && rt.surf === 'all' ? pickToday(rtList) : null;
     renderList(rtList, rtList.length ? '' : '<div class="card col" style="gap:6px"><b style="font-weight:600">Nada con esos filtros</b><span class="sub">Prueba otra distancia o suelo. Las rutas están investigadas para Madrid y San Fernando; si quieres otra zona, dímelo.</span></div>');
     return;
   }
@@ -1285,7 +1305,7 @@ function renderList(list, empty) {
   const asMap = rt.view === 'map' && rt.mode !== 'sug';
   $('#routesView').style.display = rt.mode === 'sug' ? 'none' : ''; $$('#routesView [data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === (asMap ? 'map' : 'list')));
   $('#routesMapWrap').style.display = asMap ? '' : 'none'; $('#routesList').style.display = asMap ? 'none' : '';
-  if (!asMap) { $('#routesList').innerHTML = list.length ? list.map(routeCard).join('') : empty; $$('#routesList [data-open]').forEach((b) => b.onclick = () => openRoute(list[Number(b.dataset.open)])); return; }
+  if (!asMap) { $('#routesList').innerHTML = (rtToday ? todayCard(rtToday) : '') + (list.length ? list.map(routeCard).join('') : empty); $$('#routesList [data-open]').forEach((b) => b.onclick = () => openRoute(list[Number(b.dataset.open)])); const td = rtToday; rtToday = null; const tb = $('#todayOpen'); if (tb) tb.onclick = () => openRoute(td.r); const tr = $('#todayRun'); if (tr) tr.onclick = () => { pickedRoute = td.r; go('prep'); }; return; }
   const m = makeMap('routesMap', 'calles'); routesMapLayers.forEach((l) => m.removeLayer(l)); routesMapLayers = [];
   const all = [];
   list.forEach((r) => { if (!r.ll || r.ll.length < 2) return; const st = r.start ? [r.start.lat, r.start.lon] : r.ll[0]; all.push(st);
