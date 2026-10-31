@@ -13,6 +13,9 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.32 (31 oct 2026)
+- Estiramientos guiados de 5 minutos al terminar (pantalla de fin de carrera y resumen): 7 posturas de 40 s (gemelos, cuádriceps, isquios, glúteo) con explicación, cuenta atrás, voz y vibración al cambiar. Se puede pausar o saltar.
+
 ## Novedades 0.31 (31 oct 2026)
 - Avisos de ritmo en sesiones guiadas (plan y tramos): la tarjeta de guía muestra el ritmo objetivo del tramo ("~6:03/km") y, si llevas 20 s fuera de margen, la voz te dice "Vas rápido, afloja a…" o "Un poco lento, sube a…" (como mucho una vez por minuto). Se puede desactivar en Perfil. No se usa en corre/anda.
 
