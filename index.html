@@ -263,6 +263,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weeksBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
     <div id="months" class="card col" style="gap:10px;padding:18px 20px;display:none"><div class="between"><h2>Por meses</h2><span class="sub" style="font-size:12px" id="monthsSub"></span></div><div id="monthsList" class="col" style="gap:8px"></div></div>
     <div id="monthGoal" class="card col" style="gap:10px;padding:16px 20px;display:none"></div>
+    <div id="challenges" class="card col" style="gap:12px;padding:16px 20px"></div>
     <div id="paces" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus ritmos</h2><span class="sub" style="font-size:12px" id="pacesSub"></span></div><div class="stats" id="pacesPred"></div><div class="stats" id="pacesTrain"></div></div>
     <div id="records" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus récords</h2><span class="sub" style="font-size:12px">toca uno para ver la carrera</span></div><div id="recGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
     <button class="btn ghost" id="manualBtn" style="height:44px;font-size:14px">Añadir una carrera a mano (cinta, reloj…)</button>
@@ -327,7 +328,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.34 · ordenar rutas · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.35 · retos del mes · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -799,7 +800,7 @@ function renderHistory() {
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
-  renderCalendar(); renderMonthGoal(dist, now, days); renderRecords(); renderPaces(); renderMonths();
+  renderCalendar(); renderMonthGoal(dist, now, days); renderChallenges(mr, now, days); renderRecords(); renderPaces(); renderMonths();
   const best = runs.length ? Math.max(...runs.map((r) => r.dist)) : 0;
   const HF = { all: () => true, plan: (r) => r.session, route: (r) => r.route, long: (r) => r.dist >= 8000, note: (r) => r.note || r.feel };
   const q = ($('#histSearch').value || '').trim().toLowerCase(); $('#histSearch').style.display = runs.length >= 6 || q ? '' : 'none';
@@ -913,6 +914,20 @@ function renderRecords() {
   const box = $('#records'), recs = personalRecords(); box.style.display = recs.length ? '' : 'none'; if (!recs.length) return;
   $('#recGrid').innerHTML = recs.map((x, i) => `<button data-rec="${i}" style="text-align:left;background:var(--surface2);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;color:var(--ink)"><span class="lbl" style="font-size:10px">${x.label}</span><span class="num" style="font-size:22px">${x.val}</span><span class="sub" style="font-size:11px">${x.r ? fmtDate(x.r.start).split(' · ')[0] : 'objetivo semanal'}</span></button>`).join('');
   $$('#recGrid [data-rec]').forEach((b) => b.onclick = () => { const r = recs[Number(b.dataset.rec)].r; if (r) openSummary(r.id); });
+}
+// Retos del mes (Strava Challenges / NRC): cuatro retos que se reinician cada mes, más suaves si empiezas de cero.
+function renderChallenges(mr, now, days) {
+  const easy = settings.startSeen !== '1', longKm = easy ? 3 : 5;
+  const routes = new Set(mr.map((r) => r.route?.id).filter((id) => id && !String(id).startsWith('run-')));
+  const L = [
+    ['Constancia', `${easy ? 6 : 8} salidas este mes`, mr.length, easy ? 6 : 8, (v) => `${v}`],
+    ['Tirada larga', `Una carrera de ${longKm} km o más`, Math.max(0, ...mr.map((r) => r.dist / 1000)), longKm, (v) => v.toFixed(1).replace('.', ',') + ' km'],
+    ['Explorador', '2 rutas recomendadas distintas', routes.size, 2, (v) => `${v}`],
+    ['Cuestas', `${easy ? 100 : 200} m de desnivel acumulado`, mr.reduce((a, r) => a + (r.gain || 0), 0), easy ? 100 : 200, (v) => Math.round(v) + ' m']
+  ];
+  const ok = L.filter((c) => c[2] >= c[3]).length, left = days - now.getDate();
+  $('#challenges').innerHTML = `<div class="between"><h2>Retos del mes</h2><span class="sub">${ok} de ${L.length}${left ? ` · quedan ${left} día${left === 1 ? '' : 's'}` : ' · último día'}</span></div>` +
+    L.map(([t, d, v, g, f]) => { const done = v >= g; return `<div class="col" style="gap:6px"><div class="between"><span style="font-size:14px"><b style="font-weight:600">${done ? '✓ ' : ''}${t}</b> <span class="sub" style="font-size:13px">· ${d}</span></span><span class="sub" style="font-size:12px;white-space:nowrap">${done ? 'Hecho' : f(v) + ' / ' + f(g)}</span></div><div class="track" style="background:var(--line)"><i style="width:${Math.min(100, v / g * 100)}%"></i></div></div>`; }).join('');
 }
 function renderMonthGoal(dist, now, days) {
   const goal = Number(settings.monthkm) || 0, box = $('#monthGoal'); box.style.display = goal ? '' : 'none'; if (!goal) return;
