@@ -319,7 +319,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.21 · clima en inicio · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.22 · récords en el resumen · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1800,6 +1800,14 @@ function speak(text) { try { if (settings.voice === '0' || !('speechSynthesis' i
 
 // ---------- resumen ----------
 let current = null, sumLayers = [];
+function compareRun(r) {
+  if (!r.dist || r.dist < 500) return null;
+  const prev = runs.filter((x) => x.id !== r.id && x.start < r.start && x.dist > 500 && ((r.route && x.route?.id === r.route.id) || Math.abs(x.dist - r.dist) / r.dist <= 0.15)).sort((a, b) => b.start - a.start)[0];
+  if (!prev) return null;
+  const p1 = r.dur / (r.dist / 1000), p0 = prev.dur / (prev.dist / 1000), d = Math.round(p0 - p1), same = r.route && prev.route?.id === r.route.id;
+  const when = new Date(prev.start).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  return Math.abs(d) < 3 ? `Mismo ritmo que ${same ? 'la última vez en esta ruta' : 'tu última carrera parecida'} (${when}).` : `${Math.abs(d)} s/km ${d > 0 ? 'más rápido' : 'más lento'} que ${same ? 'la última vez en esta ruta' : 'tu última carrera parecida'} (${when}, ${fmtPace(p0)}/km).`;
+}
 function openSummary(id) {
   current = runs.find((r) => r.id === id); if (!current) return go('home');
   const r = current;
@@ -1818,6 +1826,9 @@ function openSummary(id) {
   if (r.imported) info.push('Importada de un GPX');
   if (r.shoe) { const sh = shoes.find((x) => x.id === r.shoe); if (sh) info.push('Zapatillas: ' + sh.name); }
   if (r.wx) info.push(`Tiempo: ${r.wx.t} °C, viento ${r.wx.wind} km/h${r.wx.rain ? ', lluvia' : ''}`);
+  // Récords conseguidos en esta carrera y comparación con la anterior parecida (misma ruta o ±15 % de distancia).
+  const recHere = personalRecords().filter((x) => x.r && x.r.id === r.id).map((x) => x.label.toLowerCase()); if (recHere.length) info.unshift(`<b style="font-weight:600;color:var(--ink)">Récord personal: ${listEs(recHere)}</b>`);
+  const cmp = compareRun(r); if (cmp) info.push(cmp);
   renderFeel(r);
   $('#sPlan').style.display = info.length ? '' : 'none'; $('#sPlan').innerHTML = info.map((x) => `<div>${x}</div>`).join('');
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
