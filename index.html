@@ -155,6 +155,8 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .guide{display:none;border-top:1px solid rgba(244,245,240,.12);padding-top:14px;gap:8px}
 .guide.on{display:flex;flex-direction:column}
 .guide .fuerte{color:var(--volt)}
+.ghost{display:none;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid rgba(244,245,240,.12);padding-top:14px}.ghost.on{display:flex}.ghost .num{font-size:24px}.ghost .ahead{color:var(--volt)}.ghost .behind{color:#FF8A65}
+.feat{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px solid rgba(244,245,240,.12)}.feat:first-child{border-top:0}.feat .ico{width:40px;height:40px;border-radius:12px;background:rgba(244,245,240,.08);display:flex;align-items:center;justify-content:center;flex:none;color:var(--volt)}.feat b{display:block;font-weight:600;font-size:15px}.feat small{font-size:13px;color:var(--on-bar-muted);line-height:1.4}
 .rcard{background:var(--surface);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 30px -10px rgba(0,0,0,.3)}
 .rcard.on{outline:2px solid var(--ink)}
 .skel{height:96px;border-radius:24px;background:var(--surface);opacity:.6;animation:pulse 1.2s infinite alternate}
@@ -174,7 +176,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 
 <!-- BIENVENIDA -->
 <section class="screen dark" id="welcome" style="background:var(--bar);gap:18px">
-  <div class="between"><span class="num" style="font-size:22px;letter-spacing:-.04em">zancada<span style="color:var(--volt)">.</span></span><div class="dots" id="wDots"><i class="on"></i><i></i><i></i></div></div>
+  <div class="between"><span class="num" style="font-size:22px;letter-spacing:-.04em">zancada<span style="color:var(--volt)">.</span></span><div class="dots" id="wDots"><i class="on"></i><i></i><i></i><i></i></div></div>
   <div class="grow"></div>
   <div id="wStep0" class="col" style="gap:10px">
     <span class="lbl">Bienvenida</span>
@@ -190,7 +192,14 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <button class="opt on" data-goal="3"><span class="n">3</span><span><b>Mantener la constancia</b><small>3 carreras a la semana</small></span></button>
     <button class="opt" data-goal="4"><span class="n">4</span><span><b>Mejorar mis marcas</b><small>4 carreras a la semana</small></span></button>
   </div>
-  <div id="wStep2" class="col" style="gap:10px;display:none">
+  <div id="wStep2" class="col" style="gap:4px;display:none">
+    <span class="lbl">Qué hay dentro</span>
+    <h1 style="font-size:32px;margin-bottom:8px">Tres cosas, nada más.</h1>
+    <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></span><span><b>Correr</b><small>GPS, ritmo en directo, voz en cada km, autopausa y pantalla bloqueada.</small></span></div>
+    <div class="feat"><span class="ico"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M4 19h16M6 15l4-5 4 3 4-7"/></svg></span><span><b>Plan</b><small>Un plan de 5K, 10K o media que cada lunes se adapta a lo que corriste.</small></span></div>
+    <div class="feat"><span class="ico"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg></span><span><b>Rutas</b><small>Sitios investigados para correr en Madrid y San Fernando, con trazado, perfil y guía por voz.</small></span></div>
+  </div>
+  <div id="wStep3" class="col" style="gap:10px;display:none">
     <span class="lbl">Todo listo</span>
     <h1 style="font-size:36px" id="wDone">Listo.</h1>
     <p class="sub" style="margin:0;font-size:15px" id="wDoneText"></p>
@@ -237,6 +246,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <div class="stats" id="monthStats"></div>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weeksBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
     <div id="monthGoal" class="card col" style="gap:10px;padding:16px 20px;display:none"></div>
+    <button class="card between" id="heatBtn" style="width:100%;text-align:left;padding:16px 18px 16px 20px"><span><span style="display:block;font-weight:600;font-size:16px">Mapa de todas tus carreras</span><span class="sub" style="font-size:12px" id="heatBtnSub">Tus recorridos superpuestos: donde más corres</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></button>
     <div class="chips fl" id="histChips" style="margin:0 -20px;padding:0 20px"><button class="chipb on" data-hf="all">Todas</button><button class="chipb" data-hf="plan">Del plan</button><button class="chipb" data-hf="route">Con ruta</button><button class="chipb" data-hf="long">Largas</button><button class="chipb" data-hf="note">Con notas</button></div>
     <div class="list" id="histList"></div>
   </div>
@@ -290,7 +300,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.8 · insignias, clima y notas · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.9 · fantasma y mapa de calor · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -414,6 +424,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <div style="align-items:flex-end"><span class="lbl">Tiempo</span><span class="num" id="rTime" style="font-size:40px">00:00</span></div>
     </div>
     <div class="guide" id="runGuide"><div class="between"><span class="lbl">Ahora</span><span class="sub" id="gStep"></span></div><div class="between" style="align-items:baseline"><span class="num" id="gLabel" style="font-size:24px">—</span><span style="flex:none"><span class="num" id="gLeft" style="font-size:24px">0</span><span class="unit">m</span></span></div><div class="track"><i id="gTrack" style="width:0"></i></div></div>
+    <div class="ghost" id="runGhost"><span><span class="lbl">Fantasma · tu mejor <span id="ghostBest"></span></span><b class="num" id="ghostDiff" style="display:block">—</b></span><span class="sub" id="ghostSub" style="text-align:right;font-size:12px;max-width:40%"></span></div>
     <div class="nav" id="runNav"><svg id="navArrow" viewBox="0 0 24 24" style="width:36px;height:36px;flex:none;transition:transform .4s;color:var(--volt)" aria-hidden="true"><path d="M12 3l7 18-7-4-7 4z" fill="currentColor"/></svg><div style="min-width:0"><b id="navMain" style="display:block;font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</b><span class="sub" id="navSub" style="font-size:13px"></span></div></div>
   </div>
   <div class="stats" style="padding:4px 10px">
@@ -433,6 +444,8 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
   <div id="lockOverlay" class="dark" style="display:none;position:absolute;inset:0;background:var(--bar);z-index:20;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:40px">
     <span class="lbl">Pantalla bloqueada</span>
     <span class="num" id="lockDist" style="font-size:88px;color:var(--volt)">0,00</span><span class="sub">km</span>
+    <div class="stats" style="width:100%;max-width:300px;margin-top:8px"><div style="align-items:center"><span class="lbl">Tiempo</span><span class="num" id="lockTime" style="font-size:30px">00:00</span></div><div style="align-items:center"><span class="lbl">Ritmo</span><span class="num" id="lockPace" style="font-size:30px">–:––</span></div></div>
+    <p class="sub" id="lockNav" style="margin:6px 0 0;font-size:15px;min-height:22px;color:var(--on-bar)"></p>
     <button class="btn sec" id="unlockBtn" style="margin-top:30px;width:auto;position:relative;overflow:hidden">Mantén para desbloquear<i style="position:absolute;left:0;top:0;bottom:0;width:0;background:var(--volt);opacity:.35"></i></button>
   </div>
 </section>
@@ -474,6 +487,13 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <button class="btn ghost" id="gpxBtn">Exportar GPX (Strava, Garmin…)</button>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
   </div>
+</section>
+
+<!-- MAPA DE TODAS LAS CARRERAS -->
+<section class="screen" id="heat" style="padding:0;background:var(--bar)">
+  <div id="heatMap" style="position:absolute;inset:0"></div>
+  <div class="fab"><button class="icon" data-go="history" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="seg" style="background:var(--bar)" id="heatSeg"><button class="on" data-layer="calles">Calles</button><button data-layer="sat">Satélite</button></div><span style="width:44px"></span></div>
+  <div style="position:absolute;left:12px;right:12px;bottom:calc(var(--sab) + 16px);z-index:1000" class="card dark col"><span class="lbl">Todas tus carreras</span><div class="stats" id="heatStats"></div><p class="sub" style="margin:0;font-size:12px" id="heatSub"></p></div>
 </section>
 
 <!-- REPETICIÓN -->
@@ -571,6 +591,7 @@ function go(id, opts = {}) {
   if (id === 'clubs') renderClubs();
   if (id === 'routes') renderRoutes();
   if (id === 'routeDetail') renderRouteDetail();
+  if (id === 'heat') renderHeat();
   if (id === 'plan') renderPlan();
   if (id === 'prep') startPrep();
   setTimeout(() => Object.values(maps).forEach((m) => m.invalidateSize()), 60);
@@ -629,13 +650,13 @@ function weekStats() {
 let wStep = 0;
 function openWelcome() { wStep = 0; $('#wName').value = profile.name; $$('#welcome [data-goal]').forEach((b) => b.classList.toggle('on', Number(b.dataset.goal) === GOAL_OF())); showWStep(); go('welcome'); }
 function showWStep() {
-  [0, 1, 2].forEach((i) => { $('#wStep' + i).style.display = i === wStep ? '' : 'none'; $('#wDots i:nth-child(' + (i + 1) + ')').classList.toggle('on', i === wStep); });
+  [0, 1, 2, 3].forEach((i) => { $('#wStep' + i).style.display = i === wStep ? '' : 'none'; $('#wDots i:nth-child(' + (i + 1) + ')').classList.toggle('on', i === wStep); });
   const n = profile.name.trim();
   if (wStep === 1) $('#wAsk').textContent = n ? `${n}, ¿cuántas veces a la semana?` : '¿Cuántas veces a la semana?';
-  if (wStep === 2) { $('#wDone').textContent = n ? `Listo, ${n}.` : 'Listo.'; $('#wDoneText').textContent = `Objetivo: ${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana seguida. Pulsa el botón lima cuando quieras salir.`; }
-  $('#wNext').textContent = wStep === 0 ? 'Continuar' : wStep === 1 ? 'Ese es mi objetivo' : 'Empezar';
+  if (wStep === 3) { $('#wDone').textContent = n ? `Listo, ${n}.` : 'Listo.'; $('#wDoneText').textContent = `Objetivo: ${GOAL_OF()} carreras a la semana. Cada semana que lo cumplas suma una semana seguida. Pulsa el botón lima cuando quieras salir; en Perfil tienes insignias, zapatillas y copia de seguridad.`; }
+  $('#wNext').textContent = wStep === 0 ? 'Continuar' : wStep === 1 ? 'Ese es mi objetivo' : wStep === 2 ? 'Vale' : 'Empezar';
 }
-$('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 2) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); go('home'); };
+$('#wNext').onclick = () => { if (wStep === 0) { profile.name = $('#wName').value.trim().slice(0, 20); $('#wName').blur(); } if (wStep < 3) { wStep++; showWStep(); return; } profile.done = true; save(PROF, profile); go('home'); };
 $('#wName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#wNext').click(); });
 $$('#welcome [data-goal]').forEach((b) => b.onclick = () => { profile.goal = Number(b.dataset.goal); $$('#welcome [data-goal]').forEach((x) => x.classList.toggle('on', x === b)); });
 $('#goalBtn').onclick = openWelcome;
@@ -720,7 +741,18 @@ function renderHistory() {
     : `<div class="sub" style="padding:28px 4px;text-align:center">${runs.length ? 'Ninguna carrera con ese filtro.' : 'Sin carreras todavía.'}</div>`;
   $$('#histList [data-run]').forEach((b) => b.onclick = () => openSummary(b.dataset.run));
 }
-let histFilter = 'all';
+let histFilter = 'all', heatLayers = [];
+$('#heatBtn').onclick = () => { if (!runs.some((r) => r.points?.length > 1)) return toast('Cuando tengas carreras, aquí verás todas juntas'); go('heat'); };
+function renderHeat() {
+  const m = makeMap('heatMap', 'calles'); heatLayers.forEach((l) => m.removeLayer(l)); heatLayers = [];
+  const rs = runs.filter((r) => r.points?.length > 1), all = [];
+  rs.forEach((r) => { const ll = r.points.filter((_, i) => i % 2 === 0).map((p) => [p.lat, p.lon]); all.push(...ll.filter((_, i) => i % 5 === 0)); heatLayers.push(L.polyline(ll, { color: INK, weight: 8, opacity: .12, lineCap: 'round', lineJoin: 'round' }).addTo(m), L.polyline(ll, { color: VOLT, weight: 3.5, opacity: .45, lineCap: 'round', lineJoin: 'round' }).addTo(m)); });
+  const km = rs.reduce((a, r) => a + r.dist, 0) / 1000, first = rs.length ? Math.min(...rs.map((r) => r.start)) : Date.now();
+  $('#heatStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${rs.length}</span></div><div><span class="lbl">Km</span><span class="num" style="font-size:26px">${Math.round(km)}</span></div><div><span class="lbl">Desde</span><span class="num" style="font-size:26px">${new Date(first).toLocaleDateString('es-ES', { month: 'short', year: '2-digit' })}</span></div>`;
+  $('#heatSub').textContent = 'Cuanto más repites un camino, más intenso se ve. Pellizca para acercarte.';
+  setTimeout(() => { m.invalidateSize(); if (all.length) m.fitBounds(all, { padding: [40, 40] }); }, 80);
+}
+$$('#heatSeg [data-layer]').forEach((b) => b.onclick = () => { $$('#heatSeg [data-layer]').forEach((x) => x.classList.toggle('on', x === b)); setLayer(maps.heatMap, b.dataset.layer); });
 $$('#histChips [data-hf]').forEach((b) => b.onclick = () => { histFilter = b.dataset.hf; renderHistory(); });
 function renderMonthGoal(dist, now, days) {
   const goal = Number(settings.monthkm) || 0, box = $('#monthGoal'); box.style.display = goal ? '' : 'none'; if (!goal) return;
@@ -782,8 +814,8 @@ const BADGE_DEFS = [
   ['alba', '< 7 h', 'Madrugador', (R) => firstWhen(R, (r) => new Date(r.start).getHours() < 7)],
   ['noche', '> 21 h', 'Nocturno', (R) => firstWhen(R, (r) => new Date(r.start).getHours() >= 21)],
   ['plan', 'Plan', 'Sesión del plan cumplida', (R) => firstWhen(R, (r) => r.session && r.dist >= r.session.m * 0.9)],
-  ['ruta', 'Ruta', 'Una ruta recomendada', (R) => firstWhen(R, (r) => r.route)],
-  ['rutas5', '5 rutas', '5 rutas distintas', (R) => { const seen = new Set(); for (let i = R.length - 1; i >= 0; i--) { if (R[i].route) seen.add(R[i].route.id); if (seen.size >= 5) return R[i].start; } return 0; }],
+  ['ruta', 'Ruta', 'Una ruta recomendada', (R) => firstWhen(R, (r) => r.route && !String(r.route.id).startsWith('run-'))],
+  ['rutas5', '5 rutas', '5 rutas distintas', (R) => { const seen = new Set(); for (let i = R.length - 1; i >= 0; i--) { if (R[i].route && !String(R[i].route.id).startsWith('run-')) seen.add(R[i].route.id); if (seen.size >= 5) return R[i].start; } return 0; }],
 ];
 function firstWhen(R, f) { for (let i = R.length - 1; i >= 0; i--) if (f(R[i])) return R[i].start; return 0; }
 function totalWhen(R, m) { let a = 0; for (let i = R.length - 1; i >= 0; i--) { a += R[i].dist; if (a >= m) return R[i].start; } return 0; }
@@ -1217,6 +1249,8 @@ function renderRouteDetail() {
   if (r.src === 'rec') { $('#rdSurface').textContent = `${r.surface} · ${r.loop === false ? 'ida y vuelta' : 'bucle'}`; $('#rdWhy').textContent = r.why; $('#rdAccess').textContent = r.access || ''; }
   const st = r.start || { lat: r.ll[0][0], lon: r.ll[0][1] }, away = rt.here ? haversine(rt.here, st) : null;
   $('#rdAway').textContent = away == null ? 'Activa la ubicación para saber a cuánto estás de la salida.' : away <= 60 ? 'Estás en la salida.' : away <= 2500 ? `La salida está ${fmtAway(away / 1000)} de ti: al empezar te llevo hasta allí (cuenta como calentamiento).` : `La salida está ${fmtAway(away / 1000)} de ti: mejor ir en transporte.`;
+  const hist = runs.filter((x) => x.route?.id === r.id || 'run-' + x.id === r.id), bestR = bestOnRoute(r.id);
+  if (bestR) $('#rdAway').textContent += ` La has corrido ${hist.length === 1 ? 'una vez' : hist.length + ' veces'}; tu mejor tiempo, ${fmtTime(bestR.dur)}: al repetirla te comparo en directo con esa marca.`;
   $('#rdMaps').href = `https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lon}&travelmode=transit`;
   $('#rdSave').style.background = saved ? 'var(--volt)' : 'var(--surface)'; $('#rdSave svg').style.fill = saved ? 'currentColor' : 'none';
   const map = makeMap('rdMap', 'calles'); rdLayers.forEach((l) => map.removeLayer(l)); rdLayers = [];
@@ -1355,6 +1389,7 @@ function startRun() {
   Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1 });
   run.session = prep.session && prepMode === 'plan' ? prep.session : null; run.guide = buildGuide(run.session); run.route = pickedRoute;
   run.nav = run.route ? buildNav(run.route.ll) : null; run.heading = null;
+  run.ghostRef = run.route ? bestOnRoute(run.route.id) : null; $('#runGhost').classList.toggle('on', !!run.ghostRef); if (run.ghostRef) { $('#ghostBest').textContent = fmtTime(run.ghostRef.dur); updateGhost(); }
   if (run.nav && lastFix && haversine(lastFix, run.nav.pts[0]) > 50) run.nav.phase = 'start';
   $('#runGuide').classList.toggle('on', !!run.guide); $('#runNav').classList.toggle('on', !!run.nav); $('#navMain').textContent = run.nav?.phase === 'start' ? 'Hacia la salida' : 'Sigue por la ruta'; $('#navSub').textContent = ''; $('#navArrow').style.transform = '';
   applyTheme();
@@ -1374,6 +1409,21 @@ function startRun() {
   requestWake();
 }
 const KeepAwake = window.Capacitor?.Plugins?.KeepAwake; // solo existe dentro del APK
+// Fantasma: al repetir una ruta, te comparas en directo con tu mejor carrera en ella (idea de adidas Running / Strava segments, en local).
+function bestOnRoute(id) {
+  const cands = runs.filter((r) => r.points?.length > 5 && (r.route?.id === id || 'run-' + r.id === id));
+  const km = cands.length ? Math.max(...cands.map((r) => r.dist)) : 0;
+  return cands.filter((r) => r.dist >= km * 0.9).sort((a, b) => a.dur - b.dur)[0] || null;
+}
+function ghostDistAt(ref, tMs) { const p = ref.points; if (tMs >= p[p.length - 1].t) return ref.dist; let lo = 0, hi = p.length - 1; while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (p[mid].t <= tMs) lo = mid; else hi = mid; } const a = p[lo], b = p[hi], f = b.t > a.t ? (tMs - a.t) / (b.t - a.t) : 0; return (a.d || 0) + ((b.d || 0) - (a.d || 0)) * f; }
+function ghostTimeAt(ref, d) { const p = ref.points; if (d >= ref.dist) return ref.dur; let lo = 0, hi = p.length - 1; while (hi - lo > 1) { const mid = (lo + hi) >> 1; if ((p[mid].d || 0) <= d) lo = mid; else hi = mid; } const a = p[lo], b = p[hi], f = (b.d || 0) > (a.d || 0) ? (d - (a.d || 0)) / ((b.d || 0) - (a.d || 0)) : 0; return (a.t + (b.t - a.t) * f) / 1000; }
+function updateGhost() {
+  const ref = run.ghostRef; if (!ref) return;
+  if (run.dist < 50) { $('#ghostDiff').textContent = '—'; $('#ghostDiff').className = 'num'; $('#ghostSub').textContent = 'te comparo en cuanto arranques'; return; }
+  const gd = ghostDistAt(ref, elapsed() * 1000), diff = run.dist - gd, sec = Math.round(ghostTimeAt(ref, run.dist) - elapsed());
+  $('#ghostDiff').textContent = `${diff >= 0 ? '+' : '−'}${fmtM(Math.abs(diff))}`; $('#ghostDiff').className = 'num ' + (diff >= 0 ? 'ahead' : 'behind');
+  $('#ghostSub').textContent = Math.abs(sec) < 3 ? 'a la par con tu mejor marca' : `${Math.abs(sec) >= 60 ? fmtTime(Math.abs(sec)) : Math.abs(sec) + ' s'} ${sec >= 0 ? 'por delante' : 'por detrás'}`;
+}
 const runStateText = () => run.session ? run.session.title : run.route ? 'Ruta: ' + run.route.name : 'Carrera libre';
 async function requestWake() { try { if (KeepAwake) await KeepAwake.keepAwake(); else run.wake = await navigator.wakeLock?.request('screen'); } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && run.active) requestWake(); });
@@ -1397,7 +1447,8 @@ function runFix(f) {
       const prevT = run.splits.length ? run.splits[run.splits.length - 1].t : 0;
       const split = tAtKm - prevT; run.splits.push({ km: run.lastKm, t: tAtKm, split });
       run.best = Math.min(run.best, split);
-      if (settings.voice === '1') speak(`Kilómetro ${run.lastKm}. ${Math.floor(split / 60)} ${Math.round(split % 60)}.`);
+      let gh = ''; if (run.ghostRef) { const sec = Math.round(ghostTimeAt(run.ghostRef, run.dist) - elapsed()); gh = Math.abs(sec) < 3 ? ' A la par con tu mejor marca.' : ` ${Math.abs(sec)} segundos ${sec > 0 ? 'por delante' : 'por detrás'} de tu mejor marca.`; }
+      if (settings.voice === '1') speak(`Kilómetro ${run.lastKm}. ${Math.floor(split / 60)} ${Math.round(split % 60)}.${gh}`);
     }
   }
   run.points.push(p);
@@ -1424,7 +1475,8 @@ function tick() {
   $('#rAvg').textContent = run.dist > 50 ? fmtPace(el / (run.dist / 1000)) : '–:––';
   $('#rBest').textContent = isFinite(run.best) ? fmtPace(run.best) : '–:––';
   if (lastFix) $('#runAcc').textContent = '±' + Math.round(lastFix.acc) + ' m';
-  checkAutoPause();
+  $('#lockTime').textContent = fmtTime(el); $('#lockPace').textContent = $('#rPace').textContent; $('#lockNav').textContent = run.nav ? `${$('#navMain').textContent} · ${$('#navSub').textContent}` : run.guide ? `${$('#gLabel').textContent} · ${$('#gLeft').textContent} m` : '';
+  updateGhost(); checkAutoPause();
 }
 function pauseRun(auto) { if (run.paused) return; run.paused = true; run.auto = !!auto; run.pauseAt = Date.now(); run.pausePos = lastFix; $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = auto ? 'Autopausa · muévete para seguir' : 'En pausa'; speak(auto ? 'Pausa automática' : 'Pausa'); }
 function resumeRun() { if (!run.paused) return; run.pausedMs += Date.now() - run.pauseAt; run.paused = false; run.auto = false; run.gap = true; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = runStateText(); speak('Seguimos'); }
@@ -1469,7 +1521,7 @@ function finishRun() {
   run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
   if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light };
-  if (run.route) r.route = { id: run.route.id, name: run.route.name };
+  if (run.route) { r.route = { id: run.route.id, name: run.route.name }; if (run.ghostRef) r.ghost = { ref: run.ghostRef.id, refDur: run.ghostRef.dur }; }
   if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
   if (wx.data && Date.now() - wx.at < 4 * 3600e3) r.wx = { t: wx.data.t, wind: wx.data.wind, rain: wx.data.now ? 1 : 0 };
   const before = badges().filter((b) => b.when).map((b) => b.id);
@@ -1533,6 +1585,7 @@ function openSummary(id) {
 function runInsights(r) {
   if (!r || r.dist < 800) return '';
   const out = [], pace = r.dur / (r.dist / 1000), prev = runs.filter((x) => x.id !== r.id && x.start < r.start && x.dist > 800).slice(0, 5);
+  if (r.route) { const same = runs.filter((x) => x.id !== r.id && x.start < r.start && x.route?.id === r.route.id && x.dist >= r.dist * 0.9 && x.dist <= r.dist * 1.1); if (same.length) { const best = Math.min(...same.map((x) => x.dur)), d = Math.round(best - r.dur); out.push(d > 0 ? `Mejor tiempo en esta ruta: ${d >= 60 ? fmtTime(d) : d + ' s'} menos que tu marca anterior (${same.length + 1} veces aquí).` : d < -5 ? `A ${-d >= 60 ? fmtTime(-d) : -d + ' s'} de tu mejor tiempo en esta ruta (${fmtTime(best)}).` : 'Prácticamente tu mejor tiempo en esta ruta.'); } }
   if (prev.length >= 2) { const ref = prev.map((x) => x.dur / (x.dist / 1000)).sort((a, b) => a - b)[Math.floor(prev.length / 2)], d = Math.round(ref - pace); if (Math.abs(d) > 120) out.push(d > 0 ? 'Mucho más rápido que en tus últimas carreras.' : 'Mucho más tranquilo que en tus últimas carreras.'); else if (Math.abs(d) >= 8) out.push(d > 0 ? `Has ido ${d} s/km más rápido que en tus últimas carreras.` : `Has ido ${-d} s/km más tranquilo que de costumbre${r.session?.type === 'suave' || r.session?.type === 'largo' ? ', que es justo lo que tocaba' : ''}.`); else out.push('Ritmo en tu línea habitual.'); }
   const ok = (r.splits || []).filter((x) => !x.partial);
   if (ok.length >= 4) { const h = Math.floor(ok.length / 2), a = ok.slice(0, h).reduce((s1, x) => s1 + x.split, 0) / h, b = ok.slice(-h).reduce((s1, x) => s1 + x.split, 0) / h, d = Math.round(a - b); if (d >= 6) out.push(`Segunda mitad ${d} s/km más rápida: bien dosificado.`); else if (d <= -10) out.push(`Saliste ${-d} s/km más rápido de lo que luego pudiste mantener; la próxima, un poco más conservador al principio.`); const sd = Math.sqrt(ok.reduce((s1, x) => s1 + (x.split - pace) ** 2, 0) / ok.length); if (sd < 8 && d > -6 && d < 6) out.push('Parciales muy regulares.'); }

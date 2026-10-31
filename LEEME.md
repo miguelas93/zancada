@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.9 (madrugada del 31 de octubre)
+- **Fantasma**: al repetir una ruta (recomendada, guardada o una carrera tuya desde Mis recorridos), la pantalla de carrera te compara en directo con tu mejor tiempo en ella: metros por delante o por detrás y segundos de diferencia, y la voz lo dice en cada km. La ficha de la ruta muestra cuántas veces la has corrido y tu mejor tiempo; el resumen te dice si has batido tu marca en esa ruta.
+- **Mapa de todas tus carreras** (Actividad): todos tus recorridos superpuestos; donde más repites se ve más intenso. Calles o satélite.
+- **Pantalla bloqueada** en carrera: además de la distancia, tiempo, ritmo y la indicación de la guía o la ruta.
+- **Bienvenida**: una pantalla nueva explica las tres partes de la app (Correr, Plan, Rutas).
+
 ## Novedades 0.8 (madrugada del 31 de octubre)
 - **Insignias** (Perfil): 16 logros calculados a partir de tus carreras: primera carrera, 5K, 10K, media, 10 y 50 carreras, 100/500/1000 km, 3 y 10 semanas seguidas, madrugador, nocturno, sesión del plan, primera ruta y 5 rutas distintas. Al terminar una carrera, la pantalla final y la voz te dicen si has ganado alguna.
 - **Clima al preparar** (open-meteo, sin cuenta): temperatura y sensación, viento y probabilidad de lluvia, con **consejo de ropa**. El tiempo que hacía se guarda en la carrera y sale en el resumen.
