@@ -323,7 +323,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.27 · buscar carreras · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.28 · importar rutas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -339,6 +339,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <div class="chips fl" id="routesZone"></div>
       <div class="chips fl" id="routesDist"><span class="sub" style="font-size:12px;align-self:center;margin-right:2px">¿Cuánto tiempo tienes?</span><button class="chipb on" data-dist="all">Da igual</button><button class="chipb" data-dist="t20">20 min</button><button class="chipb" data-dist="t30">30 min</button><button class="chipb" data-dist="t45">45 min</button><button class="chipb" data-dist="t60">Más de 45</button><span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span><span id="routesSurf" style="display:contents"><button class="chipb on" data-surf="all">Suelo</button><button class="chipb" data-surf="tierra">Tierra</button><button class="chipb" data-surf="asfalto">Asfalto</button><button class="chipb" data-surf="pista">Pista</button></span></div>
     </div>
+    <div id="mineTools" style="display:none"><button class="btn ghost" id="routeGpxBtn" style="height:40px;font-size:13px">Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)</button><input type="file" id="routeGpx" accept=".gpx,application/gpx+xml" style="display:none"></div>
     <div class="chips fl" id="routesKm" style="display:none"><button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button></div>
     <div id="routesMapWrap" class="map" style="display:none;height:58vh;border-radius:24px;flex:none"><div id="routesMap" style="position:absolute;inset:0"></div><p class="sub" id="routesMapHint" style="position:absolute;left:12px;right:12px;bottom:10px;margin:0;z-index:1000;background:var(--surface);border-radius:12px;padding:8px 12px;font-size:12px;text-align:center">Toca un punto para ver la ruta</p></div>
     <div class="col" id="routesList" style="gap:10px"></div>
@@ -1268,7 +1269,7 @@ async function routeThrough(pts) {
   const j = await res.json(), trip = j.trip;
   return { ll: trip.legs.flatMap((l) => decodePoly6(l.shape)), km: trip.summary.length, s: trip.summary.time };
 }
-async function elevGain(ll) {
+async function fetchGain(ll) {
   try {
     const step = Math.max(1, Math.floor(ll.length / 120)), shape = ll.filter((_, i) => i % step === 0).map(([lat, lon]) => ({ lat, lon }));
     const res = await fetch(ROUTER + '/height', { method: 'POST', body: JSON.stringify({ shape }) });
@@ -1354,7 +1355,7 @@ function todayCard(t) {
 function renderRoutes() {
   $$('#routesChips [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rt.mode));
   $('#routesFilters').style.display = rt.mode === 'rec' ? '' : 'none';
-  $('#routesKm').style.display = rt.mode === 'sug' ? '' : 'none';
+  $('#routesKm').style.display = rt.mode === 'sug' ? '' : 'none'; $('#mineTools').style.display = rt.mode === 'mine' ? '' : 'none';
   $$('#routesKm [data-km]').forEach((b) => b.classList.toggle('on', Number(b.dataset.km) === rt.km));
   if (!rt.here && lastFix) rt.here = lastFix;
   if (!rt.here && 'geolocation' in navigator) navigator.geolocation.getCurrentPosition((pos) => { rt.here = { lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }; if ($('#routes').classList.contains('on')) renderRoutes(); }, () => {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
@@ -1399,7 +1400,7 @@ async function loadSuggestions() {
     const brg = rt.seed + k * 120;
     try {
       const res = await makeLoop(here, rt.km, brg); if (token !== rt.token) return;
-      const gain = await elevGain(res.ll); if (token !== rt.token) return;
+      const gain = await fetchGain(res.ll); if (token !== rt.token) return;
       out.push({ id: 'sug-' + key + '-' + k, name: `Bucle hacia el ${compass(brg)}`, ll: res.ll, km: Math.round(res.km * 10) / 10, gain, src: 'sug', created: Date.now(), start: { lat: res.ll[0][0], lon: res.ll[0][1] } });
       rtList = out.slice(); renderList(rtList, '');
     } catch (e) { /* una ruta fallida no tumba las demás */ }
@@ -1410,6 +1411,19 @@ async function loadSuggestions() {
   rt.cache[key] = out; const keys = Object.keys(rt.cache); if (keys.length > 12) delete rt.cache[keys[0]]; save('zancada.routecache.v1', rt.cache);
 }
 $$('#routesChips [data-mode]').forEach((b) => b.onclick = () => { rt.mode = b.dataset.mode; renderRoutes(); });
+// GPX de ruta (rte o trk, sin necesidad de tiempos) → Mis recorridos
+function parseRouteGpx(text) {
+  const doc = new DOMParser().parseFromString(text, 'application/xml'); if (doc.querySelector('parsererror')) return null;
+  const els = Array.from(doc.getElementsByTagName('rtept')).length >= 2 ? Array.from(doc.getElementsByTagName('rtept')) : Array.from(doc.getElementsByTagName('trkpt')); if (els.length < 2) return null;
+  const ll = [], ele = []; els.forEach((el) => { const la = parseFloat(el.getAttribute('lat')), lo = parseFloat(el.getAttribute('lon')); if (!isFinite(la) || !isFinite(lo)) return; ll.push([la, lo]); const e = el.getElementsByTagName('ele')[0]; ele.push(e ? Math.round(parseFloat(e.textContent)) : null); });
+  if (ll.length < 2) return null;
+  let m = 0; for (let i = 1; i < ll.length; i++) m += haversine({ lat: ll[i - 1][0], lon: ll[i - 1][1] }, { lat: ll[i][0], lon: ll[i][1] });
+  const hasEle = ele.filter((x) => x != null).length > ll.length * 0.8, gain = hasEle ? elevGain(ele.map((a) => ({ a }))) : null;
+  const nm = doc.getElementsByTagName('name')[0]; const name = (nm && nm.textContent.trim().slice(0, 40)) || 'Ruta importada';
+  return { id: 'gpx-' + Date.now(), name, ll, km: Math.round(m / 100) / 10, gain, ele: hasEle ? ele : undefined, created: Date.now(), start: { lat: ll[0][0], lon: ll[0][1] }, imported: true };
+}
+$('#routeGpxBtn').onclick = () => $('#routeGpx').click();
+$('#routeGpx').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; const r = parseRouteGpx(await f.text()); if (!r) return toast('No he encontrado un trazado en ese GPX'); savedRoutes.unshift(r); save(ROUTES, savedRoutes); renderRoutes(); toast(`Ruta importada: ${r.name} · ${String(r.km).replace('.', ',')} km`, 3000); };
 $('#routesZone').addEventListener('click', (e) => { const b = e.target.closest('[data-zone]'); if (b) { rt.zone = b.dataset.zone; renderRoutes(); } });
 $$('#routesDist [data-dist]').forEach((b) => b.onclick = () => { rt.dist = b.dataset.dist; renderRoutes(); });
 $$('#routesSurf [data-surf]').forEach((b) => b.onclick = () => { rt.surf = b.dataset.surf; renderRoutes(); });
