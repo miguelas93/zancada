@@ -316,7 +316,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.14 · rutas en el mapa · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.15 · objetivo en carrera libre · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -349,7 +349,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="card stats" id="rdStats" style="padding:18px 20px"></div>
     <div class="card col" id="rdProfileCard" style="gap:8px;padding:18px 20px"><div class="between"><h2>Perfil</h2><span class="sub" id="rdProfileSub"></span></div><div id="rdProfile" style="color:var(--ink)"></div></div>
     <div class="card col" id="rdAbout" style="gap:8px;padding:18px 20px"><h2 id="rdSurface"></h2><p id="rdWhy" style="margin:0;font-size:14px;line-height:1.45"></p><p id="rdAccess" class="sub" style="margin:0;font-size:13px;line-height:1.45"></p></div>
-    <div class="card col" style="gap:10px;padding:18px 20px"><h2>Cómo llegar</h2><p id="rdAway" style="margin:0;font-size:14px;line-height:1.45"></p><a class="btn sec" id="rdMaps" target="_blank" rel="noopener" style="text-decoration:none;height:48px;font-size:15px">Transporte público (Google Maps)</a></div>
+    <div class="card col" style="gap:10px;padding:18px 20px"><h2>Cómo llegar</h2><p id="rdAway" style="margin:0;font-size:14px;line-height:1.45"></p><a class="btn sec" id="rdMaps" target="_blank" rel="noopener" style="text-decoration:none;height:48px;font-size:15px">Transporte público (Google Maps)</a><div style="display:flex;gap:8px"><button class="btn ghost" id="rdShare" style="height:44px;font-size:14px">Compartir la ruta</button><button class="btn ghost" id="rdGpx" style="height:44px;font-size:14px">GPX de la ruta</button></div></div>
   </div>
   <div style="position:fixed;left:16px;right:16px;bottom:calc(var(--sab) + 14px);z-index:1000"><button class="btn" id="rdRun">Correr esta ruta</button></div>
 </section>
@@ -420,6 +420,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div id="prepTramos" class="col" style="display:none;gap:8px"><div class="chips fl" id="tramosChips" style="margin:0 -20px;padding:0 20px"></div><form id="tramosForm" style="display:flex;gap:6px;align-items:center;font-size:13px"><input id="tReps" type="number" min="1" max="30" inputmode="numeric" value="6" aria-label="Repeticiones" style="width:52px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">×<input id="tOn" type="number" min="100" max="5000" step="100" inputmode="numeric" value="400" aria-label="Metros fuertes" style="width:68px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m · rec.<input id="tOff" type="number" min="0" max="2000" step="50" inputmode="numeric" value="200" aria-label="Metros de recuperación" style="width:62px;height:38px;border-radius:10px;border:1px solid var(--line);padding:0 8px;background:var(--surface2);color:var(--ink);font:inherit;text-align:center">m<button class="btn sec" type="submit" style="width:auto;height:38px;padding:0 12px;font-size:13px;margin-left:auto">Usar</button></form></div>
     <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p><p class="sub" id="prepWx" style="display:none;margin:8px 0 0;font-size:13px;line-height:1.45;white-space:pre-line"></p></div>
     <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="chips fl" id="prepGoal" style="display:none;margin:-4px -20px 0;padding:0 20px"><button class="chipb on" data-goal="0">Sin objetivo</button><button class="chipb" data-goal="3000">3 km</button><button class="chipb" data-goal="5000">5 km</button><button class="chipb" data-goal="10000">10 km</button><button class="chipb" data-goal="t20">20 min</button><button class="chipb" data-goal="t30">30 min</button><button class="chipb" data-goal="t60">60 min</button></div>
     <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
     <button class="btn" id="startBtn" disabled>Empezar</button>
     <p id="prepHint" class="sub" style="margin:-6px 0 0;text-align:center;font-size:12px">Necesito permiso de ubicación para medir tu carrera.</p>
@@ -441,7 +442,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <div><span class="lbl">Ritmo actual</span><span><span class="num" id="rPace" style="font-size:40px;color:var(--volt)">–:––</span><span class="unit">/km</span></span></div>
       <div style="align-items:flex-end"><span class="lbl">Tiempo</span><span class="num" id="rTime" style="font-size:40px">00:00</span></div>
     </div>
-    <div class="guide" id="runGuide"><div class="between"><span class="lbl">Ahora</span><span class="sub" id="gStep"></span></div><div class="between" style="align-items:baseline"><span class="num" id="gLabel" style="font-size:24px">—</span><span style="flex:none"><span class="num" id="gLeft" style="font-size:24px">0</span><span class="unit">m</span></span></div><div class="track"><i id="gTrack" style="width:0"></i></div></div>
+    <div class="guide" id="runGuide"><div class="between"><span class="lbl">Ahora</span><span class="sub" id="gStep"></span></div><div class="between" style="align-items:baseline"><span class="num" id="gLabel" style="font-size:24px">—</span><span style="flex:none"><span class="num" id="gLeft" style="font-size:24px">0</span><span class="unit" id="gUnit">m</span></span></div><div class="track"><i id="gTrack" style="width:0"></i></div></div>
     <div class="ghost" id="runGhost"><span><span class="lbl">Fantasma · tu mejor <span id="ghostBest"></span></span><b class="num" id="ghostDiff" style="display:block">—</b></span><span class="sub" id="ghostSub" style="text-align:right;font-size:12px;max-width:40%"></span></div>
     <div class="nav" id="runNav"><svg id="navArrow" viewBox="0 0 24 24" style="width:36px;height:36px;flex:none;transition:transform .4s;color:var(--volt)" aria-hidden="true"><path d="M12 3l7 18-7-4-7 4z" fill="currentColor"/></svg><div style="min-width:0"><b id="navMain" style="display:block;font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</b><span class="sub" id="navSub" style="font-size:13px"></span></div></div>
   </div>
@@ -1167,7 +1168,7 @@ function buildGuide(s) {
 function updateGuide() {
   const g = run.guide; if (!g) return;
   let acc = 0, i = 0; while (i < g.length && run.dist >= acc + g[i].m) { acc += g[i].m; i++; }
-  if (i >= g.length) { if (run.guideIdx !== 'done') { run.guideIdx = 'done'; $('#gLabel').textContent = 'Sesión completada'; $('#gLabel').className = 'num'; $('#gStep').textContent = 'lo que corras ahora suma'; $('#gLeft').textContent = '0'; $('#gTrack').style.width = '100%'; speak('Sesión completada. Enhorabuena.'); } return; }
+  if (i >= g.length) { if (run.guideIdx !== 'done') { run.guideIdx = 'done'; const isGoal = run.session?.goal; $('#gLabel').textContent = isGoal ? 'Objetivo cumplido' : 'Sesión completada'; $('#gLabel').className = 'num'; $('#gStep').textContent = 'lo que corras ahora suma'; $('#gLeft').textContent = '0'; $('#gTrack').style.width = '100%'; speak(isGoal ? 'Objetivo cumplido. Lo que corras ahora suma.' : 'Sesión completada. Enhorabuena.'); } return; }
   const seg = g[i], left = Math.max(0, acc + seg.m - run.dist);
   if (run.guideIdx !== i) { run.guideIdx = i; $('#gLabel').textContent = seg.label; $('#gLabel').className = 'num ' + seg.kind; $('#gStep').textContent = `paso ${i + 1} de ${g.length}`; if (run.dist > 0 || i > 0) speak(seg.say); }
   $('#gLeft').textContent = left >= 1000 ? fmtKmS(left) + ' k' : String(Math.round(left / 10) * 10);
@@ -1348,6 +1349,8 @@ function renderRouteDetail() {
   setTimeout(() => { map.invalidateSize(); map.fitBounds(r.ll, { padding: [36, 36] }); }, 80);
 }
 $('#rdRun').onclick = () => { pickedRoute = detailRoute; go('prep'); };
+$('#rdShare').onclick = async () => { const r = detailRoute; if (!r) return; const st = r.start || { lat: r.ll[0][0], lon: r.ll[0][1] }; const text = `${r.name} · ${String(r.km).replace('.', ',')} km${r.gain != null ? ` · +${r.gain} m` : ''}${r.surface ? ` · ${r.surface}` : ''}\nSalida: https://maps.google.com/?q=${st.lat.toFixed(5)},${st.lon.toFixed(5)}\n${r.why ? r.why + '\n' : ''}Ruta de Zancada · https://miguelas93.github.io/zancada/`; try { if (navigator.share) { await navigator.share({ title: r.name, text }); return; } } catch (e) { if (e.name === 'AbortError') return; } try { await navigator.clipboard.writeText(text); toast('Ruta copiada: pégala en Telegram o WhatsApp', 3000); } catch (e) { toast('No he podido compartir'); } };
+$('#rdGpx').onclick = () => { const r = detailRoute; if (!r) return; const esc = (t) => String(t).replace(/[<&>]/g, (c) => ({ '<': '&lt;', '&': '&amp;', '>': '&gt;' }[c])); const pts = r.ll.map(([la, lo], i) => `<rtept lat="${la.toFixed(6)}" lon="${lo.toFixed(6)}">${r.ele && r.ele[i] != null ? `<ele>${r.ele[i]}</ele>` : ''}</rtept>`).join(''); const gpx = `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Zancada" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${esc(r.name)}</name></metadata><rte><name>${esc(r.name)}</name>${pts}</rte></gpx>`; shareOrDownload(new Blob([gpx], { type: 'application/gpx+xml' }), `zancada-ruta-${r.id}.gpx`, r.name); };
 $('#rdSave').onclick = () => { const r = detailRoute; if (savedRoutes.some((x) => x.id === r.id)) { savedRoutes = savedRoutes.filter((x) => x.id !== r.id); toast('Quitada de tus recorridos'); } else { savedRoutes.unshift({ id: r.id, name: r.name, ll: r.ll, km: r.km, gain: r.gain, created: Date.now() }); toast('Guardada en Mis recorridos'); } save(ROUTES, savedRoutes); renderRouteDetail(); };
 // ---------- guía ligera por la ruta ----------
 // Te lleva hasta la salida si estás lejos, y en carrera indica hacia dónde sigue el camino. Voz solo en cruces claros y si te sales.
@@ -1411,7 +1414,7 @@ function offRouteMeters(p, ll) { let best = Infinity; for (let i = 0; i < ll.len
 
 // ---------- preparación ----------
 let watchId = null, prepMap, prepMarker, lastFix = null, prepMode = 'plan';
-const prep = { session: null, routeLayer: null, toStart: null };
+const prep = { session: null, routeLayer: null, toStart: null, goal: settings.goal || '0' };
 function startPrep() {
   prepMap = makeMap('prepMap', 'calles'); prepMap.dragging.disable(); prepMap.touchZoom.disable(); prepMap.doubleClickZoom.disable();
   $('#startBtn').disabled = true; $('#gpsDot').className = 'dot'; $('#gpsText').textContent = 'Buscando GPS…';
@@ -1459,6 +1462,8 @@ function renderPrepSheet() {
   $('#prepLbl').textContent = usePlan ? `Plan · semana ${s.week + 1}` : tr ? 'Entreno por tramos' : 'Entreno';
   $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : tr ? `${tr.title} · ${fmtKmS(tr.m)} km` : 'Carrera libre';
   $('#prepDesc').textContent = usePlan ? `${s.desc} Ritmo objetivo ~${targetPace(s.type)}/km.${s.struct ? ' Te guío por voz en cada tramo.' : ''}` : tr ? `${tr.desc} Ritmo fuerte ~${targetPace(tr.type)}/km. Te guío por voz en cada tramo.` : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
+  $('#prepGoal').style.display = prepMode === 'libre' ? '' : 'none'; $$('#prepGoal [data-goal]').forEach((b) => b.classList.toggle('on', b.dataset.goal === String(prep.goal || '0')));
+  if (prepMode === 'libre' && prep.goal && prep.goal !== '0') { const g = goalSession(prep.goal); $('#prepTitle').textContent = `Carrera libre · ${g.title}`; $('#prepDesc').textContent = `${g.desc} Sin más guía: ritmo y parciales en directo.`; }
   $('#prepLight').style.display = usePlan ? '' : 'none'; $('#prepLight').textContent = s && s.light ? 'Volver a la sesión completa' : 'Hoy no estoy al 100 %';
   $('#prepRoute').style.display = pickedRoute ? 'flex' : 'none';
   if (pickedRoute) { $('#prepRouteName').textContent = pickedRoute.name; prepStartHint(); }
@@ -1477,6 +1482,12 @@ function prepStartHint() {
   else if (prep.toStart) { prepMap.removeLayer(prep.toStart); prep.toStart = null; }
 }
 $$('#prepMode [data-pm]').forEach((b) => b.onclick = () => { prepMode = b.dataset.pm; renderPrepSheet(); });
+// Objetivo sencillo para la carrera libre (NRC): distancia o tiempo, con progreso en la tarjeta y aviso al llegar.
+function goalSession(g) {
+  if (String(g).startsWith('t')) { const min = Number(String(g).slice(1)); return { key: 'goal', title: `${min} min`, desc: `Corre ${min} minutos; te aviso al cumplirlos.`, goal: true, min, m: 0, type: 'suave' }; }
+  const m = Number(g); return { key: 'goal', title: `${fmtKmS(m)} km`, desc: `Corre ${fmtKmS(m)} km; te aviso al llegar.`, goal: true, m, type: 'suave', segs: [{ label: `Objetivo ${fmtKmS(m)} km`, say: '', kind: 'suave', m }] };
+}
+$$('#prepGoal [data-goal]').forEach((b) => b.onclick = () => { prep.goal = b.dataset.goal; settings.goal = prep.goal; save(SET, settings); renderPrepSheet(); });
 $('#prepLight').onclick = () => { prep.light = !prep.light; renderPrepSheet(); toast(prep.light ? 'Sesión recortada un 40 %: menos series o menos km, misma estructura.' : 'Sesión completa', 3000); };
 $('#prepRouteDrop').onclick = () => { pickedRoute = null; renderPrepSheet(); if (lastFix) prepMap.setView([lastFix.lat, lastFix.lon], 16); };
 function onFix(pos) {
@@ -1505,7 +1516,7 @@ const run = { active: false, paused: false, points: [], dist: 0, start: 0, pause
 $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
   Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1 });
-  run.session = prep.session && prepMode === 'plan' ? prep.session : prepMode === 'tramos' ? prep.tramos : null; run.guide = buildGuide(run.session); run.route = pickedRoute;
+  run.session = prep.session && prepMode === 'plan' ? prep.session : prepMode === 'tramos' ? prep.tramos : prepMode === 'libre' && prep.goal && prep.goal !== '0' ? goalSession(prep.goal) : null; run.guide = run.session?.goal && run.session.min ? null : buildGuide(run.session); run.route = pickedRoute; run.goalSaid = false; $('#gUnit').textContent = 'm';
   run.nav = run.route ? buildNav(run.route.ll) : null; run.heading = null;
   run.ghostRef = run.route ? bestOnRoute(run.route.id) : null; $('#runGhost').classList.toggle('on', !!run.ghostRef); if (run.ghostRef) { $('#ghostBest').textContent = fmtTime(run.ghostRef.dur); updateGhost(); }
   if (run.nav && lastFix && haversine(lastFix, run.nav.pts[0]) > 50) run.nav.phase = 'start';
@@ -1610,6 +1621,7 @@ function tick() {
   if (lastFix) $('#runAcc').textContent = '±' + Math.round(lastFix.acc) + ' m';
   $('#lockTime').textContent = fmtTime(el); $('#lockPace').textContent = $('#rPace').textContent; $('#lockNav').textContent = run.nav ? `${$('#navMain').textContent} · ${$('#navSub').textContent}` : run.guide ? `${$('#gLabel').textContent} · ${$('#gLeft').textContent} m` : '';
   if (settings.voice === 'min5' && !run.paused && el >= 300 && Math.floor(el / 300) > (run.min5Said || 0)) { run.min5Said = Math.floor(el / 300); speak(`${Math.round(el / 60)} minutos. ${fmtKm(run.dist).replace(',', ' coma ')} kilómetros. Ritmo ${run.dist > 100 ? fmtPace(el / (run.dist / 1000)).replace(':', ' ') : 'sin datos'}.`); }
+  if (run.session?.goal && run.session.min) { const left = run.session.min * 60 - el; $('#runGuide').classList.add('on'); $('#gLabel').textContent = left > 0 ? `Objetivo ${run.session.min} min` : 'Objetivo cumplido'; $('#gLabel').className = 'num'; $('#gStep').textContent = left > 0 ? 'tiempo' : 'lo que corras ahora suma'; $('#gLeft').textContent = left > 0 ? fmtTime(left) : '0'; $('#gUnit').textContent = left > 0 ? '' : 'm'; $('#gTrack').style.width = Math.min(100, el / (run.session.min * 60) * 100) + '%'; if (left <= 0 && !run.goalSaid) { run.goalSaid = true; speak('Objetivo cumplido. Lo que corras ahora suma.'); } }
   updateGhost(); checkAutoPause();
 }
 function pauseRun(auto) { if (run.paused) return; run.paused = true; run.auto = !!auto; run.pauseAt = Date.now(); run.pausePos = lastFix; $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = auto ? 'Autopausa · muévete para seguir' : 'En pausa'; speak(auto ? 'Pausa automática' : 'Pausa'); }
@@ -1654,7 +1666,8 @@ function finishRun() {
   if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }
   run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
-  if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom };
+  if (run.session?.goal) r.goal = run.session.min ? `${run.session.min} min` : `${fmtKmS(run.session.m)} km`;
+  if (run.session && !run.session.goal) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom };
   if (run.route) { r.route = { id: run.route.id, name: run.route.name }; if (run.ghostRef) r.ghost = { ref: run.ghostRef.id, refDur: run.ghostRef.dur }; }
   else { const det = detectRoute(r); if (det) r.route = { id: det.id, name: det.name, auto: true }; }
   if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
@@ -1703,6 +1716,7 @@ function openSummary(id) {
   const info = [];
   if (plan) { const ps1 = planStatus(plan).flat().find((x) => x.run && x.run.id === r.id); if (ps1) info.push(`Plan · semana ${ps1.week + 1} · ${ps1.title} ${fmtKmS(ps1.m)} km · ${r.dist >= ps1.m * 0.9 ? 'cumplida' : 'parcial'}${ps1.moved ? ' (otro día)' : ''}`); }
   if (r.session?.custom) info.push(`Entreno por tramos: ${r.session.title}`);
+  if (r.goal) info.push(`Objetivo: ${r.goal}`);
   if (r.route) info.push('Ruta: ' + r.route.name + (r.route.auto ? ' (detectada por el trazado)' : ''));
   if (r.gain != null) info.push(`Desnivel: +${r.gain} m`);
   if (r.manual) info.push('Añadida a mano (cinta o reloj)');

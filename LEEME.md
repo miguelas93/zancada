@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.15 (31 oct 2026)
+- Objetivo en la carrera libre: en Preparar › Libre eliges 3, 5 o 10 km, o 20, 30 o 60 min. La tarjeta de carrera muestra lo que falta y la voz avisa al cumplirlo ("lo que corras ahora suma"). Se recuerda la última elección y queda anotado en el resumen.
+- Ficha de ruta: "Compartir la ruta" (texto con km, desnivel, suelo y enlace a la salida en Google Maps, por Telegram/WhatsApp o al portapapeles) y "GPX de la ruta" para llevarla al reloj o a otra app.
+
 ## Novedades 0.14 (madrugada del 31 de octubre)
 - **Rutas en el mapa**: botón Lista / Mapa en la pestaña Rutas. En el mapa ves todas las rutas recomendadas (o tus recorridos) con su trazado y una etiqueta con los km en la salida; respeta los filtros y toca cualquiera para abrir su ficha.
 - **Perfil de desnivel en tus carreras**: si la carrera tiene altitud (GPS del móvil o GPX importado), el resumen muestra el perfil y el desnivel positivo.
