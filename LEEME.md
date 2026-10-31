@@ -13,6 +13,10 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.50 (31 oct 2026)
+
+- **Novedades al abrir**: si ya usabas Zancada, al abrir la 0.50 verás una vez un resumen de lo que cambió esta noche, con enlace a la lista completa. Quien empieza de cero no lo ve.
+
 ## Novedades 0.49 (31 oct 2026)
 
 - **Revisión**: los ánimos por voz ya no interrumpen la guía en las sesiones por tramos (series, corre/anda), donde manda la voz de cada tramo.
