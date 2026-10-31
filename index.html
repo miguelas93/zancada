@@ -258,6 +258,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div class="stats" id="monthStats"></div>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Últimas 12 semanas</h2><span class="sub" id="weeksSub"></span></div><div class="weekbars" id="weeksBars"></div><div class="between sub" style="font-size:11px" id="weekAxis"></div></div>
     <div id="monthGoal" class="card col" style="gap:10px;padding:16px 20px;display:none"></div>
+    <div id="records" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus récords</h2><span class="sub" style="font-size:12px">toca uno para ver la carrera</span></div><div id="recGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
     <button class="btn ghost" id="manualBtn" style="height:44px;font-size:14px">Añadir una carrera a mano (cinta, reloj…)</button>
     <button class="card between" id="heatBtn" style="width:100%;text-align:left;padding:16px 18px 16px 20px"><span><span style="display:block;font-weight:600;font-size:16px">Mapa de todas tus carreras</span><span class="sub" style="font-size:12px" id="heatBtnSub">Tus recorridos superpuestos: donde más corres</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></button>
     <div class="chips fl" id="histChips" style="margin:0 -20px;padding:0 20px"><button class="chipb on" data-hf="all">Todas</button><button class="chipb" data-hf="plan">Del plan</button><button class="chipb" data-hf="route">Con ruta</button><button class="chipb" data-hf="long">Largas</button><button class="chipb" data-hf="note">Con notas</button></div>
@@ -307,7 +308,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     </div>
     <div class="card col" style="gap:8px;padding:18px 20px">
       <h2>Tus datos</h2><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Todo se guarda solo en este móvil. Haz una copia de vez en cuando y guárdala en Drive o Telegram; con ella recuperas carreras, plan y rutas en otro teléfono.</p>
-      <div style="display:flex;gap:8px"><button class="btn sec" id="backupBtn" style="height:46px;font-size:14px">Exportar copia</button><button class="btn sec" id="restoreBtn" style="height:46px;font-size:14px">Importar copia</button></div>
+      <div style="display:flex;gap:8px"><button class="btn sec" id="backupBtn" style="height:46px;font-size:14px">Exportar copia</button><button class="btn sec" id="csvBtn" style="height:46px;font-size:14px">CSV</button><button class="btn sec" id="restoreBtn" style="height:46px;font-size:14px">Importar copia</button></div>
       <input type="file" id="restoreFile" accept="application/json,.json" style="display:none">
       <button class="btn ghost" id="gpxImportBtn" style="height:44px;font-size:14px">Importar carreras GPX (Strava, Garmin…)</button>
       <input type="file" id="gpxFiles" accept=".gpx,application/gpx+xml" multiple style="display:none">
@@ -316,7 +317,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.16 · rutas por tiempo · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.17 · récords y CSV · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -771,7 +772,7 @@ function renderHistory() {
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
-  renderMonthGoal(dist, now, days);
+  renderMonthGoal(dist, now, days); renderRecords();
   const best = runs.length ? Math.max(...runs.map((r) => r.dist)) : 0;
   const HF = { all: () => true, plan: (r) => r.session, route: (r) => r.route, long: (r) => r.dist >= 8000, note: (r) => r.note || r.feel };
   const shown = runs.filter(HF[histFilter] || HF.all);
@@ -809,6 +810,29 @@ function renderHeat() {
 }
 $$('#heatSeg [data-layer]').forEach((b) => b.onclick = () => { $$('#heatSeg [data-layer]').forEach((x) => x.classList.toggle('on', x === b)); setLayer(maps.heatMap, b.dataset.layer); });
 $$('#histChips [data-hf]').forEach((b) => b.onclick = () => { histFilter = b.dataset.hf; renderHistory(); });
+// Récords personales (NRC/Strava): mejor km, 5K, 10K a partir de los parciales (o escalado si la carrera es a mano), más larga, más desnivel, mejor racha.
+function bestFor(r, D) {
+  if (r.manual) return r.dist >= D && r.dist < D * 1.15 ? r.dur * D / r.dist : null;
+  const ok = (r.splits || []).filter((x) => !x.partial); if (ok.length * 1000 < D) return null;
+  const t = [0]; ok.forEach((x) => t.push(t[t.length - 1] + x.split)); const n = D / 1000; let best = Infinity;
+  for (let i = 0; i + n < t.length; i++) best = Math.min(best, t[i + n] - t[i]); return isFinite(best) ? best : null;
+}
+function bestStreak() { if (!runs.length) return 0; const byW = {}; runs.forEach((r) => { const w = weekStart(r.start); byW[w] = (byW[w] || 0) + 1; }); const ws = Object.keys(byW).map(Number).sort((a, b) => a - b); let best = 0, cur = 0, prev = null; ws.forEach((w) => { if (byW[w] >= GOAL_OF()) { cur = prev != null && w - prev === 7 * 864e5 ? cur + 1 : 1; best = Math.max(best, cur); } else cur = 0; prev = w; }); return best; }
+function personalRecords() {
+  const out = [], pick = (label, val, fmt, r) => { if (r) out.push({ label, val: fmt(val), r }); };
+  let bk = null, b5 = null, b10 = null, lg = null, gn = null;
+  runs.forEach((r) => { const ok = (r.splits || []).filter((x) => !x.partial); const k = ok.length ? Math.min(...ok.map((x) => x.split)) : null; if (k && (!bk || k < bk.v)) bk = { v: k, r };
+    const f5 = bestFor(r, 5000); if (f5 && (!b5 || f5 < b5.v)) b5 = { v: f5, r }; const f10 = bestFor(r, 10000); if (f10 && (!b10 || f10 < b10.v)) b10 = { v: f10, r };
+    if (!lg || r.dist > lg.v) lg = { v: r.dist, r }; if (r.gain > 20 && (!gn || r.gain > gn.v)) gn = { v: r.gain, r }; });
+  pick('Mejor km', bk?.v, fmtTime, bk?.r); pick('Mejor 5 km', b5?.v, fmtTime, b5?.r); pick('Mejor 10 km', b10?.v, fmtTime, b10?.r); pick('Más larga', lg?.v, (v) => fmtKm(v) + ' km', lg?.r); pick('Más desnivel', gn?.v, (v) => '+' + Math.round(v) + ' m', gn?.r);
+  const bs = bestStreak(); if (bs >= 2) out.push({ label: 'Mejor racha', val: bs + ' semanas', r: null });
+  return out;
+}
+function renderRecords() {
+  const box = $('#records'), recs = personalRecords(); box.style.display = recs.length ? '' : 'none'; if (!recs.length) return;
+  $('#recGrid').innerHTML = recs.map((x, i) => `<button data-rec="${i}" style="text-align:left;background:var(--surface2);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;color:var(--ink)"><span class="lbl" style="font-size:10px">${x.label}</span><span class="num" style="font-size:22px">${x.val}</span><span class="sub" style="font-size:11px">${x.r ? fmtDate(x.r.start).split(' · ')[0] : 'objetivo semanal'}</span></button>`).join('');
+  $$('#recGrid [data-rec]').forEach((b) => b.onclick = () => { const r = recs[Number(b.dataset.rec)].r; if (r) openSummary(r.id); });
+}
 function renderMonthGoal(dist, now, days) {
   const goal = Number(settings.monthkm) || 0, box = $('#monthGoal'); box.style.display = goal ? '' : 'none'; if (!goal) return;
   const km = dist / 1000, left = Math.max(0, goal - km), daysLeft = days - now.getDate() + 1, perWeek = left / Math.max(1, daysLeft / 7), pct = Math.min(100, km / goal * 100), onTrack = km / goal >= (now.getDate() - 1) / days;
@@ -922,6 +946,7 @@ async function shareOrDownload(blob, name, text) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   toast('Archivo guardado en descargas', 3000); return true;
 }
+$('#csvBtn').onclick = () => { if (!runs.length) return toast('Aún no hay carreras que exportar'); const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"'; const rows = [['fecha', 'hora', 'nombre', 'km', 'tiempo', 'ritmo_min_km', 'desnivel_m', 'sensacion', 'ruta', 'sesion', 'notas']].concat(runs.slice().reverse().map((r) => { const d = new Date(r.start); return [d.toISOString().slice(0, 10), d.toTimeString().slice(0, 5), r.name, (r.dist / 1000).toFixed(2), fmtTime(r.dur), fmtPace(r.dur / (r.dist / 1000)), r.gain ?? '', r.feel ? FEEL_L[r.feel] : '', r.route?.name || '', r.session?.title || r.goal || '', r.note || '']; })); const csv = '\ufeff' + rows.map((row) => row.map(q).join(';')).join('\r\n'); shareOrDownload(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `zancada-carreras-${new Date().toISOString().slice(0, 10)}.csv`, 'Carreras de Zancada'); };
 $('#backupBtn').onclick = () => { const data = { app: 'zancada', version: 1, exported: new Date().toISOString() }; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith('zancada.') && k !== 'zancada.routecache.v1') data[k] = JSON.parse(localStorage.getItem(k)); } shareOrDownload(new Blob([JSON.stringify(data)], { type: 'application/json' }), `zancada-copia-${new Date().toISOString().slice(0, 10)}.json`, 'Copia de seguridad de Zancada'); };
 $('#restoreBtn').onclick = () => $('#restoreFile').click();
 $('#restoreFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { const data = JSON.parse(await f.text()); if (data.app !== 'zancada') throw new Error('no es una copia de Zancada'); let n = 0; Object.keys(data).forEach((k) => { if (k.startsWith('zancada.')) { localStorage.setItem(k, JSON.stringify(data[k])); n++; } }); toast(`Copia importada (${n} apartados). Recargando…`, 2500); setTimeout(() => location.reload(), 1200); } catch (err) { toast('No he podido leer esa copia: ' + err.message, 4000); } e.target.value = ''; };
