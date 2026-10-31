@@ -122,6 +122,28 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:32px 32px 0 0;padding:12px 20px calc(var(--sab) + 24px);z-index:1000;box-shadow:0 -8px 32px rgba(0,0,0,.12)}
 .handle{width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 18px}
 .fab{position:absolute;z-index:1000;display:flex;justify-content:space-between;align-items:center;left:20px;right:20px;top:calc(var(--sat) + 14px)}
+/* v0.4: plan de entrenamiento y rutas */
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0}.chips::-webkit-scrollbar{display:none}
+.chipb{flex:none;height:38px;padding:0 14px;border-radius:999px;background:var(--surface);color:var(--ink);font-weight:600;font-size:13px;box-shadow:0 4px 14px -6px rgba(0,0,0,.25)}
+.chipb.on{background:var(--bar);color:var(--on-bar)}
+.chip.mid{background:var(--bar);color:var(--on-bar)}.chip.hard{background:var(--danger);color:#fff}
+.carousel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 12px 4px}.carousel::-webkit-scrollbar{display:none}
+.carousel>*{flex:none;width:calc(100vw - 56px);scroll-snap-align:center}
+.days{display:flex;gap:6px}.days button{flex:1;height:50px;border-radius:14px;background:rgba(244,245,240,.08);color:var(--on-bar);font-weight:600;font-size:15px}.days button.on{background:var(--volt);color:var(--on-volt)}
+.dark .seg{background:rgba(244,245,240,.08)}.dark .seg button{color:var(--on-bar-muted)}.dark .seg button.on{background:var(--volt);color:var(--on-volt)}
+.sess{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--line);width:100%;text-align:left}.sess:first-child{border-top:0}
+.sess .st{width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--surface2);color:var(--muted);font-family:var(--display);font-weight:700;font-size:13px}
+.sess .st.ok{background:var(--volt);color:var(--on-volt)}.sess .st.miss{background:transparent;border:1.5px dashed var(--line)}.sess .st.today{background:var(--bar);color:var(--on-bar)}.sess .st.skip{opacity:.4}
+.wk{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}.wk::-webkit-scrollbar{display:none}
+.wk button{flex:none;width:46px;height:58px;border-radius:14px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted)}
+.wk button b{font-family:var(--display);font-size:17px;color:var(--ink)}.wk button.on{background:var(--bar);color:var(--on-bar-muted)}.wk button.on b{color:var(--volt)}.wk button.past{opacity:.55}
+.guide{display:none;border-top:1px solid rgba(244,245,240,.12);padding-top:14px;gap:8px}
+.guide.on{display:flex;flex-direction:column}
+.guide .fuerte{color:var(--volt)}
+.rcard{background:var(--surface);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 30px -10px rgba(0,0,0,.3)}
+.rcard.on{outline:2px solid var(--ink)}
+.skel{height:96px;border-radius:24px;background:var(--surface);opacity:.6;animation:pulse 1.2s infinite alternate}
+@keyframes pulse{from{opacity:.4}to{opacity:.8}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -177,6 +199,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <div class="track"><i id="weekTrack" style="width:0"></i></div>
       <div class="stats" id="weekStats"></div>
     </div>
+    <div id="planCard"></div>
     <button class="card between" data-go="prep" style="width:100%;text-align:left;padding:18px 18px 18px 22px">
       <div class="col" style="gap:6px"><span class="chip" style="align-self:flex-start">Carrera libre</span><span class="num" style="font-size:26px">Salir a correr</span><span class="sub" id="homeNudge">GPS, ritmo en directo y aviso de voz en cada km</span></div>
       <span class="icon big" style="background:var(--volt);color:var(--on-volt)"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></span>
@@ -205,7 +228,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 <!-- CLUBS -->
 <section class="screen scroll withtabs" id="clubs">
   <div class="col" style="gap:20px">
-    <h1>Clubs</h1>
+    <div class="between"><h1>Clubs</h1><button class="icon" data-go="profile" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <div class="card dark col" style="gap:12px;padding:24px">
       <span class="chip" style="align-self:flex-start">Muy pronto</span>
       <span class="num" style="font-size:30px">Corre con tu gente</span>
@@ -232,12 +255,80 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <label class="setrow">Modo noche<select class="sel" id="setNight"><option value="auto">Automático</option><option value="on">Siempre</option><option value="off">Nunca</option></select></label>
       <label class="setrow">Mapa del resumen<select class="sel" id="setMap"><option value="calles">Calles</option><option value="sat">Satélite</option></select></label>
     </div>
+    <button class="card between" data-go="clubs" style="width:100%;text-align:left;padding:16px 18px 16px 20px"><span><span class="chip" style="font-size:9px;padding:3px 8px">Muy pronto</span><span style="display:block;font-weight:600;font-size:16px;margin-top:6px">Clubs</span><span class="sub" style="font-size:12px">Corre con tu gente cuando haya cuentas</span></span><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="m9 18 6-6-6-6"/></svg></button>
     <button class="btn sec" id="goalBtn">Cambiar mi nombre u objetivo</button>
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.3 · estilo Volt · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.4 · plan y rutas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
+</section>
+
+<!-- RUTAS -->
+<section class="screen" id="routes" style="padding:0">
+  <div id="routesMap" style="position:absolute;inset:0"></div>
+  <div class="fab" style="flex-direction:column;align-items:stretch;gap:10px;left:12px;right:12px">
+    <div class="between"><span class="pill" style="font-family:var(--display);font-size:18px;font-weight:700;padding:10px 18px">Rutas</span><button class="icon" id="routesLocate" aria-label="Centrar en mi posición"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></button></div>
+    <div class="chips" id="routesChips">
+      <button class="chipb on" data-mode="sug">Para ti</button><button class="chipb" data-mode="mine">Mis recorridos</button>
+      <span style="width:1px;background:var(--line);flex:none;margin:7px 2px"></span>
+      <button class="chipb" data-km="3">3 km</button><button class="chipb on" data-km="5">5 km</button><button class="chipb" data-km="8">8 km</button><button class="chipb" data-km="10">10 km</button><button class="chipb" data-km="15">15 km</button>
+    </div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:calc(var(--sab) + 96px);z-index:1000"><div class="carousel" id="routesCards"></div></div>
+  <nav class="tabs" data-tab="routes"></nav>
+</section>
+
+<!-- PLAN -->
+<section class="screen scroll" id="plan">
+  <div class="col" style="gap:18px">
+    <div class="between"><button class="icon" data-go="home" aria-label="Volver"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><span class="chip" id="planGoalChip"></span><span style="width:44px"></span></div>
+    <div><span class="lbl" id="planSub"></span><h1 id="planTitle" style="margin-top:4px">Tu plan</h1></div>
+    <div class="card dark col" style="gap:14px" id="planWeekCard"></div>
+    <div class="wk" id="planWeeks"></div>
+    <div class="list" id="planSessions"></div>
+    <div class="card col" style="gap:4px">
+      <h2 style="margin-bottom:6px">Avisos</h2>
+      <label class="setrow">Recordarme los días de entreno<select class="sel" id="planRemind"><option value="0">No</option><option value="1">Sí</option></select></label>
+      <label class="setrow">Hora del aviso<select class="sel" id="planHour"></select></label>
+      <p class="sub" style="margin:4px 0 0;font-size:12px" id="planRemindHint"></p>
+    </div>
+    <button class="btn sec" id="planEdit">Cambiar objetivo, días o nivel</button>
+    <button class="btn ghost" id="planDelete" style="color:var(--danger)">Eliminar el plan</button>
+  </div>
+</section>
+
+<!-- CREAR PLAN -->
+<section class="screen dark" id="planSetup" style="background:var(--bar);gap:18px">
+  <div class="between"><button class="icon" id="psClose" aria-label="Cerrar" style="background:rgba(244,245,240,.08);color:var(--on-bar)"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div class="dots" id="psDots"><i class="on"></i><i></i><i></i><i></i></div><span style="width:44px"></span></div>
+  <div class="grow"></div>
+  <div id="ps0" class="col" style="gap:10px">
+    <span class="lbl">Objetivo</span><h1 style="font-size:32px">¿Para qué entrenas?</h1>
+    <button class="opt" data-pgoal="5k"><span class="n">5</span><span><b>Correr 5 km</b><small>Terminar o mejorar tu 5K</small></span></button>
+    <button class="opt on" data-pgoal="10k"><span class="n">10</span><span><b>Correr 10 km</b><small>El clásico. Con 8 semanas suele bastar</small></span></button>
+    <button class="opt" data-pgoal="media"><span class="n">21</span><span><b>Media maratón</b><small>21,1 km. Mejor con 12 semanas</small></span></button>
+    <button class="opt" data-pgoal="constancia"><span class="n">∞</span><span><b>Coger el hábito</b><small>Sin carrera objetivo, solo constancia</small></span></button>
+  </div>
+  <div id="ps1" class="col" style="gap:12px;display:none">
+    <span class="lbl">Días y duración</span><h1 style="font-size:32px">¿Qué días corres?</h1>
+    <div class="days" id="psDays"></div>
+    <p class="sub" style="margin:0" id="psDaysHint"></p>
+    <span class="lbl" style="margin-top:6px">Semanas</span>
+    <div class="seg" id="psWeeks"><button data-w="6">6</button><button class="on" data-w="8">8</button><button data-w="10">10</button><button data-w="12">12</button></div>
+  </div>
+  <div id="ps2" class="col" style="gap:10px;display:none">
+    <span class="lbl">Nivel</span><h1 style="font-size:32px">¿Cuánto corres ahora?</h1>
+    <p class="sub" style="margin:0 0 4px" id="psLevelHint"></p>
+    <button class="opt" data-level="inicio"><span class="n">A</span><span><b>Estoy empezando</b><small>Menos de 10 km a la semana</small></span></button>
+    <button class="opt on" data-level="medio"><span class="n">B</span><span><b>Corro con regularidad</b><small>Entre 10 y 25 km a la semana</small></span></button>
+    <button class="opt" data-level="avanzado"><span class="n">C</span><span><b>Ya entreno en serio</b><small>Más de 25 km a la semana</small></span></button>
+  </div>
+  <div id="ps3" class="col" style="gap:10px;display:none">
+    <span class="lbl">Tu plan</span><h1 style="font-size:32px" id="psDoneTitle"></h1>
+    <p class="sub" style="margin:0;font-size:15px" id="psDoneText"></p>
+  </div>
+  <div class="grow"></div>
+  <button class="btn" id="psNext">Continuar</button>
 </section>
 
 <!-- PREPARACIÓN -->
@@ -248,8 +339,10 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
     <span class="pill"><span class="dot" id="gpsDot"></span><span id="gpsText">Buscando GPS…</span></span>
     <span style="width:44px"></span>
   </div>
-  <div class="sheet col" style="gap:18px">
-    <div><div class="handle"></div><span class="lbl">Entreno</span><h1 style="font-size:32px;margin-top:4px">Carrera libre</h1><p class="sub" style="margin:6px 0 0">Sin objetivo. Distancia, ritmo y parciales en directo.</p></div>
+  <div class="sheet col" style="gap:16px">
+    <div><div class="handle"></div><div class="seg" id="prepMode" style="display:none"><button class="on" data-pm="plan">Sesión del plan</button><button data-pm="libre">Carrera libre</button></div></div>
+    <div><span class="lbl" id="prepLbl">Entreno</span><h1 style="font-size:30px;margin-top:4px" id="prepTitle">Carrera libre</h1><p class="sub" style="margin:6px 0 0" id="prepDesc">Sin objetivo. Distancia, ritmo y parciales en directo.</p></div>
+    <div id="prepRoute" class="between" style="display:none;background:var(--surface2);border-radius:16px;padding:10px 10px 10px 16px"><span style="display:flex;align-items:center;gap:10px;min-width:0"><svg class="i" viewBox="0 0 24 24" style="color:var(--muted)"><path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/></svg><span style="min-width:0"><b style="display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="prepRouteName"></b><small class="sub" id="prepRouteSub"></small></span></span><button class="icon" id="prepRouteDrop" aria-label="Quitar ruta" style="width:36px;height:36px;background:var(--surface)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <button class="btn" id="startBtn" disabled>Empezar</button>
     <p id="prepHint" class="sub" style="margin:-6px 0 0;text-align:center;font-size:12px">Necesito permiso de ubicación para medir tu carrera.</p>
   </div>
@@ -270,6 +363,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <div><span class="lbl">Ritmo actual</span><span><span class="num" id="rPace" style="font-size:40px;color:var(--volt)">–:––</span><span class="unit">/km</span></span></div>
       <div style="align-items:flex-end"><span class="lbl">Tiempo</span><span class="num" id="rTime" style="font-size:40px">00:00</span></div>
     </div>
+    <div class="guide" id="runGuide"><div class="between"><span class="lbl">Ahora</span><span class="sub" id="gStep"></span></div><div class="between" style="align-items:baseline"><span class="num" id="gLabel" style="font-size:24px">—</span><span style="flex:none"><span class="num" id="gLeft" style="font-size:24px">0</span><span class="unit">m</span></span></div><div class="track"><i id="gTrack" style="width:0"></i></div></div>
   </div>
   <div class="stats" style="padding:4px 10px">
     <div><span class="lbl">Ritmo medio</span><span><span class="num" id="rAvg" style="font-size:28px">–:––</span><span class="unit">/km</span></span></div>
@@ -321,6 +415,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
       <div><div class="sub" id="sDate"></div><h1 style="font-size:28px;margin-top:4px" id="sTitle">Carrera</h1></div>
       <div><span class="num" id="sKm" style="font-size:76px;letter-spacing:-.05em">0</span><span class="unit" style="font-size:22px;font-weight:600">km</span></div>
       <div class="stats" id="sStats"></div>
+      <div id="sPlan" class="sub" style="display:none;font-size:13px;border-top:1px solid var(--line);padding-top:12px;line-height:1.6"></div>
     </div>
     <div class="card col" style="gap:12px;padding:22px"><div class="between"><h2>Parciales</h2><span class="sub" style="font-size:12px">Mejor km en lima</span></div><div class="splits" id="sSplits"></div></div>
     <button class="btn ghost" id="deleteBtn" style="color:var(--danger)">Borrar esta carrera</button>
@@ -356,9 +451,10 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 'use strict';
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
-const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1', PROF = 'zancada.profile.v1';
+const KEY = 'zancada.runs.v1', SET = 'zancada.settings.v1', PROF = 'zancada.profile.v1', PLAN = 'zancada.plan.v1', ROUTES = 'zancada.routes.v1';
 const settings = Object.assign({ voice: '1', night: 'auto', map: 'sat' }, load(SET, {}));
 let runs = load(KEY, []);
+let plan = load(PLAN, null), savedRoutes = load(ROUTES, []);
 const profile = Object.assign({ name: '', goal: 3, done: false }, load(PROF, {}));
 const GOAL_OF = () => Math.max(1, Number(profile.goal) || 3);
 // Día / noche: claro de día, oscuro de 20:00 a 7:00 o con el móvil en modo oscuro (o forzado en Perfil).
@@ -407,29 +503,44 @@ const ROUTE_HALO = { color: INK, weight: 9, opacity: 1, lineCap: 'round', lineJo
 const dotIcon = (bg, border) => L.divIcon({ className: '', html: `<span style="display:block;width:18px;height:18px;border-radius:9px;background:${bg};border:3px solid ${border};box-shadow:0 2px 6px rgba(0,0,0,.3)"></span>`, iconSize: [18, 18], iconAnchor: [9, 9] });
 
 // ---------- navegación ----------
-function go(id) {
+function go(id, opts = {}) {
   $$('.screen').forEach((s) => s.classList.toggle('on', s.id === id));
   window.scrollTo(0, 0);
+  if (!opts.pop && history.state?.id !== id) history.pushState({ id }, '');
+  if (!run.active && !['prep', 'count', 'run'].includes(id) && watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; } // no gastar batería fuera de la carrera
   if (id === 'home') renderHome();
   if (id === 'history') renderHistory();
   if (id === 'profile') renderProfile();
   if (id === 'clubs') renderClubs();
+  if (id === 'routes') renderRoutes();
+  if (id === 'plan') renderPlan();
   if (id === 'prep') startPrep();
   setTimeout(() => Object.values(maps).forEach((m) => m.invalidateSize()), 60);
 }
+// Botón "atrás" del móvil (y del navegador): vuelve a la pantalla anterior y nunca cierra la app en plena carrera.
+window.addEventListener('popstate', (e) => {
+  const id = e.state?.id;
+  if (run.active) { history.pushState({ id: 'run' }, ''); return; }
+  if (!profile.done) { history.pushState({ id: 'welcome' }, ''); return; }
+  if (id === 'summary' && current) return openSummary(current.id);
+  if (id === 'replay' && current) return openReplay();
+  if (!id || ['welcome', 'count', 'run', 'cele', 'summary', 'replay'].includes(id)) return go('home', { pop: true });
+  go(id, { pop: true });
+});
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
 // Deslizar entre pantallas: Inicio ↔ Actividad ↔ Clubs ↔ Perfil; hacia la derecha vuelve atrás en Preparación y Resumen.
-const TABS = ['home', 'history', 'clubs', 'profile'];
+const TABS = ['home', 'history', 'routes', 'profile'];
 const TAB_ICONS = {
   home: ['Inicio', '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'],
   history: ['Actividad', '<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>'],
+  routes: ['Rutas', '<path d="M4 19c4-1 5-6 8-7s5 2 8-5"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="7" r="2"/>'],
   clubs: ['Clubs', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
   profile: ['Perfil', '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
 };
 $$('nav.tabs').forEach((nav) => {
   const tab = (id) => `<button data-go="${id}" class="${nav.dataset.tab === id ? 'on' : ''}" aria-label="${TAB_ICONS[id][0]}"><svg class="i" viewBox="0 0 24 24">${TAB_ICONS[id][1]}</svg>${TAB_ICONS[id][0]}</button>`;
   nav.setAttribute('aria-label', 'Pestañas');
-  nav.innerHTML = tab('home') + tab('history') + '<button class="go" data-go="prep" aria-label="Correr"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></button>' + tab('clubs') + tab('profile');
+  nav.innerHTML = tab('home') + tab('history') + '<button class="go" data-go="prep" aria-label="Correr"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></svg></button>' + tab('routes') + tab('profile');
 });
 let sw = null;
 document.addEventListener('touchstart', (e) => { const cur = $('.screen.on')?.id; if (e.touches.length !== 1 || !['home', 'history', 'clubs', 'profile', 'prep', 'summary'].includes(cur) || e.target.closest('input,.slide,#sumMap')) { sw = null; return; } sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
@@ -477,6 +588,7 @@ function renderHome() {
   const d = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#homeDate').textContent = d[0].toUpperCase() + d.slice(1);
   $('#homeHello').textContent = profile.name ? `Hola, ${profile.name}` : 'Hola';
+  renderPlanCard();
   const week = runs.filter((r) => r.start >= ws), km = week.reduce((a, r) => a + r.dist, 0), dur = week.reduce((a, r) => a + r.dur, 0);
   const perDay = [0, 0, 0, 0, 0, 0, 0]; week.forEach((r) => { perDay[(new Date(r.start).getDay() + 6) % 7] += r.dist; });
   const maxDay = Math.max(5000, ...perDay);
@@ -578,7 +690,7 @@ function renderProfile() {
   $('#setVoice').value = settings.voice; $('#setNight').value = settings.night; $('#setMap').value = settings.map;
 }
 ['setVoice', 'setNight', 'setMap'].forEach((id) => $('#' + id).onchange = (e) => { settings[id.slice(3).toLowerCase()] = e.target.value; save(SET, settings); applyTheme(); });
-$('#wipeBtn').onclick = () => { if ($('#wipeBtn').dataset.sure) { runs = []; save(KEY, runs); toast('Datos borrados'); go('home'); } else { $('#wipeBtn').dataset.sure = '1'; $('#wipeBtn').textContent = 'Pulsa otra vez para confirmar'; setTimeout(() => { delete $('#wipeBtn').dataset.sure; $('#wipeBtn').textContent = 'Borrar todos los datos de este móvil'; }, 3000); } };
+$('#wipeBtn').onclick = () => { if ($('#wipeBtn').dataset.sure) { runs = []; plan = null; savedRoutes = []; save(KEY, runs); save(PLAN, null); save(ROUTES, savedRoutes); syncReminders(); toast('Datos borrados'); go('home'); } else { $('#wipeBtn').dataset.sure = '1'; $('#wipeBtn').textContent = 'Pulsa otra vez para confirmar'; setTimeout(() => { delete $('#wipeBtn').dataset.sure; $('#wipeBtn').textContent = 'Borrar todos los datos de este móvil'; }, 3000); } };
 $('#demoBtn').onclick = () => { runs.unshift(demoRun()); save(KEY, runs); toast('Carrera de ejemplo añadida'); go('home'); };
 function demoRun() {
   const pts = [], start = Date.now() - 3600e3, lat0 = 40.4152, lon0 = -3.6845; let t = 0, lat = lat0, lon = lon0;
@@ -586,21 +698,349 @@ function demoRun() {
   return finalizeRun({ id: 'demo-' + start, start, points: pts, pausedMs: 0 });
 }
 
+
+// ---------- plan de entrenamiento ----------
+// Un plan es: objetivo, días de la semana, nivel y nº de semanas. Las sesiones se calculan siempre a partir de eso
+// (nada se guarda por sesión), y `factor[w]` es lo único que cambia la revisión semanal.
+const GOALS = { '5k': { name: '5K', race: 5000, peak: 22, cap: 1.5 }, '10k': { name: '10K', race: 10000, peak: 32, cap: 1.6 }, media: { name: 'Media maratón', race: 21097.5, peak: 48, cap: 1.8 }, constancia: { name: 'Constancia', race: 0, peak: 0, cap: 1.35 } };
+const LEVELS = { inicio: { base: 8, max: 30, reps: [4, 7] }, medio: { base: 16, max: 50, reps: [6, 9] }, avanzado: { base: 26, max: 70, reps: [8, 12] } };
+const DAY_L = ['L', 'M', 'X', 'J', 'V', 'S', 'D'], DAY_N = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+const dayStart = (ts) => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
+const fmtKmS = (m) => (m / 1000).toFixed(m % 1000 ? 1 : 0).replace('.', ',');
+const listEs = (a) => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+const curWeek = (p) => Math.floor((dayStart(Date.now()) - p.start) / (7 * 864e5));
+function planWeekKm(p, w) {
+  const g = GOALS[p.goal], lv = LEVELS[p.level];
+  const base = lv.base, peak = Math.min(lv.max, Math.max(base * g.cap, g.peak));
+  const N = p.weeks, race = g.race > 0, build = race ? N - 1 : N;
+  const t = build > 1 ? Math.min(1, w / (build - 1)) : 1;
+  let km = base + (peak - base) * t;
+  if (race && w === N - 1) km = base * 0.6;                 // semana de carrera: afinar
+  else if (w % 4 === 3 && w < build - 1) km *= 0.75;         // descarga cada cuatro semanas
+  return km * (p.factor?.[w] ?? 1);
+}
+function planSessions(p) {
+  const g = GOALS[p.goal], lv = LEVELS[p.level], days = [...p.days].sort((a, b) => a - b), n = days.length, race = g.race > 0;
+  const unit = p.goal === '10k' ? 800 : p.goal === 'media' ? 1000 : 400, warm = p.level === 'inicio' ? 1000 : 1500;
+  const weeks = [];
+  for (let w = 0; w < p.weeks; w++) {
+    const km = planWeekKm(p, w), last = race && w === p.weeks - 1, t = Math.min(1, w / Math.max(1, p.weeks - (race ? 2 : 1)));
+    let types = n <= 2 ? ['series', 'largo'] : n === 3 ? ['suave', 'series', 'largo'] : n === 4 ? ['suave', 'series', 'suave', 'largo'] : ['suave', 'series', 'suave', 'tempo', 'largo'].concat(Array(n - 5).fill('suave'));
+    if (w === 0 || (p.level === 'inicio' && w < 2)) types = types.map((x) => x === 'series' || x === 'tempo' ? 'suave' : x); // arrancar sin calidad
+    if (last) types[n - 1] = 'carrera';
+    const reps = Math.round(lv.reps[0] + (lv.reps[1] - lv.reps[0]) * t), nEasy = types.filter((x) => x === 'suave').length;
+    const list = types.map((type, i) => {
+      let m = null, struct = null, title, desc;
+      if (type === 'largo') { m = km * (n <= 2 ? 0.55 : 0.38) * 1000; title = 'Rodaje largo'; desc = 'Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.'; }
+      else if (type === 'series') { const off = Math.round(unit / 2); struct = { warm, reps, on: unit, off, cool: 1000 }; m = warm + reps * (unit + off) + 1000; title = `Series ${reps}×${unit >= 1000 ? unit / 1000 + ' km' : unit + ' m'}`; desc = `Calienta ${fmtKmS(warm)} km, ${reps} repeticiones fuertes de ${unit} m con ${off} m al trote entre ellas, y 1 km suave para acabar.`; }
+      else if (type === 'tempo') { const on = Math.max(2000, Math.round(km * 0.22 * 2) * 500); struct = { warm, reps: 1, on, off: 0, cool: 1000 }; m = warm + on + 1000; title = `Tempo ${fmtKmS(on)} km`; desc = `Calienta ${fmtKmS(warm)} km, ${fmtKmS(on)} km a ritmo controlado (frases cortas, nada de charla) y 1 km suave.`; }
+      else if (type === 'carrera') { m = g.race; title = `Carrera: ${g.name}`; desc = 'El día. Sal conservador los primeros km y disfruta.'; }
+      else { title = 'Rodaje suave'; desc = 'Ritmo fácil. Si no puedes hablar, frena.'; }
+      return { type, m, struct, title, desc, dayIdx: days[i] };
+    });
+    const fixed = list.reduce((a, s) => a + (s.m || 0), 0), rest = Math.max(nEasy * 3000, km * 1000 - fixed);
+    list.forEach((s) => { if (s.m === null) s.m = rest / nEasy; if (s.type !== 'carrera') s.m = Math.max(3000, Math.round(s.m / 500) * 500); });
+    weeks.push(list.map((s) => Object.assign(s, { key: `w${w}d${s.dayIdx}`, week: w, date: p.start + (w * 7 + s.dayIdx) * 864e5 })));
+  }
+  return weeks;
+}
+// Cruza las sesiones con las carreras guardadas: la del mismo día cuenta; una carrera en otro día de la misma semana cubre la sesión pendiente más cercana.
+function planStatus(p) {
+  const weeks = planSessions(p), today = dayStart(Date.now()), created = dayStart(p.created);
+  const byDay = new Map(); runs.forEach((r) => { const k = dayStart(r.start); byDay.set(k, (byDay.get(k) || []).concat(r)); });
+  weeks.forEach((ss, w) => {
+    const w0 = p.start + w * 7 * 864e5, w1 = w0 + 7 * 864e5, used = new Set();
+    ss.forEach((s) => { const r = (byDay.get(dayStart(s.date)) || []).find((x) => !used.has(x.id)); if (r) { s.run = r; used.add(r.id); } });
+    const extra = runs.filter((r) => r.start >= w0 && r.start < w1 && !used.has(r.id)).sort((a, b) => a.start - b.start);
+    ss.filter((s) => !s.run && dayStart(s.date) >= created).forEach((s) => { const r = extra.shift(); if (r) { s.run = r; s.moved = true; } });
+    ss.forEach((s) => { const d = dayStart(s.date); s.state = s.run ? 'ok' : d < created ? 'skip' : d < today ? 'miss' : d === today ? 'today' : 'next'; });
+  });
+  return weeks;
+}
+// Revisión semanal: cada lunes mira la semana anterior y ajusta las siguientes. Se hace una sola vez por semana.
+function reviewPlan() {
+  if (!plan) return;
+  const weeks = planStatus(plan), wi = curWeek(plan); let changed = false;
+  plan.factor = plan.factor || Array(plan.weeks).fill(1);
+  for (let w = plan.reviewed || 0; w < Math.min(wi, plan.weeks); w++) {
+    const ss = weeks[w].filter((s) => s.state !== 'skip'); plan.reviewed = w + 1; changed = true;
+    if (!ss.length) continue;
+    const planKm = ss.reduce((a, s) => a + s.m, 0), doneKm = ss.reduce((a, s) => a + (s.run ? s.run.dist : 0), 0), done = ss.filter((s) => s.run).length, ratio = doneKm / planKm;
+    let f = 1, text;
+    if (done === 0) { f = 0.85; text = 'Semana en blanco: bajo un 15 % para retomar sin agobio.'; }
+    else if (ratio < 0.6) { f = 0.9; text = 'Quedó menos del 60 % de los km: bajo un 10 % las próximas semanas.'; }
+    else if (done === ss.length && ratio >= 1.1) { f = 1.05; text = 'Todo hecho y con margen: subo un 5 %.'; }
+    else text = 'Vas según lo previsto. Sigo con el plan tal cual.';
+    for (let k = w + 1; k < plan.weeks; k++) plan.factor[k] = Math.min(1.15, Math.max(0.7, plan.factor[k] * f));
+    plan.lastReview = { week: w, done, total: ss.length, doneKm, planKm, text };
+  }
+  if (changed) { save(PLAN, plan); syncReminders(); }
+}
+function todaySession() { if (!plan) return null; const wi = curWeek(plan); if (wi < 0 || wi >= plan.weeks) return null; return planStatus(plan)[wi].find((s) => s.state === 'today') || null; }
+function nextSession(weeks) { const now = dayStart(Date.now()); return weeks.flat().find((s) => !s.run && s.state !== 'skip' && dayStart(s.date) >= now) || null; }
+const sessIcon = (s) => s.state === 'ok' ? '<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;stroke-width:3"><path d="M5 12l5 5L20 7"/></svg>' : DAY_L[s.dayIdx];
+function renderPlanCard() {
+  const box = $('#planCard');
+  if (!plan) { box.innerHTML = `<button class="card dark col" id="planNew" style="width:100%;text-align:left;gap:10px;padding:20px"><span class="chip" style="align-self:flex-start">Nuevo</span><span class="num" style="font-size:26px">Entrena con un plan</span><span class="sub">Objetivo, días y semanas. Se adapta cada semana a lo que corres.</span></button>`; $('#planNew').onclick = () => openPlanSetup(); return; }
+  const weeks = planStatus(plan), wi = curWeek(plan), g = GOALS[plan.goal];
+  if (wi >= plan.weeks) { const all = weeks.flat().filter((s) => s.state !== 'skip'), done = all.filter((s) => s.run).length; box.innerHTML = `<button class="card dark col" id="planOpen" style="width:100%;text-align:left;gap:10px;padding:20px"><span class="chip" style="align-self:flex-start">Plan terminado</span><span class="num" style="font-size:26px">${done} de ${all.length} sesiones</span><span class="sub">${g.name} en ${plan.weeks} semanas. Toca para verlo o crear otro.</span></button>`; $('#planOpen').onclick = () => { planView = null; go('plan'); }; return; }
+  const ws = weeks[wi], done = ws.filter((s) => s.run).length, total = ws.filter((s) => s.state !== 'skip').length;
+  const td = ws.find((s) => s.state === 'today'), nx = td || nextSession(weeks);
+  const when = !nx ? '' : nx === td ? 'Hoy' : dayStart(nx.date) === dayStart(Date.now()) + 864e5 ? 'Mañana' : 'El ' + DAY_N[nx.dayIdx];
+  const rev = plan.lastReview && plan.lastReview.week === wi - 1 ? `<p class="sub" style="margin:0;font-size:12px;border-top:1px solid rgba(244,245,240,.12);padding-top:10px">Semana pasada: ${plan.lastReview.done} de ${plan.lastReview.total} sesiones, ${fmtKmS(plan.lastReview.doneKm)} de ${fmtKmS(plan.lastReview.planKm)} km. ${plan.lastReview.text}</p>` : '';
+  box.innerHTML = `<button class="card dark col" id="planOpen" style="width:100%;text-align:left;gap:12px;padding:20px">
+    <div class="between"><span class="lbl">Plan ${g.name} · semana ${wi + 1} de ${plan.weeks}</span><span class="sub">${done}/${total}</span></div>
+    ${nx ? `<div><span class="chip" style="align-self:flex-start;margin-bottom:8px">${when}</span><div class="num" style="font-size:26px">${nx.title} · ${fmtKmS(nx.m)} km</div><div class="sub" style="margin-top:4px">${nx.desc}</div></div>` : '<div class="num" style="font-size:24px">Semana cumplida</div>'}
+    <div class="track"><i style="width:${total ? done / total * 100 : 0}%"></i></div>${rev}</button>`;
+  $('#planOpen').onclick = () => { planView = null; go('plan'); };
+}
+let planView = null;
+function renderPlan() {
+  if (!plan) return go('home');
+  const weeks = planStatus(plan), wi = Math.min(plan.weeks - 1, Math.max(0, curWeek(plan))), g = GOALS[plan.goal];
+  if (planView === null || planView < 0) planView = wi;
+  const w = planView, ss = weeks[w], km = ss.reduce((a, s) => a + s.m, 0), done = ss.reduce((a, s) => a + (s.run ? s.run.dist : 0), 0);
+  $('#planGoalChip').textContent = g.name === 'Constancia' ? 'Hábito' : g.name;
+  $('#planSub').textContent = `${plan.weeks} semanas · ${listEs(plan.days.map((d) => DAY_N[d]))}`;
+  $('#planTitle').textContent = curWeek(plan) >= plan.weeks ? 'Plan terminado' : `Semana ${wi + 1} de ${plan.weeks}`;
+  const title = w === wi ? 'Esta semana' : w < wi ? `Semana ${w + 1}` : `Semana ${w + 1}`;
+  const note = plan.factor?.[w] && Math.abs(plan.factor[w] - 1) > 0.01 ? `<span class="sub" style="font-size:12px">${plan.factor[w] > 1 ? 'Subida' : 'Bajada'} del ${Math.round(Math.abs(plan.factor[w] - 1) * 100)} % tras la revisión</span>` : (GOALS[plan.goal].race && w === plan.weeks - 1 ? '<span class="sub" style="font-size:12px">Semana de carrera: afinar</span>' : (w % 4 === 3 && w < plan.weeks - 1 ? '<span class="sub" style="font-size:12px">Semana de descarga</span>' : ''));
+  $('#planWeekCard').innerHTML = `<div class="between"><span class="lbl">${title}</span>${note}</div>
+    <div class="between" style="align-items:flex-end"><div><span class="num" style="font-size:56px;letter-spacing:-.05em">${fmtKmS(done)}</span><span class="unit" style="font-size:18px;font-weight:600">de ${fmtKmS(km)} km</span></div><span class="sub">${ss.filter((s) => s.run).length}/${ss.length} sesiones</span></div>
+    <div class="track"><i style="width:${Math.min(100, km ? done / km * 100 : 0)}%"></i></div>`;
+  $('#planWeeks').innerHTML = weeks.map((x, i) => `<button class="${i === w ? 'on' : ''} ${i < wi ? 'past' : ''}" data-w="${i}"><b>${i + 1}</b>${Math.round(x.reduce((a, s) => a + s.m, 0) / 1000)} km</button>`).join('');
+  $$('#planWeeks [data-w]').forEach((b) => b.onclick = () => { planView = Number(b.dataset.w); renderPlan(); });
+  $('#planWeeks .on')?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  $('#planSessions').innerHTML = ss.map((s) => `<button class="sess" data-key="${s.key}"><span class="st ${s.state}">${sessIcon(s)}</span>
+    <span style="flex:1;min-width:0"><b style="font-weight:600;display:block">${s.title}</b><span class="sub" style="font-size:12px">${new Date(s.date).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' })}${s.run ? ` · hecha${s.moved ? ' (otro día)' : ''}: ${fmtKm(s.run.dist)} km` : s.state === 'miss' ? ' · no hecha' : s.state === 'skip' ? ' · antes de crear el plan' : s.state === 'today' ? ' · hoy' : ''}</span></span>
+    <span><span class="num" style="font-size:20px">${fmtKmS(s.m)}</span><span class="unit" style="font-size:12px">km</span></span></button>`).join('');
+  $$('#planSessions [data-key]').forEach((b) => b.onclick = () => { const s = ss.find((x) => x.key === b.dataset.key); if (s.run) openSummary(s.run.id); else if (s.state === 'today') go('prep'); else toast(s.desc, 4000); });
+  $('#planRemind').value = plan.remind?.on ? '1' : '0';
+  $('#planHour').innerHTML = [6, 7, 8, 9, 10, 12, 14, 17, 18, 19, 20].map((h) => `<option value="${h}">${h}:00</option>`).join('');
+  $('#planHour').value = String(plan.remind?.hour ?? 8);
+  $('#planRemindHint').textContent = LocalNotif ? 'Te avisará el móvil a esa hora los días de entreno, aunque la app esté cerrada.' : 'Los avisos del móvil solo funcionan en la app de Android. En la web verás la sesión del día en Inicio.';
+}
+$('#planRemind').onchange = async (e) => { plan.remind = Object.assign({ hour: 8 }, plan.remind, { on: e.target.value === '1' }); if (plan.remind.on && LocalNotif) { try { const p = await LocalNotif.requestPermissions(); if (p.display !== 'granted') { toast('Sin permiso de notificaciones: actívalo en Ajustes del móvil'); } } catch (err) {} } save(PLAN, plan); syncReminders(); };
+$('#planHour').onchange = (e) => { plan.remind = Object.assign({ on: false }, plan.remind, { hour: Number(e.target.value) }); save(PLAN, plan); syncReminders(); };
+$('#planEdit').onclick = () => openPlanSetup(plan);
+$('#planDelete').onclick = () => { if ($('#planDelete').dataset.sure) { plan = null; save(PLAN, null); syncReminders(); toast('Plan eliminado'); go('home'); } else { $('#planDelete').dataset.sure = '1'; $('#planDelete').textContent = 'Pulsa otra vez para confirmar'; setTimeout(() => { delete $('#planDelete').dataset.sure; $('#planDelete').textContent = 'Eliminar el plan'; }, 3000); } };
+
+// Asistente de creación
+let ps = null, psStep = 0;
+function histWeeklyKm() { const from = weekStart(Date.now()) - 4 * 7 * 864e5, to = weekStart(Date.now()); const rs = runs.filter((r) => r.start >= from && r.start < to); return { km: rs.reduce((a, r) => a + r.dist, 0) / 4000, n: rs.length }; }
+function openPlanSetup(prev) {
+  const h = histWeeklyKm(), lvl = h.n >= 2 ? (h.km < 10 ? 'inicio' : h.km < 25 ? 'medio' : 'avanzado') : 'medio';
+  const defDays = GOAL_OF() <= 2 ? [1, 5] : GOAL_OF() === 3 ? [1, 3, 5] : [0, 2, 4, 6];
+  ps = prev ? { goal: prev.goal, weeks: prev.weeks, days: [...prev.days], level: prev.level } : { goal: '10k', weeks: 8, days: defDays, level: lvl };
+  psStep = 0;
+  $('#psLevelHint').textContent = h.n >= 2 ? `Según tus últimas 4 semanas corres unos ${h.km.toFixed(0)} km por semana.` : 'Sin carreras recientes en Zancada: elige a ojo, se puede cambiar.';
+  showPs(); go('planSetup');
+}
+function showPs() {
+  [0, 1, 2, 3].forEach((i) => { $('#ps' + i).style.display = i === psStep ? '' : 'none'; $('#psDots i:nth-child(' + (i + 1) + ')').classList.toggle('on', i === psStep); });
+  $$('#planSetup [data-pgoal]').forEach((b) => b.classList.toggle('on', b.dataset.pgoal === ps.goal));
+  $$('#planSetup [data-level]').forEach((b) => b.classList.toggle('on', b.dataset.level === ps.level));
+  $$('#psWeeks [data-w]').forEach((b) => b.classList.toggle('on', Number(b.dataset.w) === ps.weeks));
+  $('#psDays').innerHTML = DAY_L.map((l, i) => `<button class="${ps.days.includes(i) ? 'on' : ''}" data-d="${i}" aria-label="${DAY_N[i]}">${l}</button>`).join('');
+  $$('#psDays [data-d]').forEach((b) => b.onclick = () => { const d = Number(b.dataset.d); ps.days = ps.days.includes(d) ? ps.days.filter((x) => x !== d) : ps.days.concat(d).sort((a, b2) => a - b2); showPs(); });
+  $('#psDaysHint').textContent = ps.days.length < 2 ? 'Elige al menos 2 días.' : ps.days.length > 5 ? 'Más de 5 días no es buena idea en esta beta.' : `${ps.days.length} días: ${listEs(ps.days.map((d) => DAY_N[d]))}. El rodaje largo cae en ${DAY_N[ps.days[ps.days.length - 1]]}.`;
+  if (psStep === 3) {
+    const tmp = Object.assign({ start: weekStart(Date.now()), created: Date.now(), factor: [] }, ps), kms = Array.from({ length: ps.weeks }, (_, w) => planWeekKm(tmp, w));
+    const g = GOALS[ps.goal];
+    $('#psDoneTitle').textContent = g.race ? `${g.name} en ${ps.weeks} semanas` : `${ps.weeks} semanas de hábito`;
+    $('#psDoneText').textContent = `${ps.days.length} sesiones a la semana (${listEs(ps.days.map((d) => DAY_N[d]))}), de ${Math.round(Math.min(...kms))} a ${Math.round(Math.max(...kms))} km semanales. Cada lunes reviso lo que has corrido y ajusto la carga.${LocalNotif ? ' Te avisaré a las 8:00 los días de entreno.' : ''} Tu objetivo semanal pasa a ${ps.days.length} carreras.`;
+  }
+  $('#psNext').textContent = psStep < 3 ? 'Continuar' : (plan ? 'Sustituir mi plan' : 'Crear el plan');
+  $('#psNext').disabled = psStep === 1 && (ps.days.length < 2 || ps.days.length > 5);
+}
+$$('#planSetup [data-pgoal]').forEach((b) => b.onclick = () => { ps.goal = b.dataset.pgoal; if (ps.goal === 'media' && ps.weeks < 10) ps.weeks = 12; showPs(); });
+$$('#planSetup [data-level]').forEach((b) => b.onclick = () => { ps.level = b.dataset.level; showPs(); });
+$$('#psWeeks [data-w]').forEach((b) => b.onclick = () => { ps.weeks = Number(b.dataset.w); showPs(); });
+$('#psClose').onclick = () => go(plan ? 'plan' : 'home');
+$('#psNext').onclick = async () => {
+  if (psStep < 3) { psStep++; showPs(); return; }
+  plan = Object.assign({}, ps, { start: weekStart(Date.now()), created: Date.now(), factor: Array(ps.weeks).fill(1), reviewed: 0, remind: { on: !!LocalNotif, hour: 8 } });
+  profile.goal = ps.days.length; save(PROF, profile); save(PLAN, plan); planView = null;
+  if (LocalNotif) { try { const p = await LocalNotif.requestPermissions(); if (p.display !== 'granted') plan.remind.on = false; } catch (e) { plan.remind.on = false; } save(PLAN, plan); }
+  syncReminders(); toast('Plan creado'); go('plan');
+};
+// Avisos: solo dentro del APK (notificaciones locales de Android). Se reprograman los próximos 21 días cada vez que algo cambia.
+const LocalNotif = window.Capacitor?.Plugins?.LocalNotifications || null;
+async function syncReminders() {
+  if (!LocalNotif) return;
+  try {
+    const pend = await LocalNotif.getPending(); if (pend?.notifications?.length) await LocalNotif.cancel({ notifications: pend.notifications.map((n) => ({ id: n.id })) });
+    if (!plan || !plan.remind?.on) return;
+    const perm = await LocalNotif.checkPermissions(); if (perm.display !== 'granted') return;
+    const now = Date.now(), list = [];
+    planStatus(plan).flat().filter((s) => !s.run && s.state !== 'skip').forEach((s) => {
+      const at = new Date(s.date); at.setHours(plan.remind.hour, 0, 0, 0);
+      if (at.getTime() > now && at.getTime() < now + 21 * 864e5) list.push({ id: 1000 + s.week * 7 + s.dayIdx, title: 'Hoy toca correr', body: `${s.title} · ${fmtKmS(s.m)} km. ${s.desc}`, schedule: { at, allowWhileIdle: true }, smallIcon: 'ic_stat_zancada', iconColor: '#D4FF3A' });
+    });
+    if (list.length) await LocalNotif.schedule({ notifications: list });
+  } catch (e) {}
+}
+
+// ---------- guía de la sesión durante la carrera ----------
+function buildGuide(s) {
+  if (!s) return null;
+  if (!s.struct) return [{ label: s.title, say: `${s.title}, ${fmtKmS(s.m).replace(',', ' coma ')} kilómetros.`, kind: 'suave', m: s.m }];
+  const st = s.struct, segs = [{ label: 'Calentamiento', say: `Calentamiento, ${st.warm} metros suaves.`, kind: 'suave', m: st.warm }];
+  for (let k = 1; k <= st.reps; k++) {
+    segs.push(st.reps === 1 ? { label: 'Tempo · ritmo controlado', say: `Tempo. ${fmtKmS(st.on).replace(',', ' coma ')} kilómetros a ritmo controlado.`, kind: 'fuerte', m: st.on } : { label: `Serie ${k} de ${st.reps} · fuerte`, say: `Serie ${k}. Fuerte, ${st.on} metros.`, kind: 'fuerte', m: st.on });
+    if (st.off && k < st.reps) segs.push({ label: 'Recupera al trote', say: `Recupera, ${st.off} metros al trote.`, kind: 'suave', m: st.off });
+  }
+  segs.push({ label: 'Vuelta a la calma', say: 'Vuelta a la calma, un kilómetro suave.', kind: 'suave', m: st.cool });
+  return segs;
+}
+function updateGuide() {
+  const g = run.guide; if (!g) return;
+  let acc = 0, i = 0; while (i < g.length && run.dist >= acc + g[i].m) { acc += g[i].m; i++; }
+  if (i >= g.length) { if (run.guideIdx !== 'done') { run.guideIdx = 'done'; $('#gLabel').textContent = 'Sesión completada'; $('#gLabel').className = 'num'; $('#gStep').textContent = 'lo que corras ahora suma'; $('#gLeft').textContent = '0'; $('#gTrack').style.width = '100%'; speak('Sesión completada. Enhorabuena.'); } return; }
+  const seg = g[i], left = Math.max(0, acc + seg.m - run.dist);
+  if (run.guideIdx !== i) { run.guideIdx = i; $('#gLabel').textContent = seg.label; $('#gLabel').className = 'num ' + seg.kind; $('#gStep').textContent = `paso ${i + 1} de ${g.length}`; if (run.dist > 0 || i > 0) speak(seg.say); }
+  $('#gLeft').textContent = left >= 1000 ? fmtKmS(left) + ' k' : String(Math.round(left / 10) * 10);
+  $('#gTrack').style.width = ((seg.m - left) / seg.m * 100) + '%';
+}
+
+// ---------- rutas ----------
+// Rutas "para ti": bucles desde donde estás, calculados con el enrutador peatonal de Valhalla (FOSSGIS, OpenStreetMap), con desnivel.
+const ROUTER = 'https://valhalla1.openstreetmap.de';
+const rt = { map: null, mode: 'sug', km: 5, list: [], layers: [], sel: 0, here: null, hereM: null, token: 0, seed: Math.floor(Math.random() * 360), cache: load('zancada.routecache.v1', {}) };
+let pickedRoute = null;
+function decodePoly6(str) {
+  const out = []; let i = 0, lat = 0, lon = 0;
+  while (i < str.length) {
+    for (const k of [0, 1]) { let sh = 0, res = 0, b; do { b = str.charCodeAt(i++) - 63; res |= (b & 31) << sh; sh += 5; } while (b >= 32); const d = res & 1 ? ~(res >> 1) : res >> 1; if (k === 0) lat += d; else lon += d; }
+    out.push([lat / 1e6, lon / 1e6]);
+  }
+  return out;
+}
+function dest(p, brg, m) { const R = 6371000, b = brg * Math.PI / 180, la1 = p.lat * Math.PI / 180, lo1 = p.lon * Math.PI / 180, dr = m / R; const la2 = Math.asin(Math.sin(la1) * Math.cos(dr) + Math.cos(la1) * Math.sin(dr) * Math.cos(b)); const lo2 = lo1 + Math.atan2(Math.sin(b) * Math.sin(dr) * Math.cos(la1), Math.cos(dr) - Math.sin(la1) * Math.sin(la2)); return { lat: la2 * 180 / Math.PI, lon: lo2 * 180 / Math.PI }; }
+async function routeThrough(pts) {
+  const body = { locations: pts.map((p) => ({ lat: p.lat, lon: p.lon, type: 'break' })), costing: 'pedestrian', directions_type: 'none', units: 'kilometers' };
+  const res = await fetch(ROUTER + '/route', { method: 'POST', body: JSON.stringify(body) });
+  if (!res.ok) throw new Error('router ' + res.status);
+  const j = await res.json(), trip = j.trip;
+  return { ll: trip.legs.flatMap((l) => decodePoly6(l.shape)), km: trip.summary.length, s: trip.summary.time };
+}
+async function elevGain(ll) {
+  try {
+    const step = Math.max(1, Math.floor(ll.length / 120)), shape = ll.filter((_, i) => i % step === 0).map(([lat, lon]) => ({ lat, lon }));
+    const res = await fetch(ROUTER + '/height', { method: 'POST', body: JSON.stringify({ shape }) });
+    if (!res.ok) return null;
+    const h = (await res.json()).height || []; let gain = 0, ref = h[0];
+    h.forEach((x) => { if (x == null) return; if (x - ref >= 3) { gain += x - ref; ref = x; } else if (x < ref) ref = x; });  // histéresis de 3 m contra el ruido
+    return Math.round(gain);
+  } catch (e) { return null; }
+}
+async function makeLoop(start, km, brg) {
+  let r = km * 1000 / (2 * Math.PI) / 1.25, best = null;   // las calles alargan ~25 % respecto al círculo ideal
+  for (let i = 0; i < 2; i++) {
+    const c = dest(start, brg, r), res = await routeThrough([start, dest(c, brg + 90, r), dest(c, brg, r), dest(c, brg - 90, r), start]);
+    if (!best || Math.abs(res.km - km) < Math.abs(best.km - km)) best = res;
+    if (Math.abs(res.km - km) / km <= 0.12) break;
+    r *= km / res.km;
+  }
+  return best;
+}
+const compass = (b) => ['norte', 'noreste', 'este', 'sureste', 'sur', 'suroeste', 'oeste', 'noroeste'][Math.round((((b % 360) + 360) % 360) / 45) % 8];
+function userPace() { const ps2 = runs.slice(0, 5).map((r) => r.dur / (r.dist / 1000)).filter((x) => isFinite(x) && x > 150 && x < 1200).sort((a, b) => a - b); return ps2.length ? ps2[Math.floor(ps2.length / 2)] : 390; }
+function routeMeta(r) { const t = r.km * userPace() + (r.gain || 0) * 6, d = r.km < 7 && (r.gain || 0) < 80 ? ['Fácil', ''] : r.km < 13 && (r.gain || 0) < 220 ? ['Media', 'mid'] : ['Exigente', 'hard']; return { time: t, diff: d }; }
+async function loadSuggestions() {
+  const here = rt.here; if (!here) return;
+  const key = `${here.lat.toFixed(3)},${here.lon.toFixed(3)},${rt.km},${rt.seed}`, token = ++rt.token;
+  if (rt.cache[key]) { rt.list = rt.cache[key]; rt.sel = 0; drawRoutes(); return; }
+  rt.list = []; $('#routesCards').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; clearRouteLayers();
+  const out = [];
+  for (const k of [0, 1, 2]) {
+    const brg = rt.seed + k * 120;
+    try {
+      const res = await makeLoop(here, rt.km, brg); if (token !== rt.token) return;
+      const gain = await elevGain(res.ll); if (token !== rt.token) return;
+      out.push({ id: 'sug-' + key + '-' + k, name: `Bucle hacia el ${compass(brg)}`, ll: res.ll, km: Math.round(res.km * 10) / 10, gain, src: 'sug', created: Date.now() });
+      rt.list = out.slice(); rt.sel = 0; drawRoutes();
+    } catch (e) { /* una ruta fallida no tumba las demás */ }
+  }
+  if (token !== rt.token) return;
+  if (!out.length) { $('#routesCards').innerHTML = `<div class="rcard"><b style="font-weight:600">No he podido calcular rutas ahora</b><span class="sub" style="font-size:13px">Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Prueba de nuevo en un momento.</span><button class="btn sec" style="height:46px" id="routesRetry">Reintentar</button></div>`; $('#routesRetry').onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); }; return; }
+  rt.cache[key] = out; const keys = Object.keys(rt.cache); if (keys.length > 12) delete rt.cache[keys[0]]; save('zancada.routecache.v1', rt.cache);
+}
+function myRoutes() {
+  const fromRuns = runs.filter((r) => r.points?.length > 5 && r.dist > 500).slice(0, 20).map((r) => ({ id: 'run-' + r.id, name: r.name, sub: fmtDate(r.start), ll: r.points.map((p) => [p.lat, p.lon]), km: Math.round(r.dist / 100) / 10, gain: null, src: 'run' }));
+  return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
+}
+function clearRouteLayers() { rt.layers.forEach((l) => rt.map.removeLayer(l)); rt.layers = []; }
+function drawRoutes() {
+  const list = rt.list; clearRouteLayers();
+  if (!list.length) { $('#routesCards').innerHTML = rt.mode === 'mine' ? '<div class="rcard"><b style="font-weight:600">Aún no tienes recorridos</b><span class="sub" style="font-size:13px">Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar las rutas que te proponga.</span></div>' : ''; return; }
+  rt.sel = Math.min(rt.sel, list.length - 1);
+  list.forEach((r, i) => { if (i !== rt.sel) rt.layers.push(L.polyline(r.ll, { color: INK, weight: 3, opacity: .3, lineCap: 'round' }).addTo(rt.map)); });
+  const s = list[rt.sel];
+  rt.layers.push(L.polyline(s.ll, ROUTE_HALO).addTo(rt.map), L.polyline(s.ll, ROUTE_STYLE).addTo(rt.map), L.marker(s.ll[0], { icon: dotIcon('#fff', INK) }).addTo(rt.map));
+  rt.map.fitBounds(s.ll, { paddingTopLeft: [30, 150], paddingBottomRight: [30, 300] });
+  $('#routesCards').innerHTML = list.map((r, i) => { const m = routeMeta(r), saved = savedRoutes.some((x) => x.id === r.id); return `<div class="rcard ${i === rt.sel ? 'on' : ''}" data-i="${i}">
+    <div class="between"><div style="min-width:0"><b style="font-weight:600;font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</b><span class="sub" style="font-size:12px">${r.src === 'sug' ? 'Desde tu ubicación · Generada para ti' : r.sub || ''}</span></div>
+      <button class="icon" data-save="${i}" aria-label="${saved ? 'Quitar de guardadas' : 'Guardar'}" style="width:40px;height:40px;background:${saved ? 'var(--volt)' : 'var(--surface2)'};color:var(--on-volt)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;${saved ? 'fill:currentColor' : ''}"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="chip ${m.diff[1]}">${m.diff[0]}</span><span><span class="num" style="font-size:22px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span></span><span class="sub">·</span><span class="sub" style="font-weight:600;color:var(--ink)">${r.gain == null ? '— ' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span class="sub" style="font-weight:600;color:var(--ink)">${fmtTime(m.time).replace(/^(\d+):(\d+):\d+$/, '$1 h $2 min').replace(/^(\d+):\d+$/, '$1 min')}</span></div>
+    <button class="btn" data-runroute="${i}" style="height:48px;font-size:15px">Correr esta ruta</button></div>`; }).join('') + (rt.mode === 'sug' ? `<div class="rcard" style="justify-content:center;align-items:center;text-align:center"><b style="font-weight:600">¿Otras opciones?</b><span class="sub" style="font-size:13px">Genero tres bucles nuevos de ${rt.km} km.</span><button class="btn sec" style="height:46px" id="routesMore">Generar otras</button></div>` : '');
+  $$('#routesCards [data-i]').forEach((c) => c.onclick = (e) => { if (e.target.closest('button')) return; rt.sel = Number(c.dataset.i); drawRoutes(); });
+  $$('#routesCards [data-save]').forEach((b) => b.onclick = () => { const r = list[Number(b.dataset.save)]; if (savedRoutes.some((x) => x.id === r.id)) { savedRoutes = savedRoutes.filter((x) => x.id !== r.id); toast('Quitada de tus recorridos'); } else { savedRoutes.unshift({ id: r.id, name: r.name, ll: r.ll, km: r.km, gain: r.gain, created: Date.now() }); toast('Guardada en Mis recorridos'); } save(ROUTES, savedRoutes); drawRoutes(); });
+  $$('#routesCards [data-runroute]').forEach((b) => b.onclick = () => { pickedRoute = list[Number(b.dataset.runroute)]; go('prep'); });
+  const more = $('#routesMore'); if (more) more.onclick = () => { rt.seed = (rt.seed + 37) % 360; loadSuggestions(); };
+  const card = $(`#routesCards [data-i="${rt.sel}"]`); if (card) card.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+}
+function renderRoutes() {
+  rt.map = makeMap('routesMap', 'calles');
+  $$('#routesChips [data-mode]').forEach((b) => b.classList.toggle('on', b.dataset.mode === rt.mode));
+  $$('#routesChips [data-km]').forEach((b) => { b.classList.toggle('on', Number(b.dataset.km) === rt.km); b.style.display = rt.mode === 'sug' ? '' : 'none'; });
+  const place = (p) => { rt.here = p; if (!rt.hereM) rt.hereM = L.marker([p.lat, p.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(rt.map); else rt.hereM.setLatLng([p.lat, p.lon]); };
+  if (lastFix) place(lastFix);
+  if (rt.mode === 'mine') { rt.list = myRoutes(); rt.sel = 0; drawRoutes(); if (!rt.list.length && rt.here) rt.map.setView([rt.here.lat, rt.here.lon], 14); return; }
+  if (rt.here) { loadSuggestions(); return; }
+  $('#routesCards').innerHTML = '<div class="rcard"><b style="font-weight:600">Buscando tu posición…</b><span class="sub" style="font-size:13px">Las rutas se calculan desde donde estás.</span></div>';
+  if (!('geolocation' in navigator)) return;
+  navigator.geolocation.getCurrentPosition((pos) => { place({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy }); if ($('#routes').classList.contains('on')) loadSuggestions(); }, () => { $('#routesCards').innerHTML = '<div class="rcard"><b style="font-weight:600">Sin ubicación</b><span class="sub" style="font-size:13px">Activa la ubicación para que te proponga rutas desde donde estás.</span><button class="btn sec" style="height:46px" id="routesRetry">Reintentar</button></div>'; $('#routesRetry').onclick = renderRoutes; }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+}
+$$('#routesChips [data-mode]').forEach((b) => b.onclick = () => { rt.mode = b.dataset.mode; renderRoutes(); });
+$$('#routesChips [data-km]').forEach((b) => b.onclick = () => { rt.km = Number(b.dataset.km); renderRoutes(); });
+$('#routesLocate').onclick = () => { if (rt.here) rt.map.setView([rt.here.lat, rt.here.lon], 15); else renderRoutes(); };
+// Distancia de un punto a la ruta elegida (al vértice más cercano; las rutas vienen densas).
+function offRouteMeters(p, ll) { let best = Infinity; for (let i = 0; i < ll.length; i += 2) { const d = haversine(p, { lat: ll[i][0], lon: ll[i][1] }); if (d < best) best = d; } return best; }
+
 // ---------- preparación ----------
-let watchId = null, prepMap, prepMarker, lastFix = null;
+let watchId = null, prepMap, prepMarker, lastFix = null, prepMode = 'plan';
+const prep = { session: null, routeLayer: null };
 function startPrep() {
   prepMap = makeMap('prepMap', 'calles'); prepMap.dragging.disable(); prepMap.touchZoom.disable(); prepMap.doubleClickZoom.disable();
   $('#startBtn').disabled = true; $('#gpsDot').className = 'dot'; $('#gpsText').textContent = 'Buscando GPS…';
+  renderPrepSheet();
   if (!('geolocation' in navigator)) { $('#prepHint').textContent = 'Este navegador no tiene GPS disponible.'; return; }
   if (!window.isSecureContext) { $('#prepHint').textContent = 'El GPS solo funciona en una web con https.'; return; }
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
   watchId = navigator.geolocation.watchPosition(onFix, onGeoError, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
 }
+function renderPrepSheet() {
+  const s = todaySession(); prep.session = s;
+  $('#prepMode').style.display = s ? '' : 'none';
+  if (!s) prepMode = 'libre'; else if (prepMode !== 'libre') prepMode = 'plan';
+  $$('#prepMode [data-pm]').forEach((b) => b.classList.toggle('on', b.dataset.pm === prepMode));
+  const usePlan = s && prepMode === 'plan';
+  $('#prepLbl').textContent = usePlan ? `Plan · semana ${s.week + 1}` : 'Entreno';
+  $('#prepTitle').textContent = usePlan ? `${s.title} · ${fmtKmS(s.m)} km` : 'Carrera libre';
+  $('#prepDesc').textContent = usePlan ? s.desc + (s.struct ? ' Te guío por voz en cada tramo.' : '') : 'Sin objetivo. Distancia, ritmo y parciales en directo.';
+  $('#prepRoute').style.display = pickedRoute ? 'flex' : 'none';
+  if (pickedRoute) { $('#prepRouteName').textContent = pickedRoute.name; $('#prepRouteSub').textContent = `${String(pickedRoute.km).replace('.', ',')} km · te aviso si te sales`; }
+  if (prep.routeLayer) { prepMap.removeLayer(prep.routeLayer); prep.routeLayer = null; }
+  if (pickedRoute) { prep.routeLayer = L.polyline(pickedRoute.ll, { color: INK, weight: 4, opacity: .55, dashArray: '2 9', lineCap: 'round' }).addTo(prepMap); setTimeout(() => { prepMap.invalidateSize(); prepMap.fitBounds(pickedRoute.ll, { paddingTopLeft: [30, 90], paddingBottomRight: [30, 340] }); }, 80); }
+}
+$$('#prepMode [data-pm]').forEach((b) => b.onclick = () => { prepMode = b.dataset.pm; renderPrepSheet(); });
+$('#prepRouteDrop').onclick = () => { pickedRoute = null; renderPrepSheet(); if (lastFix) prepMap.setView([lastFix.lat, lastFix.lon], 16); };
 function onFix(pos) {
   const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
   lastFix = { lat, lon, acc, t: pos.timestamp };
   if ($('#prep').classList.contains('on')) {
-    prepMap.setView([lat, lon], 16);
+    if (!pickedRoute) prepMap.setView([lat, lon], 16);
     if (!prepMarker) prepMarker = L.marker([lat, lon], { icon: dotIcon(VOLT, INK) }).addTo(prepMap); else prepMarker.setLatLng([lat, lon]);
     const good = acc <= 25;
     $('#gpsDot').className = 'dot ' + (good ? 'ok' : acc <= 60 ? '' : 'bad');
@@ -620,19 +1060,25 @@ function onGeoError(err) {
 const run = { active: false, paused: false, points: [], dist: 0, start: 0, pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], wake: null, timer: null, map: null, line: null, marker: null };
 $('#startBtn').onclick = () => { go('count'); let n = 3; $('#countNum').textContent = n; const iv = setInterval(() => { n--; if (n === 0) { clearInterval(iv); startRun(); } else $('#countNum').textContent = n; }, 1000); speak('Tres, dos, uno. ¡Vamos!'); };
 function startRun() {
-  Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity });
+  Object.assign(run, { active: true, paused: false, points: [], dist: 0, start: Date.now(), pausedMs: 0, pauseAt: 0, lastKm: 0, splits: [], best: Infinity, gap: false, off: 0, offSaid: 0, guideIdx: -1 });
+  run.session = prep.session && prepMode === 'plan' ? prep.session : null; run.guide = buildGuide(run.session); run.route = pickedRoute;
+  $('#runGuide').classList.toggle('on', !!run.guide);
   applyTheme();
-  $('#pausePanel').style.display = 'none'; $('#runCtl').style.display = 'grid'; $('#runState').textContent = 'Carrera libre';
+  $('#pausePanel').style.display = 'none'; $('#runCtl').style.display = 'grid'; $('#runState').textContent = runStateText();
   ['#rDist', '#lockDist'].forEach((q) => $(q).textContent = '0,00'); $('#rTime').textContent = '00:00'; ['#rPace', '#rAvg', '#rBest'].forEach((q) => $(q).textContent = '–:––');
   go('run');
   run.map = makeMap('runMap', 'calles'); run.map.setZoom(16);
   [run.halo, run.line, run.marker].forEach((l) => l && run.map.removeLayer(l));
   run.halo = L.polyline([], ROUTE_HALO).addTo(run.map); run.line = L.polyline([], ROUTE_STYLE).addTo(run.map); run.marker = null;
+  if (run.ghost) run.map.removeLayer(run.ghost);
+  run.ghost = run.route ? L.polyline(run.route.ll, { color: INK, weight: 5, opacity: .45, dashArray: '2 10', lineCap: 'round' }).addTo(run.map) : null;
+  if (run.guide) updateGuide();
   if (lastFix) runFix(lastFix);
   clearInterval(run.timer); tick(); run.timer = setInterval(tick, 500);
   requestWake();
 }
 const KeepAwake = window.Capacitor?.Plugins?.KeepAwake; // solo existe dentro del APK
+const runStateText = () => run.session ? run.session.title : run.route ? 'Ruta: ' + run.route.name : 'Carrera libre';
 async function requestWake() { try { if (KeepAwake) await KeepAwake.keepAwake(); else run.wake = await navigator.wakeLock?.request('screen'); } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && run.active) requestWake(); });
 function elapsed() { return (Date.now() - run.start - run.pausedMs - (run.paused ? Date.now() - run.pauseAt : 0)) / 1000; }
@@ -641,7 +1087,8 @@ function runFix(f) {
   if (f.acc > 40) return;
   const p = { lat: f.lat, lon: f.lon, t: Date.now() - run.start - run.pausedMs };
   const prev = run.points[run.points.length - 1];
-  if (prev) {
+  if (prev && run.gap) { run.gap = false; p.gap = true; }   // primer punto tras una pausa: lo andado no cuenta
+  else if (prev) {
     const d = haversine(prev, p), dt = (p.t - prev.t) / 1000;
     if (dt <= 0) return;
     if (d / dt > 8) return;          // salto imposible para un corredor
@@ -657,6 +1104,12 @@ function runFix(f) {
     }
   }
   run.points.push(p);
+  updateGuide();
+  if (run.route && run.points.length % 5 === 0) {
+    const off = offRouteMeters(p, run.route.ll);
+    if (off > 60) { run.off++; if (run.off >= 2 && Date.now() - run.offSaid > 60000) { run.offSaid = Date.now(); toast('Te has salido de la ruta', 3000); speak('Te has salido de la ruta.'); } }
+    else { if (run.off >= 2) toast('De vuelta en la ruta', 2000); run.off = 0; }
+  }
   run.halo.addLatLng([p.lat, p.lon]); run.line.addLatLng([p.lat, p.lon]);
   if (!run.marker) run.marker = L.marker([p.lat, p.lon], { icon: dotIcon(VOLT, INK) }).addTo(run.map); else run.marker.setLatLng([p.lat, p.lon]);
   run.map.panTo([p.lat, p.lon], { animate: true });
@@ -680,7 +1133,7 @@ function tick() {
   if (lastFix) $('#runAcc').textContent = '±' + Math.round(lastFix.acc) + ' m';
 }
 $('#pauseBtn').onclick = () => { run.paused = true; run.pauseAt = Date.now(); $('#runCtl').style.display = 'none'; $('#pausePanel').style.display = 'flex'; $('#runState').textContent = 'En pausa'; speak('Pausa'); };
-$('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.paused = false; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = 'Carrera libre'; speak('Seguimos'); };
+$('#resumeBtn').onclick = () => { run.pausedMs += Date.now() - run.pauseAt; run.paused = false; run.gap = true; $('#runCtl').style.display = 'grid'; $('#pausePanel').style.display = 'none'; $('#runState').textContent = runStateText(); speak('Seguimos'); };
 slideButton($('#finishSlide'), finishRun);
 function slideButton(el, done) {
   const knob = el.querySelector('.knob'), fill = el.querySelector('.fill');
@@ -713,10 +1166,12 @@ function finishRun() {
   if (run.dist < 50 && !run.forceSave) { $('#shortText').textContent = `Has recorrido ${Math.round(run.dist)} m. ¿La guardo igualmente?`; $('#shortModal').classList.add('on'); return; }
   run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
-  runs.unshift(r); save(KEY, runs);
+  if (run.session) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m };
+  if (run.route) r.route = { id: run.route.id, name: run.route.name };
+  runs.unshift(r); save(KEY, runs); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
-  $('#cText').textContent = runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
+  $('#cText').textContent = r.session && r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   speak('Carrera terminada. ' + fmtKm(r.dist).replace(',', ' coma ') + ' kilómetros.');
@@ -727,7 +1182,7 @@ $('#shortDrop').onclick = () => { $('#shortModal').classList.remove('on'); toast
 function finalizeRun(r) {
   const pts = r.points; let dist = 0; const splits = []; let lastKm = 0, prevT = 0;
   for (let i = 1; i < pts.length; i++) {
-    const d = haversine(pts[i - 1], pts[i]); dist += d;
+    const d = pts[i].gap ? 0 : haversine(pts[i - 1], pts[i]); dist += d;
     while (dist >= (lastKm + 1) * 1000) { lastKm++; const frac = (dist - lastKm * 1000) / d; const tAt = (pts[i].t - (pts[i].t - pts[i - 1].t) * frac) / 1000; splits.push({ km: lastKm, split: tAt - prevT }); prevT = tAt; }
     pts[i].d = dist;
   }
@@ -748,6 +1203,10 @@ function openSummary(id) {
   $('#sStats').innerHTML = `<div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(r.dur)}</span></div>
     <div><span class="lbl">Ritmo</span><span><span class="num" style="font-size:26px">${fmtPace(r.dur / (r.dist / 1000))}</span><span class="unit">/km</span></span></div>
     <div><span class="lbl">Mejor km</span><span><span class="num" style="font-size:26px">${okSplits.length ? fmtPace(Math.min(...okSplits.map((s) => s.split))) : '–:––'}</span><span class="unit">/km</span></span></div>`;
+  const info = [];
+  if (plan) { const ps1 = planStatus(plan).flat().find((x) => x.run && x.run.id === r.id); if (ps1) info.push(`Plan · semana ${ps1.week + 1} · ${ps1.title} ${fmtKmS(ps1.m)} km · ${r.dist >= ps1.m * 0.9 ? 'cumplida' : 'parcial'}${ps1.moved ? ' (otro día)' : ''}`); }
+  if (r.route) info.push('Ruta: ' + r.route.name);
+  $('#sPlan').style.display = info.length ? '' : 'none'; $('#sPlan').innerHTML = info.map((x) => `<div>${x}</div>`).join('');
   const best = Math.min(...r.splits.filter((s) => !s.partial).map((s) => s.split));
   const maxS = Math.max(...r.splits.map((s) => s.split));
   $('#sSplits').innerHTML = r.splits.length ? r.splits.map((s) => `<span class="sub" style="font-size:13px">${s.km}</span><div class="bar"><i class="${s.split === best && !s.partial ? 'best' : ''}" style="width:${Math.max(18, 100 * (maxS / s.split) * 0.84)}%"></i></div><span style="text-align:right">${fmtPace(s.split)}${s.partial ? '*' : ''}</span>`).join('') : '<span class="sub" style="grid-column:1/-1">Menos de un kilómetro, sin parciales.</span>';
@@ -812,8 +1271,10 @@ $('#scrub').oninput = (e) => { rep.pos = e.target.value / 1000; rep.playing = fa
 $('#repClose').onclick = () => { cancelAnimationFrame(rep.raf); openSummary(current.id); };
 
 // ---------- arranque ----------
-applyTheme();
+applyTheme(); reviewPlan();
+history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
+syncReminders();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
 </script>

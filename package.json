@@ -1,12 +1,13 @@
 {
   "name": "zancada",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Zancada beta: envoltorio Android (Capacitor) de la web",
   "dependencies": {
     "@capacitor/android": "^7.0.0",
     "@capacitor/cli": "^7.0.0",
     "@capacitor/core": "^7.0.0",
-    "@capacitor-community/keep-awake": "^6.0.0"
+    "@capacitor-community/keep-awake": "^6.0.0",
+    "@capacitor/local-notifications": "^7.0.0"
   }
 }

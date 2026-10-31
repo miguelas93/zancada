@@ -44,10 +44,12 @@ jobs:
       - name: Permisos de ubicación, versión e icono
         run: |
           M=android/app/src/main/AndroidManifest.xml
-          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-feature android:name="android.hardware.location.gps" android:required="false" />\n</manifest>#' "$M"
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n    <uses-feature android:name="android.hardware.location.gps" android:required="false" />\n</manifest>#' "$M"
+          # Icono de las notificaciones (silueta blanca; Android lo tiñe de lima)
+          mkdir -p android/app/src/main/res/drawable && cp android-ci/ic_stat_zancada.png android/app/src/main/res/drawable/ic_stat_zancada.png
           G=android/app/build.gradle
           sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" "$G"
-          sed -i "s/versionName \"1.0\"/versionName \"0.3.${{ github.run_number }}\"/" "$G"
+          sed -i "s/versionName \"1.0\"/versionName \"0.4.${{ github.run_number }}\"/" "$G"
           R=android/app/src/main/res
           rm -rf "$R/mipmap-anydpi-v26"
           for d in "$R"/mipmap-*; do
