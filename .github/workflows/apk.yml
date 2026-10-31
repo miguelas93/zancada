@@ -104,7 +104,7 @@ jobs:
           cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
           cp app/build/outputs/apk/debug/app-debug.apk ../zancada-beta.apk
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: zancada-beta-apk
           path: zancada-beta.apk
