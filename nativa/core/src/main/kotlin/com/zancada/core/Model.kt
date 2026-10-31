@@ -67,6 +67,8 @@ data class Run(
     val shoe: String? = null,
     val wx: RunWx? = null,
     val ghost: GhostRef? = null,
+    /** Cadencia media (pasos por minuto), con el sensor de pasos del móvil. Solo la nativa. */
+    val cad: Int? = null,
 )
 
 @Serializable
@@ -93,6 +95,11 @@ data class Settings(
     val goal: String? = null,
     val bigm: String? = null,
     val pacemap: String? = null,
+    /** Modo seguridad (solo la nativa): avisar por SMS a un contacto durante la carrera. */
+    val sosOn: String? = null,
+    val sosPhone: String? = null,
+    val sosName: String? = null,
+    val sosEvery: Int? = null,
 )
 
 @Serializable

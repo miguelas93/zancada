@@ -1,6 +1,7 @@
 package com.zancada.app
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +28,16 @@ object Perm {
         if (Build.VERSION.SDK_INT < 33) { cb(true); return }
         act?.ask(arrayOf(Manifest.permission.POST_NOTIFICATIONS), cb) ?: cb(false)
     }
+    /** Antes de empezar: notificación, sensor de pasos (cadencia) y SMS si el modo seguridad está activo. Lo que se niegue, simplemente no se usa. */
+    fun runExtras(cb: () -> Unit) {
+        val want = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= 33) want += Manifest.permission.POST_NOTIFICATIONS
+        if (Build.VERSION.SDK_INT >= 29) want += Manifest.permission.ACTIVITY_RECOGNITION
+        if (Repo.data.value.settings.sosOn == "1") want += Manifest.permission.SEND_SMS
+        val a = act ?: return cb()
+        a.askMissing(want.toTypedArray()) { cb() }
+    }
+    fun sms(cb: (Boolean) -> Unit) = act?.ask(arrayOf(Manifest.permission.SEND_SMS), cb) ?: cb(false)
 }
 
 class MainActivity : ComponentActivity() {
@@ -42,6 +53,14 @@ class MainActivity : ComponentActivity() {
         askPerms.launch(perms)
     }
 
+    /** Pide solo los permisos que falten; [cb] siempre se llama. */
+    fun askMissing(perms: Array<String>, cb: (Boolean) -> Unit) {
+        val miss = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+        if (miss.isEmpty()) { cb(true); return }
+        pending = cb
+        askPerms.launch(miss.toTypedArray())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -55,6 +74,7 @@ class MainActivity : ComponentActivity() {
         ) { RunService.send(this, RunService.RECOVER); Nav.reset(Scr(HOME), Scr(RUN)) }
         else if (RunBus.state.value.phase == Phase.RUNNING && Nav.cur.id != RUN) Nav.reset(Scr(HOME), Scr(RUN))
         Reminders.sync(this)
+        handle(intent)
         setContent {
             val data by Repo.data.collectAsState()
             val minute by Repo.minute.collectAsState()
@@ -76,6 +96,23 @@ class MainActivity : ComponentActivity() {
                 }
             }
             ZRoot()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); handle(intent) }
+
+    /** «Terminar» desde la notificación: abre la app en la carrera y la termina (sale la celebración o la pregunta de carrera corta). */
+    private fun handle(i: Intent?) {
+        // «Correr» desde el widget: directo a preparar la carrera.
+        if (i?.action == Widget.RUN) {
+            i.action = null
+            if (Repo.data.value.profile.done && RunBus.state.value.phase != Phase.RUNNING) Nav.reset(Scr(HOME), Scr(PREP))
+            return
+        }
+        if (i?.action == RunService.FINISH && RunBus.state.value.phase == Phase.RUNNING) {
+            i.action = null
+            if (Nav.cur.id != RUN) Nav.reset(Scr(HOME), Scr(RUN))
+            RunService.send(this, RunService.FINISH)
         }
     }
 

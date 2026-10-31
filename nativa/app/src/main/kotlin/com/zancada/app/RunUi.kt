@@ -131,9 +131,11 @@ fun PrepScreen() {
             }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
             Btn("Empezar", {
                 RunBus.config = RunConfig(ss, route)
-                Perm.notifications { }
-                Nav.go(COUNT)
+                Perm.runExtras { Nav.go(COUNT) }
             }, enabled = fix != null && perm)
+            Repo.data.collectAsState().value.settings.takeIf { it.sosOn == "1" && !it.sosPhone.isNullOrEmpty() }?.let { st ->
+                Sub("Modo seguridad: avisaré por SMS a ${st.sosName?.ifEmpty { null } ?: st.sosPhone} cada ${st.sosEvery ?: 10} min y si me quedo parado.", size = 12.sp)
+            }
             Sub(when {
                 !perm || denied -> "Necesito permiso de ubicación para medir tu carrera. Si lo negaste, actívalo en Ajustes › Apps › Zancada › Permisos."
                 ui.gpsError != null -> ui.gpsError!!
@@ -292,6 +294,7 @@ fun RunScreen() {
             Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Stat("Ritmo medio", if (ui.dist > 50) fmtPace(el / (ui.dist / 1000)) else "–:––", 28.sp, unit = "/km")
                 Stat("Mejor km", if (ui.bestKm.isFinite()) fmtPace(ui.bestKm) else "–:––", 28.sp, unit = "/km")
+                ui.cad?.let { Stat("Cadencia", "$it", 28.sp, unit = "ppm") }
             }
             Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(20.dp))) { ZMap(Modifier.matchParentSize(), "calles", lines, dots, ctl) }
             if (!ui.paused) Box(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {

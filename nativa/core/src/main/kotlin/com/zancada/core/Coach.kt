@@ -34,10 +34,11 @@ fun App.coachCtx(): String {
         if (week.isNotEmpty()) lines.add("Esta semana: $week.")
         p.lastReview?.let { lines.add("Última revisión del plan: " + it.text) }
     }
-    val last = runs.take(6).joinToString("; ") { r -> "${es.numeric(r.start)}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${pace(r.paceSec())}/km)${r.session?.let { ", " + it.title } ?: ""}${r.feel?.let { ", sensación $it/5" } ?: ""}" }
+    val last = runs.take(6).joinToString("; ") { r -> "${es.numeric(r.start)}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${pace(r.paceSec())}/km)${r.session?.let { ", " + it.title } ?: ""}${r.feel?.let { ", sensación $it/5" } ?: ""}${if (!webCompat && r.cad != null) ", cadencia ${r.cad} ppm" else ""}" }
     lines.add("Últimas carreras: " + last.ifEmpty { "ninguna todavía" } + ".")
     val recs = personalRecords().filter { it.run != null }.joinToString(", ") { "${it.label}: ${it.value}" }
     if (recs.isNotEmpty()) lines.add("Récords: $recs.")
+    if (!webCompat) loadWarn()?.let { lines.add("Aviso de carga: " + it.text) }
     lines.add("Hoy es " + es.wdLongDayMonLong(now()) + ".")
     return lines.joinToString("\n")
 }

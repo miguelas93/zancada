@@ -54,6 +54,10 @@ class RunService : LifecycleService() {
     private val cfgFile by lazy { File(filesDir, "live.cfg.json") }
     private var ticks = 0
     private var foreground = false
+    private val steps by lazy { StepMeter(this) }
+    private val sos by lazy { SosSender(this) }
+    /** Tiempo de carrera cuando empezó a contar el sensor de pasos (tras recuperar una carrera no es 0). */
+    private var stepsFromSec = 0.0
 
     private val callback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -86,7 +90,7 @@ class RunService : LifecycleService() {
             // Se pidió recuperar pero no había nada (o ya se borró): cerrar limpio. Android exige mostrar la notificación igualmente.
             RECOVER -> if (!session.active) { goForeground("Zancada"); shutdown() }
             null -> if (!session.active) stopSelf()
-            DISCARD, STOP -> { if (!session.active || intent.action == DISCARD) { clearLive(); RunBus.state.value = RunUi(); shutdown() } }
+            DISCARD, STOP -> { if (!session.active || intent.action == DISCARD) { if (intent.action == DISCARD) sos.end(session.dist, session.elapsed(System.currentTimeMillis())); clearLive(); RunBus.state.value = RunUi(); shutdown() } }
         }
         // Con carrera en marcha, si Android mata el servicio le pedimos que lo vuelva a arrancar.
         return if (session.active) START_STICKY else START_NOT_STICKY
@@ -116,6 +120,8 @@ class RunService : LifecycleService() {
         RunBus.track.value = emptyList(); RunBus.cele.value = null
         wire(cfg, prevFix?.let { LatLon(it.lat, it.lon) })
         session.begin(System.currentTimeMillis())
+        stepsFromSec = 0.0; steps.start()
+        sos.begin(System.currentTimeMillis(), prevFix?.lat, prevFix?.lon)
         startTicker(); persist(); publish()
     }
 
@@ -124,7 +130,10 @@ class RunService : LifecycleService() {
         ticker = lifecycleScope.launch {
             while (isActive) {
                 val now = System.currentTimeMillis()
-                session.tick(now); live?.tick(session, now); publish()
+                session.tick(now); live?.tick(session, now)
+                steps.paused = session.paused
+                sos.tick(now, session.dist, session.elapsed(now), session.lastFix?.lat, session.lastFix?.lon, manualPause = session.paused && !session.autoPaused)
+                publish()
                 if (++ticks % 10 == 0) persist()   // cada 5 s
                 delay(500)
             }
@@ -149,6 +158,8 @@ class RunService : LifecycleService() {
         wire(cfg, null)
         RunBus.track.value = session.points.map { LatLon(it.lat, it.lon) }
         startLocation(); startTicker()
+        stepsFromSec = session.elapsed(System.currentTimeMillis()); steps.start()
+        sos.begin(System.currentTimeMillis(), session.lastFix?.lat, session.lastFix?.lon, resumed = true)
         Voice.say("Carrera recuperada")
         publish()
     }
@@ -158,20 +169,21 @@ class RunService : LifecycleService() {
         val res = session.finish(now, forceShort = force)
         ticker?.cancel()
         when (res) {
-            is RunSession.Result.Empty -> { clearLive(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
+            is RunSession.Result.Empty -> { sos.cancel(); clearLive(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
             is RunSession.Result.TooShort -> RunBus.state.value = RunBus.state.value.copy(tooShort = res.meters)   // la pantalla pregunta
             is RunSession.Result.Saved -> {
                 val cfg = RunBus.config
                 val w = Repo.wxFresh()?.let { RunWx(it.t.toInt(), it.wind.toInt(), if (it.now) 1 else 0) }
                 val cele = Repo.mutate {
                     val prevBest = runs.maxOfOrNull { it.dist } ?: 0.0
-                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w)
+                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w).copy(cad = cadenceOf(steps.steps, res.run.dur - stepsFromSec))
                     val nb = addRun(r)
                     val wk = weekStats()
                     Voice.say(finishSpeech(r, nb))
                     Cele(r, nb, celeText(r, nb, prevBest), "${wk.count} de ${goalOf()}")
                 }
                 Repo.saveNow()
+                steps.stop(); sos.end(cele.run.dist, cele.run.dur)
                 clearLive()   // solo después de guardarla de verdad
                 Reminders.sync(this)
                 RunBus.cele.value = cele
@@ -195,6 +207,7 @@ class RunService : LifecycleService() {
             avg = if (session.dist > 50) el / (session.dist / 1000) else Double.NaN,
             bestKm = session.bestKm, paused = session.paused, autoPaused = session.autoPaused,
             live = lv?.state ?: cur.live, lockLine = lv?.lockLine() ?: "",
+            cad = if (session.active) steps.live(now) else null, sos = sos.active,
         )
         if (session.active) updateNotification("${fmtKm(session.dist)} km · ${fmtTime(el)}${if (session.paused) " · en pausa" else ""}")
         else session.lastFix?.let { updateNotification("GPS listo · ±${Math.round(it.acc)} m") }
@@ -212,11 +225,20 @@ class RunService : LifecycleService() {
         val nm = getSystemService(NotificationManager::class.java)
         if (nm.getNotificationChannel(CHANNEL) == null) nm.createNotificationChannel(NotificationChannel(CHANNEL, "Grabación de carreras", NotificationManager.IMPORTANCE_LOW))
         val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE)
-        return NotificationCompat.Builder(this, CHANNEL)
+        val b = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_zancada).setColor(0xFFD4FF3A.toInt())
             .setContentTitle(if (session.active) "Zancada está grabando tu carrera" else "Zancada · preparando la carrera").setContentText(text)
-            .setContentIntent(open).setOngoing(true).setOnlyAlertOnce(true).setSilent(true).build()
+            .setContentIntent(open).setOngoing(true).setOnlyAlertOnce(true).setSilent(true)
+            .setCategory(NotificationCompat.CATEGORY_WORKOUT).setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        // Botones en la notificación y en la pantalla de bloqueo: pausar, seguir y terminar sin abrir la app.
+        if (session.active) {
+            if (session.paused) b.addAction(0, "Seguir", action(RESUME)) else b.addAction(0, "Pausa", action(PAUSE))
+            b.addAction(0, "Terminar", PendingIntent.getActivity(this, 9, Intent(this, MainActivity::class.java).setAction(FINISH).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE))
+        }
+        return b.build()
     }
+
+    private fun action(a: String) = PendingIntent.getService(this, a.hashCode(), Intent(this, RunService::class.java).setAction(a), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
     private fun goForeground(text: String) {
         ServiceCompat.startForeground(this, NOTIF_ID, notification(text), if (Build.VERSION.SDK_INT >= 29) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else 0)
@@ -229,6 +251,7 @@ class RunService : LifecycleService() {
     }
 
     private fun shutdown() {
+        steps.stop()
         if (listening) { fused.removeLocationUpdates(callback); listening = false }
         foreground = false
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
