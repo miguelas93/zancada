@@ -3,7 +3,8 @@
 
     <!-- Permisos mínimos (ver SECURITY.md): ubicación mientras corres, el servicio que la mantiene
          con la pantalla apagada, la notificación que lo hace visible, la vibración de cada km,
-         internet (mapas, tiempo, rutas, Zeta) y los avisos del plan (que se reprograman al reiniciar).
+         internet (mapas, tiempo, rutas, Zeta), los avisos del plan (que se reprograman al reiniciar),
+         el contador de pasos (cadencia) y, solo si activas el modo seguridad, enviar SMS a tu contacto.
          Sin ubicación "todo el tiempo", sin contactos, cámara ni acceso a tus archivos. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -13,6 +14,12 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Cadencia con el contador de pasos del móvil (se pide al empezar a correr; si se niega, no hay cadencia). -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- Modo seguridad: SMS a tu contacto durante la carrera. Solo se pide si lo activas en Perfil. -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
     <application
@@ -48,6 +55,14 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
+        </receiver>
+
+        <!-- Widget de la pantalla de inicio. -->
+        <receiver android:name=".ZancadaWidget" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />
         </receiver>
 
         <!-- Compartir imágenes, GPX, CSV y copias: solo la carpeta temporal "share" de la app. -->

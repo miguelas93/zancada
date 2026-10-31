@@ -103,7 +103,7 @@ fun SummaryScreen(id: String?) {
                     Stat("Tiempo", fmtTime(r.dur), 26.sp); Stat("Ritmo", app.pace(r.paceSec()), 26.sp, unit = "/km")
                     Stat("Mejor km", if (ok.isNotEmpty()) app.pace(ok.minOf { it.split }) else "–:––", 26.sp, unit = "/km")
                 }
-                val info = app.summaryInfo(r)
+                val info = app.summaryInfo(r) + listOfNotNull(cadenceTip(r.cad)?.let { it to false })
                 if (info.isNotEmpty()) Column { Divider(); Spacer(Modifier.height(12.dp)); info.forEach { (t, b) -> Txt(t, size = 13.sp, weight = if (b) FontWeight.SemiBold else FontWeight.Medium, color = if (b) c.ink else c.muted, lineHeight = 1.6) } }
             }
             app.runInsights(r).takeIf { it.isNotEmpty() }?.let { ins2 ->

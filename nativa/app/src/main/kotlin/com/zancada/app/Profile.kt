@@ -149,6 +149,7 @@ fun ProfileScreen() {
             SelRow("Autopausa al pararte", listOf("1" to "Sí", "0" to "No"), s.autopause) { v -> Repo.settings { it.copy(autopause = v) } }
         }
         ShoesCard(app)
+        SosCard()
         // Tus datos
         ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
             H2("Tus datos")
@@ -163,7 +164,7 @@ fun ProfileScreen() {
             }
             Btn("Importar carreras GPX (Strava, Garmin…)", { gpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost)
         }
-        LinkCard("Clubs", "Corre con tu gente cuando haya cuentas", chip = "Muy pronto") { Nav.go(CLUBS) }
+        // Clubs se oculta hasta que Zancada tenga cuentas (ClubsScreen se queda para entonces).
         Btn("Cambiar mi nombre u objetivo", { Nav.go(WELCOME) }, kind = BtnKind.Sec)
         Btn("Cargar una carrera de ejemplo", { Repo.mutate { addRun(demoRun()) }; toast("Carrera de ejemplo añadida"); Nav.go(HOME) }, kind = BtnKind.Ghost)
         ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
@@ -184,6 +185,37 @@ fun ProfileScreen() {
             Repo.update { it.copy(runs = emptyList(), plan = null, savedRoutes = emptyList(), shoes = emptyList()) }; Reminders.sync(ctx); toast("Datos borrados"); Nav.go(HOME)
         }, kind = BtnKind.Ghost, color = c.danger)
         Sub("$APP_VER · $APP_DATE", size = 12.sp, align = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** Modo seguridad: un contacto recibe tu ubicación por SMS mientras corres. */
+@Composable
+private fun SosCard() {
+    val st = Repo.data.collectAsState().value.settings
+    var phone by remember { mutableStateOf(st.sosPhone ?: "") }
+    var name by remember { mutableStateOf(st.sosName ?: "") }
+    ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
+        H2("Modo seguridad")
+        Sub("Al empezar a correr, Zancada manda un SMS a tu contacto con tu ubicación, otro cada pocos minutos, uno si te quedas parado mucho rato y otro al terminar. Los SMS los paga tu tarifa como cualquier otro.")
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Field(name, { name = it }, "Nombre (Ana)", Modifier.weight(1f), maxLen = 20)
+            Field(phone, { phone = it.filter { ch -> ch.isDigit() || ch == '+' || ch == ' ' } }, "Teléfono", Modifier.weight(1.3f), numeric = true, maxLen = 18)
+        }
+        SelRow("Avisar cada", listOf("5" to "5 min", "10" to "10 min", "15" to "15 min", "30" to "30 min"), "${st.sosEvery ?: 10}") { v -> Repo.settings { it.copy(sosEvery = v.toInt()) } }
+        if (st.sosOn == "1") {
+            Btn("Guardar contacto", {
+                if (!Sos.validPhone(phone)) { toast("Revisa el número de teléfono"); return@Btn }
+                Repo.settings { it.copy(sosPhone = Sos.cleanPhone(phone), sosName = safeText(name, 20)) }; toast("Contacto guardado")
+            }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
+            Btn("Desactivar modo seguridad", { Repo.settings { it.copy(sosOn = "0") }; toast("Modo seguridad desactivado") }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
+        } else Btn("Activar modo seguridad", {
+            if (!Sos.validPhone(phone)) { toast("Escribe el teléfono de tu contacto"); return@Btn }
+            Perm.sms { ok ->
+                if (!ok) { toast("Sin permiso para enviar SMS: actívalo en Ajustes del móvil", 3500); return@sms }
+                Repo.settings { it.copy(sosOn = "1", sosPhone = Sos.cleanPhone(phone), sosName = safeText(name, 20)) }
+                toast("Modo seguridad activado")
+            }
+        }, height = 46.dp, size = 15.sp)
     }
 }
 

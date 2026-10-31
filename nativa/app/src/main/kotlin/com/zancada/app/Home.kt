@@ -126,6 +126,13 @@ fun HomeScreen() {
             }
         }
         app.recap()?.let { r -> RecapCard(r) }
+        app.loadWarn()?.let { lw ->
+            ZCard(gap = 8.dp, onClick = ::openCoach) {
+                Chip("Cuidado con la carga", "hard")
+                Sub(lw.text, size = 14.sp, color = c.ink)
+                Underline("Pregúntale a Zeta cómo seguir", ::openCoach)
+            }
+        }
         PlanCardUi(app)
         app.nearRoute(here)?.let { n -> NearCard(n) }
         // Salir a correr

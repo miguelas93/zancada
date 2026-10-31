@@ -34,6 +34,10 @@ data class RunUi(
     val tooShort: Double? = null,
     val live: LiveRun.State = LiveRun.State(),
     val lockLine: String = "",
+    /** Pasos por minuto en los últimos 30 s (sensor de pasos); null si no hay sensor o permiso. */
+    val cad: Int? = null,
+    /** Modo seguridad activo en esta carrera. */
+    val sos: Boolean = false,
 )
 
 /** Lo que se enseña al terminar (pantalla «Carrera terminada»). */
