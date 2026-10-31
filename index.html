@@ -332,7 +332,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.52 · avisar a alguien · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.53 · mejor hora para correr · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -739,7 +739,7 @@ function renderHome() {
 // Ruta recomendada más cercana, solo si ya diste permiso de ubicación (no pedimos nada al abrir Inicio).
 const near = { at: 0, pos: null, asked: false };
 // Clima en Inicio (misma fuente que Preparar) y tarjeta "¿Empiezas de cero?" que lleva al corre/anda guiado.
-async function renderHomeWx() { const pos = near.pos || lastFix || rt.here, el = $('#homeWx'); if (!pos) return; const w = await loadWeather(pos.lat, pos.lon); if (!w) return; el.style.display = ''; el.textContent = wxText(w).replace(/\.$/, ''); }
+async function renderHomeWx() { const pos = near.pos || lastFix || rt.here, el = $('#homeWx'); if (!pos) return; const w = await loadWeather(pos.lat, pos.lon); if (!w) return; el.style.display = ''; el.textContent = wxText(w).replace(/\.$/, '') + (w.best ? ` · Mejor hora hoy: ${w.best.h}:00 (${w.best.t}°, ${w.best.rain} % de lluvia)` : ''); }
 function renderStartCard() {
   const box = $('#startCard'), show = runs.length < 3 && !plan && settings.startSeen !== '1'; box.innerHTML = '';
   if (!show) return;
@@ -1094,10 +1094,18 @@ function renderBadges() {
 const wx = { at: 0, data: null, p: null };
 async function loadWeather(lat, lon) {
   if (wx.p || (wx.data && Date.now() - wx.at < 20 * 60e3 && haversine(wx.p0, { lat, lon }) < 3000)) return wx.data;
-  wx.p = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code&hourly=precipitation_probability&daily=sunrise,sunset&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(6000) })
-    .then((r) => r.json()).then((j) => { const c = j.current, h = new Date().getHours(), pp = j.hourly?.precipitation_probability || []; wx.data = { t: Math.round(c.temperature_2m), app: Math.round(c.apparent_temperature), wind: Math.round(c.wind_speed_10m), rain: Math.max(pp[h] || 0, pp[h + 1] || 0), now: c.precipitation > 0, code: c.weather_code, sunrise: j.daily?.sunrise?.[0]?.slice(11, 16) || null, sunset: j.daily?.sunset?.[0]?.slice(11, 16) || null }; wx.at = Date.now(); wx.p0 = { lat, lon }; return wx.data; })
+  wx.p = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code&hourly=precipitation_probability,temperature_2m&daily=sunrise,sunset&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(6000) })
+    .then((r) => r.json()).then((j) => { const c = j.current, h = new Date().getHours(), pp = j.hourly?.precipitation_probability || []; wx.data = { t: Math.round(c.temperature_2m), app: Math.round(c.apparent_temperature), wind: Math.round(c.wind_speed_10m), rain: Math.max(pp[h] || 0, pp[h + 1] || 0), now: c.precipitation > 0, code: c.weather_code, sunrise: j.daily?.sunrise?.[0]?.slice(11, 16) || null, sunset: j.daily?.sunset?.[0]?.slice(11, 16) || null, best: bestHour(j, h) }; wx.at = Date.now(); wx.p0 = { lat, lon }; return wx.data; })
     .catch(() => null).finally(() => { wx.p = null; });
   return wx.p;
+}
+// Mejor hora para correr lo que queda de día (con luz): poca lluvia y temperatura cerca de 12 °C.
+function bestHour(j, h) {
+  const pp = j.hourly?.precipitation_probability || [], tt = j.hourly?.temperature_2m || [], hr = (s) => s ? Number(s.slice(11, 13)) : null;
+  const sr = hr(j.daily?.sunrise?.[0]) ?? 7, ss = hr(j.daily?.sunset?.[0]) ?? 19, sc = (i) => (pp[i] || 0) + Math.abs((tt[i] ?? 12) - 12) * 3;
+  let best = null; for (let i = Math.max(h + 1, sr); i <= Math.min(22, ss - 1); i++) if (tt[i] != null && (best == null || sc(i) < sc(best))) best = i;
+  if (best == null || sc(best) + 8 >= sc(Math.min(h, 23))) return null;   // si ahora ya es buen momento, no lo decimos
+  return { h: best, t: Math.round(tt[best]), rain: pp[best] || 0 };
 }
 function wxText(w) {
   if (!w) return '';
