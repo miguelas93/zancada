@@ -34,3 +34,9 @@ Regla: cada fallo que aparezca en la app se convierte primero en una prueba que 
   El filtro de 4 m se queda corto. Se corregirá a propósito (actualizando `golden/`) en la versión nativa.
 - **El ruido del GPS suma distancia**: con buen GPS sale ≈ +2–3 % (5,15 km en un 5K de 5,03), bajo árboles ≈ +6 %.
   Strava suaviza el trazado; la nativa debería hacerlo también.
+- **Terminar en pausa**: si terminas la carrera estando en pausa, `elapsed()` descuenta la pausa dos veces y el tiempo sale corto. La versión Kotlin lo replica a propósito (paridad) hasta corregirlo en las dos a la vez.
+- **Ritmo «5:60»**: `fmtPace` redondea los segundos aparte, así que 5:59,6 se escribe «5:60». Igual en Kotlin, a corregir en las dos.
+
+## App nativa
+
+`nativa/core` (Kotlin) usa estos mismos `fixtures/` y `golden/`: `cd nativa && ./gradlew :core:test` tiene que dar lo mismo que la web.

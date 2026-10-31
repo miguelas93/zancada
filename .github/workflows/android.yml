@@ -1,0 +1,84 @@
+name: App nativa (Kotlin)
+
+# Compila y prueba la app nativa de nativa/ (la carpeta android/ la genera Capacitor para la beta).
+#  1. Cálculos (:core): las mismas 8 carreras de tests/ tienen que dar lo mismo que la web.
+#  2. App (:app): compilación, revisión de Android Lint y APK firmado con la clave de siempre.
+#  3. En main: publica el APK en la release "apk-nativa" (se instala AL LADO de la beta, no la sustituye).
+on:
+  push:
+    branches: [main]
+    paths: ['nativa/**', 'tests/fixtures/**', 'tests/golden/**', '.github/workflows/android.yml']
+  pull_request:
+    paths: ['nativa/**', 'tests/fixtures/**', 'tests/golden/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Pruebas, Lint y APK nativo
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nativa
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Paridad con la web (:core)
+        run: ./gradlew :core:test --no-daemon
+
+      - name: Compilar la app
+        env:
+          ZANCADA_KEYSTORE_B64: ${{ secrets.ZANCADA_KEYSTORE_B64 }}
+        run: |
+          # Misma clave de firma que la beta (Secret ZANCADA_KEYSTORE_B64, nunca en el repo).
+          if [ -n "$ZANCADA_KEYSTORE_B64" ]; then mkdir -p ~/.android && echo "$ZANCADA_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore; fi
+          ./gradlew :app:assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../zancada-nativa.apk
+
+      - name: Android Lint (errores y seguridad)
+        run: ./gradlew :app:lintDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zancada-nativa
+          path: |
+            zancada-nativa.apk
+            nativa/app/build/reports/lint-results-debug.html
+            nativa/core/build/reports/tests/
+          if-no-files-found: ignore
+
+  publish:
+    name: Publicar apk-nativa
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: zancada-nativa
+      - name: Publicar release apk-nativa
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete apk-nativa --yes --cleanup-tag || true
+          gh release create apk-nativa zancada-nativa.apk \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Zancada nativa (Kotlin) · fase 1 · build ${{ github.run_number }}" \
+            --notes "App nativa en Kotlin, fase 1: grabar carreras con la pantalla apagada. Se instala al lado de la beta (icono «Zancada N») y no toca sus datos."
