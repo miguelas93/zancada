@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.40 (31 oct 2026)
+
+- **Plan en tu calendario**: en la pantalla del plan, "Añadir el plan a mi calendario" genera un archivo .ics con las sesiones pendientes a la hora del aviso y una alarma 30 minutos antes. Lo abren Google Calendar, Apple y Outlook.
+- **Arreglo**: los botones Copiar, ChatGPT y Claude del entrenador IA ya no se salen de la tarjeta en móviles estrechos.
+
 ## Novedades 0.39 (31 oct 2026)
 
 - **Compartir tu semana**: en Actividad, una imagen con los km de la semana, barras por día, salidas, tiempo, desnivel y ritmo medio, lista para enviar por Telegram o WhatsApp.
