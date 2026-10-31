@@ -264,6 +264,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <div id="months" class="card col" style="gap:10px;padding:18px 20px;display:none"><div class="between"><h2>Por meses</h2><span class="sub" style="font-size:12px" id="monthsSub"></span></div><div id="monthsList" class="col" style="gap:8px"></div></div>
     <div id="monthGoal" class="card col" style="gap:10px;padding:16px 20px;display:none"></div>
     <div id="challenges" class="card col" style="gap:12px;padding:16px 20px"></div>
+    <div id="trend" class="card col" style="gap:8px;padding:18px 20px;display:none"><div class="between"><h2>Evolución del ritmo</h2><span class="sub" style="font-size:12px" id="trendSub"></span></div><div id="trendSvg" style="color:var(--ink)"></div><p class="sub" id="trendNote" style="margin:0;font-size:13px;line-height:1.45"></p></div>
     <div id="paces" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus ritmos</h2><span class="sub" style="font-size:12px" id="pacesSub"></span></div><div class="stats" id="pacesPred"></div><div class="stats" id="pacesTrain"></div></div>
     <div id="records" class="card col" style="gap:12px;padding:18px 20px;display:none"><div class="between"><h2>Tus récords</h2><span class="sub" style="font-size:12px">toca uno para ver la carrera</span></div><div id="recGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
     <button class="btn ghost" id="manualBtn" style="height:44px;font-size:14px">Añadir una carrera a mano (cinta, reloj…)</button>
@@ -328,7 +329,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.35 · retos del mes · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.36 · evolución del ritmo · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -800,7 +801,7 @@ function renderHistory() {
   $('#monthStats').innerHTML = `<div><span class="lbl">Carreras</span><span class="num" style="font-size:26px">${mr.length}</span></div>
     <div><span class="lbl">Tiempo</span><span class="num" style="font-size:26px">${fmtTime(dur)}</span></div>
     <div><span class="lbl">Ritmo medio</span><span><span class="num" style="font-size:26px">${dist > 0 ? fmtPace(dur / (dist / 1000)) : '–:––'}</span><span class="unit">/km</span></span></div>`;
-  renderCalendar(); renderMonthGoal(dist, now, days); renderChallenges(mr, now, days); renderRecords(); renderPaces(); renderMonths();
+  renderCalendar(); renderMonthGoal(dist, now, days); renderChallenges(mr, now, days); renderRecords(); renderPaces(); renderTrend(); renderMonths();
   const best = runs.length ? Math.max(...runs.map((r) => r.dist)) : 0;
   const HF = { all: () => true, plan: (r) => r.session, route: (r) => r.route, long: (r) => r.dist >= 8000, note: (r) => r.note || r.feel };
   const q = ($('#histSearch').value || '').trim().toLowerCase(); $('#histSearch').style.display = runs.length >= 6 || q ? '' : 'none';
@@ -889,6 +890,19 @@ function renderPaces() {
 // Totales por mes (últimos 6 con carreras), como el "este año" de Strava, con barra proporcional al mes más largo.
 // Calendario del mes (Strava): punto lima proporcional a los km de cada día; tocar un día abre su carrera (la más larga si hay varias).
 let calOff = 0;
+// Evolución del ritmo (Garmin/Strava): cada punto es una carrera; la línea es la media de las últimas 5. Arriba = más rápido.
+function renderTrend() {
+  const L = runs.filter((r) => r.dist >= 1000 && r.dur > 0).sort((a, b) => a.start - b.start).slice(-20), box = $('#trend');
+  box.style.display = L.length >= 4 ? '' : 'none'; if (L.length < 4) return;
+  const pc = L.map((r) => r.dur / (r.dist / 1000)), ma = pc.map((_, i) => { const w = pc.slice(Math.max(0, i - 4), i + 1); return w.reduce((a, v) => a + v, 0) / w.length; });
+  const lo = Math.min(...pc), hi = Math.max(...pc), pad = Math.max(10, (hi - lo) * 0.15), y0 = lo - pad, y1 = hi + pad, W = 320, H = 110;
+  const X = (i) => 40 + i * (W - 48) / (L.length - 1), Y = (v) => 8 + (v - y0) / (y1 - y0) * (H - 16);
+  const line = ma.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+  $('#trendSvg').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Ritmo de tus últimas ${L.length} carreras"><text x="2" y="12" font-size="10" fill="var(--muted)">${fmtPace(lo)}</text><text x="2" y="${H - 2}" font-size="10" fill="var(--muted)">${fmtPace(hi)}</text>${pc.map((v, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3.2" fill="var(--muted)" opacity=".55"/>`).join('')}<path d="${line}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${X(L.length - 1).toFixed(1)}" cy="${Y(ma[ma.length - 1]).toFixed(1)}" r="5" fill="var(--volt)" stroke="currentColor" stroke-width="2"/></svg>`;
+  $('#trendSub').textContent = `últimas ${L.length} carreras`;
+  const n = Math.min(5, Math.floor(L.length / 2)), now = pc.slice(-n).reduce((a, v) => a + v, 0) / n, before = pc.slice(0, n).reduce((a, v) => a + v, 0) / n, d = Math.round(before - now);
+  $('#trendNote').textContent = Math.abs(d) < 5 ? `Ritmo estable: unos ${fmtPace(now)}/km de media. Si quieres mejorar, mete una sesión de series o tempo a la semana.` : d > 0 ? `Vas ${d} s/km más rápido que al principio (${fmtPace(before)} → ${fmtPace(now)}/km). Buena señal: mantén la mayoría de salidas en suave.` : `Vas ${-d} s/km más lento que al principio (${fmtPace(before)} → ${fmtPace(now)}/km). Puede ser cansancio, calor o rutas con más cuestas: no pasa nada si las salidas son suaves.`;
+}
 function renderCalendar() {
   const base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + calOff); const y = base.getFullYear(), m = base.getMonth(), days = new Date(y, m + 1, 0).getDate(), lead = (new Date(y, m, 1).getDay() + 6) % 7;
   const per = {}; runs.forEach((r) => { const d = new Date(r.start); if (d.getFullYear() === y && d.getMonth() === m) (per[d.getDate()] = per[d.getDate()] || []).push(r); });
