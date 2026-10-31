@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.52 (31 oct 2026)
+
+- **Avisar a alguien** antes de salir: en Preparar, un mensaje listo para WhatsApp o Telegram con la ruta, el punto de salida en Google Maps y la hora a la que calculas volver.
+- La pantalla de novedades también menciona el metro cercano y el aviso.
+
 ## Novedades 0.51 (31 oct 2026)
 
 - **Transporte cerca de la salida**: en "Cómo llegar" de cada ruta aparecen las estaciones de Metro, Cercanías o Metro Ligero más próximas a la salida y a cuántos metros están (OpenStreetMap). También funciona en tus recorridos y en las rutas importadas.

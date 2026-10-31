@@ -332,7 +332,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.51 · transporte cerca de la salida · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.52 · avisar a alguien · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -445,7 +445,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="prepLight" style="display:none;height:40px;font-size:13px;margin:-4px 0">Hoy no estoy al 100 %</button>
     <button class="btn" id="startBtn" disabled>Empezar</button>
     <p id="prepHint" class="sub" style="margin:-6px 0 0;text-align:center;font-size:12px">Necesito permiso de ubicación para medir tu carrera.</p>
-    <div style="display:flex;gap:18px;justify-content:center;margin-top:-4px"><button class="sub" id="warmBtn" style="font-size:13px;text-decoration:underline">Calentar 3 min, guiado</button><button class="sub" id="cintaBtn" style="font-size:13px;text-decoration:underline">¿En cinta? Sin GPS</button></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;margin-top:-4px"><button class="sub" id="warmBtn" style="font-size:13px;text-decoration:underline">Calentar 3 min, guiado</button><button class="sub" id="cintaBtn" style="font-size:13px;text-decoration:underline">¿En cinta? Sin GPS</button><button class="sub" id="tellBtn" style="font-size:13px;text-decoration:underline">Avisar a alguien</button></div>
   </div>
 </section>
 
@@ -854,6 +854,17 @@ $('#stSkip').onclick = () => stGo(stz.i + 1);
 $('#stPause').onclick = () => { stz.paused = !stz.paused; $('#stPause').textContent = stz.paused ? 'Seguir' : 'Pausa'; };
 $('#manualBtn').onclick = () => { const d = new Date(Date.now() - 3600e3); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $('#mDate').value = d.toISOString().slice(0, 16); $('#manualModal').classList.add('on'); setTimeout(() => $('#mKm').focus(), 50); };
 $('#mCancel').onclick = () => $('#manualModal').classList.remove('on');
+// Avisar a alguien antes de salir (Strava Beacon, Garmin LiveTrack): sin servidor no hay seguimiento en directo,
+// pero un mensaje con por dónde vas y a qué hora calculas volver cubre lo importante.
+$('#tellBtn').onclick = async () => {
+  const r = pickedRoute, ss = prepMode === 'plan' ? prep.session : prepMode === 'tramos' ? prep.tramos : prepMode === 'libre' && prep.goal && prep.goal !== '0' ? goalSession(prep.goal) : null;
+  const min = ss?.min ? ss.min : ss?.m ? ss.m / 1000 * userPace() / 60 : r ? routeMeta(r).time / 60 : 45;
+  const back = new Date(Date.now() + (min + 10) * 60e3).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const pos = r ? (r.start || { lat: r.ll[0][0], lon: r.ll[0][1] }) : lastFix, map = pos ? ` https://maps.google.com/?q=${pos.lat.toFixed(5)},${pos.lon.toFixed(5)}` : '';
+  const text = `Salgo a correr${r ? ` por ${r.name}` : ''}${ss ? ` (${ss.title || 'entreno'})` : ''}. Calculo volver sobre las ${back}.${pos ? ` ${r ? 'Salida' : 'Salgo de aquí'}:${map}` : ''}`;
+  try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('Mensaje copiado: pégalo en WhatsApp o Telegram', 3500); } catch (e) { toast(text, 6000); }
+};
 // Cinta (NRC indoor): cronómetro sin GPS con voz cada 5 min; al terminar abre "Carrera a mano" con fecha y tiempo ya puestos.
 const cinta = { t0: 0, paused: 0, pauseAt: 0, timer: null };
 const cintaSec = () => Math.floor((Date.now() - cinta.t0 - cinta.paused - (cinta.pauseAt ? Date.now() - cinta.pauseAt : 0)) / 1000);
@@ -2268,9 +2279,9 @@ history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
 const NEWS_VER = '0.50', NEWS = [
-  ['Rutas', 'Para hoy según tu plan, filtro por tiempo, ordenar, fuentes y aseos en el mapa, tu historial en cada ruta e importar GPX.'],
+  ['Rutas', 'Para hoy según tu plan, filtro por tiempo, ordenar, fuentes y aseos en el mapa, metro cercano, tu historial en cada ruta e importar GPX.'],
   ['Entrenador IA', 'eliges una pregunta en el plan y se abre ChatGPT o Claude con tu contexto ya escrito.'],
-  ['Correr', 'objetivo en carrera libre, avisos de ritmo, ánimos por voz, calentamiento guiado y modo cinta sin GPS.'],
+  ['Correr', 'objetivo en carrera libre, avisos de ritmo, ánimos por voz, calentamiento guiado, modo cinta sin GPS y avisar a alguien antes de salir.'],
   ['Al terminar', 'estiramientos guiados, récords y comparación, ritmo en el mapa y cómo repartiste el esfuerzo.'],
   ['Actividad', 'calendario, retos del mes, evolución del ritmo, tus ritmos, récords, buscador y compartir tu semana.'],
   ['Plan', 'añádelo a tu calendario con alarma, y corre/anda para empezar de cero.'],
