@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.57 (31 oct 2026)
+
+- **Recorrido animado en cada ruta.** Al abrir la ficha, el mapa se acerca a la salida y recorre el trazado en unos segundos (5–9 s según la longitud), con el km y la altura en una etiqueta; al acabar enseña la ruta entera. Se repite con «▶ Recorrido». Si tocas o arrastras el mapa, la animación se para y el mapa es tuyo (zoom, mover, satélite, ampliar).
+- **Fotos con criterio.** Primero se buscan por el nombre del sitio y después alrededor del trazado. Solo entran fotos apaisadas de paisaje (parque, camino, pinar, río, playa, montaña, vistas…) y se descartan fauna, flores y setas, arte y esculturas, edificios, interiores, carteles, personas y eventos, mirando el título y las categorías de Commons. Si no hay ninguna buena, no se enseña la tarjeta.
+- **Zeta, tu entrenador IA.** Tiene nombre y vive en un botón redondo en la esquina (Inicio, Actividad, Rutas, Perfil, Clubs y Plan). Al tocarlo se despliega el chat; la primera vez lleva un punto rojo. En Plan hay además un acceso «Pregúntale a Zeta».
+
 ## Novedades 0.56 (31 oct 2026)
 
 - **Entrenador IA dentro de la app.** En Plan hay un chat de verdad: escribes o tocas una sugerencia y te contesta ahí mismo, sabiendo tu plan, tus últimas carreras y tus récords. Usa Pollinations, una IA gratuita sin cuenta ni clave; sin registro solo admite una pregunta cada ~30 s por conexión, y si hay cola la app espera y reintenta sola. La conversación se guarda en el móvil. Ya no hay botones para ir a ChatGPT o Claude.
