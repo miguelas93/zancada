@@ -332,7 +332,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.50 · novedades al abrir · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.51 · transporte cerca de la salida · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -367,7 +367,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <p class="sub" id="rdPois" style="display:none;margin:-4px 4px 0;font-size:13px;line-height:1.45"></p>
     <div class="card col" id="rdProfileCard" style="gap:8px;padding:18px 20px"><div class="between"><h2>Perfil</h2><span class="sub" id="rdProfileSub"></span></div><div id="rdProfile" style="color:var(--ink)"></div></div>
     <div class="card col" id="rdAbout" style="gap:8px;padding:18px 20px"><h2 id="rdSurface"></h2><p id="rdWhy" style="margin:0;font-size:14px;line-height:1.45"></p><p id="rdAccess" class="sub" style="margin:0;font-size:13px;line-height:1.45"></p></div>
-    <div class="card col" style="gap:10px;padding:18px 20px"><h2>Cómo llegar</h2><p id="rdAway" style="margin:0;font-size:14px;line-height:1.45"></p><a class="btn sec" id="rdMaps" target="_blank" rel="noopener" style="text-decoration:none;height:48px;font-size:15px">Transporte público (Google Maps)</a><div style="display:flex;gap:8px"><button class="btn ghost" id="rdShare" style="height:44px;font-size:14px">Compartir la ruta</button><button class="btn ghost" id="rdGpx" style="height:44px;font-size:14px">GPX de la ruta</button></div></div>
+    <div class="card col" style="gap:10px;padding:18px 20px"><h2>Cómo llegar</h2><p id="rdAway" style="margin:0;font-size:14px;line-height:1.45"></p><p class="sub" id="rdTransit" style="display:none;margin:0;font-size:13px;line-height:1.45"></p><a class="btn sec" id="rdMaps" target="_blank" rel="noopener" style="text-decoration:none;height:48px;font-size:15px">Transporte público (Google Maps)</a><div style="display:flex;gap:8px"><button class="btn ghost" id="rdShare" style="height:44px;font-size:14px">Compartir la ruta</button><button class="btn ghost" id="rdGpx" style="height:44px;font-size:14px">GPX de la ruta</button></div></div>
     <div class="card col" id="rdNowCard" style="gap:6px;padding:18px 20px;display:none"><h2>Ahora mismo allí</h2><p id="rdNow" class="sub" style="margin:0;font-size:14px;line-height:1.45;white-space:pre-line"></p></div>
     <div class="col" id="rdSimilarWrap" style="gap:10px;display:none"><h2 style="padding:0 4px">Parecidas</h2><div class="col" id="rdSimilar" style="gap:10px"></div></div>
   </div>
@@ -1634,8 +1634,11 @@ function renderRouteDetail() {
   if (rt.here && away != null && away < 20000) rdLayers.push(L.marker([rt.here.lat, rt.here.lon], { icon: dotIcon(VOLT, INK), zIndexOffset: 500 }).addTo(map));
   setTimeout(() => { map.invalidateSize(); map.fitBounds(r.ll, { padding: [36, 36] }); }, 80);
   $('#rdPois').style.display = 'none';
-  loadPois(r).then((ps) => {
-    if (!ps || rdTok !== renderRouteDetail.tok || detailRoute !== r) return;
+  $('#rdTransit').style.display = 'none';
+  loadPois(r).then((res) => {
+    if (!res || rdTok !== renderRouteDetail.tok || detailRoute !== r) return;
+    const ps = res.p || [];
+    if (res.s?.length) { $('#rdTransit').textContent = 'Transporte cerca de la salida: ' + res.s.map((x) => `${x.k} ${x.n} (${x.d < 1000 ? 'a ' + (Math.round(x.d / 10) * 10) + ' m' : 'a ' + (x.d / 1000).toFixed(1).replace('.', ',') + ' km'})`).join(' · ') + '.'; $('#rdTransit').style.display = ''; }
     ps.forEach((q) => rdLayers.push(L.circleMarker([q.lat, q.lon], { radius: 6, color: '#fff', weight: 2, fillColor: q.k === 'w' ? '#2F80ED' : '#7A7F78', fillOpacity: 1 }).bindTooltip(q.k === 'w' ? 'Fuente' : 'Aseo').addTo(map)));
     const w = ps.filter((q) => q.k === 'w').length, t = ps.length - w;
     $('#rdPois').innerHTML = w || t ? `<span style="display:inline-block;width:9px;height:9px;border-radius:5px;background:#2F80ED;margin-right:6px"></span>${w ? `${w} fuente${w === 1 ? '' : 's'}` : 'Sin fuentes'}${t ? ` y ${t} aseo${t === 1 ? '' : 's'}` : ''} junto al recorrido, marcad${w + t === 1 ? 'o' : 'os'} en el mapa. Datos de OpenStreetMap.` : 'No hay fuentes registradas junto al recorrido: lleva agua si hace calor. Datos de OpenStreetMap.';
@@ -1645,19 +1648,25 @@ function renderRouteDetail() {
 // Fuentes y aseos junto a la ruta (Komoot/Strava muestran puntos de interés): Overpass API de OpenStreetMap, sin clave; se guarda 14 días.
 const POI_KEY = 'zancada.pois.v1'; let poiCache = load(POI_KEY, {});
 async function loadPois(r) {
-  const c = r.id && poiCache[r.id]; if (c && Date.now() - c.t < 14 * 864e5) return c.p;
+  const c = r.id && poiCache[r.id]; if (c && c.s && Date.now() - c.t < 14 * 864e5) return c;
   if (!r.ll || r.ll.length < 2) return null;
   const la = r.ll.map((q) => q[0]), lo = r.ll.map((q) => q[1]), pad = 0.0015;
   const bb = [Math.min(...la) - pad, Math.min(...lo) - pad, Math.max(...la) + pad, Math.max(...lo) + pad].map((v) => v.toFixed(5)).join(',');
-  const q = `[out:json][timeout:15];(node["amenity"="drinking_water"](${bb});node["amenity"="toilets"](${bb}););out;`;
+  const st = r.start || { lat: r.ll[0][0], lon: r.ll[0][1] };
+  const q = `[out:json][timeout:15];(node["amenity"="drinking_water"](${bb});node["amenity"="toilets"](${bb});node(around:1200,${st.lat.toFixed(5)},${st.lon.toFixed(5)})["railway"~"^(station|halt)$"];);out;`;
   try {
     const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 12000);
     const res = await fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(q), { signal: ctl.signal }); clearTimeout(tm);
     if (!res.ok) return null;
     const j = await res.json(), step = Math.max(1, Math.floor(r.ll.length / 400)), samp = r.ll.filter((_, i) => i % step === 0);
-    const ps = (j.elements || []).filter((e) => e.lat != null).map((e) => ({ k: e.tags?.amenity === 'toilets' ? 't' : 'w', lat: e.lat, lon: e.lon })).filter((e) => samp.some(([a, b]) => haversine({ lat: a, lon: b }, e) < 80)).slice(0, 40);
-    if (r.id) { poiCache[r.id] = { t: Date.now(), p: ps }; save(POI_KEY, poiCache); }
-    return ps;
+    const els = (j.elements || []).filter((e) => e.lat != null);
+    const ps = els.filter((e) => e.tags?.amenity).map((e) => ({ k: e.tags.amenity === 'toilets' ? 't' : 'w', lat: e.lat, lon: e.lon })).filter((e) => samp.some(([a, b]) => haversine({ lat: a, lon: b }, e) < 80)).slice(0, 40);
+    // Estaciones cerca de la salida: Metro, Cercanías o Metro Ligero, la más cercana de cada nombre.
+    const kind = (t) => t.station === 'subway' || /metro/i.test(t.network || '') && !/ligero/i.test(t.network || '') ? 'Metro' : t.station === 'light_rail' || /ligero/i.test(t.network || '') ? 'Metro Ligero' : /cercan/i.test((t.network || '') + (t.operator || '')) || t.train === 'yes' ? 'Cercanías' : 'Estación';
+    const seen = new Set(), ss = els.filter((e) => e.tags?.railway && e.tags.name).map((e) => ({ n: e.tags.name, k: kind(e.tags), d: Math.round(haversine(st, e)) })).sort((a, b) => a.d - b.d).filter((x) => !seen.has(x.k + x.n) && seen.add(x.k + x.n)).slice(0, 2);
+    const out = { t: Date.now(), p: ps, s: ss };
+    if (r.id) { poiCache[r.id] = out; save(POI_KEY, poiCache); }
+    return out;
   } catch (e) { return null; }
 }
 $('#rdRun').onclick = () => { pickedRoute = detailRoute; go('prep'); };
