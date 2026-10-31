@@ -329,7 +329,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.37 · calentamiento guiado · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.38 · rutas con tu historial · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -1431,9 +1431,17 @@ function myRoutes() {
   return savedRoutes.map((r) => Object.assign({}, r, { src: 'saved', sub: 'Guardada' })).concat(fromRuns.filter((r) => !savedRoutes.some((s) => s.id === r.id)));
 }
 const SURF = { tierra: 'Tierra', asfalto: 'Asfalto', pista: 'Pista', mixto: 'Mixto' };
+// Rutas más personales: en cada recomendada, cuántas veces la has corrido y tu mejor tiempo completo.
+function routeDoneTag(r) {
+  if (r.src !== 'rec') return '';
+  const mine = runs.filter((x) => x.route?.id === r.id);
+  if (!mine.length) return '';
+  const full = mine.filter((x) => x.dist >= r.km * 1000 * 0.9), best = full.length ? Math.min(...full.map((x) => x.dur)) : 0;
+  return `<span class="tag" style="color:var(--ink);border-color:var(--ink)">✓ ${mine.length} ${mine.length === 1 ? 'vez' : 'veces'}${best ? ' · mejor ' + fmtTime(best) : ''}</span>`;
+}
 function routeCard(r, i) {
   const m = routeMeta(r), sub = r.src === 'rec' ? `${r.zone}${r.away != null ? ' · ' + fmtAway(r.away) : ''}` : r.src === 'sug' ? `Desde tu ubicación${r.away != null && r.away > 0.05 ? ' · ' + fmtAway(r.away) : ''}` : r.sub || '';
-  return `<button class="rlist" data-open="${i}"><span class="rmini">${routeSvg(r.ll)}</span><span class="rbody"><b>${r.name}</b><span class="sub">${sub}</span><span class="rmeta"><span class="num" style="font-size:20px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span><span class="sub">·</span><span>${r.gain == null ? '—' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span>${fmtDur(m.time)}</span></span><span class="rtags"><span class="chip ${m.diff[1]}">${m.diff[0]}</span>${r.surf ? `<span class="tag">${SURF[r.surf] || r.surface}</span>` : ''}${r.loop === false ? '<span class="tag">Ida y vuelta</span>' : ''}</span></span></button>`;
+  return `<button class="rlist" data-open="${i}"><span class="rmini">${routeSvg(r.ll)}</span><span class="rbody"><b>${r.name}</b><span class="sub">${sub}</span><span class="rmeta"><span class="num" style="font-size:20px">${String(r.km).replace('.', ',')}</span><span class="unit">km</span><span class="sub">·</span><span>${r.gain == null ? '—' : r.gain + ' m'} <span class="sub">D+</span></span><span class="sub">·</span><span>${fmtDur(m.time)}</span></span><span class="rtags"><span class="chip ${m.diff[1]}">${m.diff[0]}</span>${r.surf ? `<span class="tag">${SURF[r.surf] || r.surface}</span>` : ''}${r.loop === false ? '<span class="tag">Ida y vuelta</span>' : ''}${routeDoneTag(r)}</span></span></button>`;
 }
 let rtList = [], rtToday = null;
 // "Para hoy": una propuesta razonada entre las recomendadas (cerca, 25–50 min a tu ritmo, que no hayas corrido esta semana); cambia cada día.
