@@ -1,0 +1,4508 @@
+{
+ "fmt": {
+  "pace": [
+   "–:––",
+   "4:60",
+   "5:00",
+   "5:60",
+   "5:59",
+   "–:––",
+   "–:––",
+   "39:60"
+  ],
+  "time": [
+   "00:00",
+   "01:00",
+   "01:01",
+   "1:00:00",
+   "1:00:00",
+   "2:02:02"
+  ],
+  "km": [
+   "0,00",
+   "0,01",
+   "0,99",
+   "1,00",
+   "21,10"
+  ],
+  "kmS": [
+   "0",
+   "0,5",
+   "1",
+   "1,5",
+   "21,1",
+   "3,3"
+  ],
+  "m": [
+   "10 m",
+   "40 m",
+   "0,9 km",
+   "950 m",
+   "1,2 km",
+   "12 km"
+  ],
+  "dur": [
+   "00 min",
+   "10 min",
+   "59 min",
+   "1 h 00 min",
+   "1 h 23 min"
+  ],
+  "away": [
+   "a 200 m",
+   "a 950 m",
+   "a 1 km",
+   "a 3,3 km",
+   "a 13 km"
+  ],
+  "min": [
+   "1 min",
+   "1,5 min",
+   "2,5 min",
+   "5 min"
+  ],
+  "list": [
+   "",
+   "a",
+   "a y b",
+   "a, b y c"
+  ],
+  "date": [
+   "mar, 20 oct · 07:40",
+   "lun, 19 oct · 19:10",
+   "dom, 18 oct · 10:00",
+   "sáb, 17 oct · 10:00"
+  ],
+  "runName": [
+   "Carrera de la mañana",
+   "Carrera de la tarde",
+   "Carrera de la tarde",
+   "Carrera nocturna",
+   "Carrera nocturna"
+  ]
+ },
+ "weekStart": [
+  1792360800000,
+  1792360800000,
+  1791151200000
+ ],
+ "weekStats": {
+  "count": 2,
+  "daysDone": [
+   0,
+   1
+  ],
+  "streak": 1,
+  "today": 2
+ },
+ "records": [
+  {
+   "label": "Mejor km",
+   "val": "04:58",
+   "run": "r1792137605000"
+  },
+  {
+   "label": "Mejor 5 km",
+   "val": "26:15",
+   "run": "r1792474800000"
+  },
+  {
+   "label": "Mejor 10 km",
+   "val": "56:20",
+   "run": "r1792051205000"
+  },
+  {
+   "label": "Más larga",
+   "val": "21,29 km",
+   "run": "r1792051205000"
+  },
+  {
+   "label": "Más desnivel",
+   "val": "+108 m",
+   "run": "r1792137605000"
+  }
+ ],
+ "bestStreak": 1,
+ "raceBase": {
+  "base": {
+   "d": 10000,
+   "t": 3380.239143159691
+  },
+  "srcTxt": "según tu mejor 10 km"
+ },
+ "userPace": 330,
+ "targetPace": [
+  "6:10",
+  "5:56",
+  "5:07",
+  "4:44",
+  "5:14",
+  "5:30"
+ ],
+ "badges": [
+  {
+   "id": "primera",
+   "when": 1791705605000
+  },
+  {
+   "id": "5k",
+   "when": 1791878405000
+  },
+  {
+   "id": "10k",
+   "when": 1792051205000
+  },
+  {
+   "id": "21k",
+   "when": 1792051205000
+  },
+  {
+   "id": "x10",
+   "when": 1792429800000
+  },
+  {
+   "id": "x50",
+   "when": 0
+  },
+  {
+   "id": "km100",
+   "when": 0
+  },
+  {
+   "id": "km500",
+   "when": 0
+  },
+  {
+   "id": "km1000",
+   "when": 0
+  },
+  {
+   "id": "sem3",
+   "when": 0
+  },
+  {
+   "id": "sem10",
+   "when": 0
+  },
+  {
+   "id": "alba",
+   "when": 0
+  },
+  {
+   "id": "noche",
+   "when": 0
+  },
+  {
+   "id": "plan",
+   "when": 1792474800000
+  },
+  {
+   "id": "ruta",
+   "when": 1792167600000
+  },
+  {
+   "id": "rutas5",
+   "when": 0
+  }
+ ],
+ "shoeKm": [
+  127.6494488518082
+ ],
+ "perRun": [
+  {
+   "id": "r1792474800000",
+   "bestFor5": 1574.5347659252209,
+   "bestFor10": null,
+   "bestFor1": 312.15463056157984,
+   "effort1": 307.9071385995982,
+   "effort5": 1569.9208500742898,
+   "compare": "Mismo ritmo que tu última carrera parecida (13 oct).",
+   "insights": "Has ido 19 s/km más rápido que en tus últimas carreras. Parciales muy regulares. Sesión del plan cumplida.",
+   "segs": [
+    [
+     46,
+     150.523,
+     325.538
+    ],
+    [
+     45,
+     153.565,
+     293.036
+    ],
+    [
+     46,
+     150.672,
+     311.936
+    ],
+    [
+     44,
+     151.773,
+     316.255
+    ],
+    [
+     45,
+     150.936,
+     311.39
+    ],
+    [
+     45,
+     150.116,
+     339.738
+    ],
+    [
+     44,
+     150.805,
+     318.291
+    ],
+    [
+     48,
+     151.854,
+     316.092
+    ],
+    [
+     45,
+     150.509,
+     305.63
+    ],
+    [
+     46,
+     152.363,
+     295.348
+    ],
+    [
+     47,
+     151.797,
+     309.625
+    ],
+    [
+     46,
+     152.107,
+     315.568
+    ],
+    [
+     46,
+     152.117,
+     315.546
+    ],
+    [
+     48,
+     153.707,
+     344.813
+    ],
+    [
+     47,
+     153.69,
+     318.823
+    ],
+    [
+     46,
+     150.396,
+     319.158
+    ],
+    [
+     45,
+     150.179,
+     299.642
+    ],
+    [
+     45,
+     153.538,
+     306.113
+    ],
+    [
+     46,
+     151.839,
+     302.953
+    ],
+    [
+     46,
+     151.938,
+     309.337
+    ],
+    [
+     46,
+     150.99,
+     324.526
+    ],
+    [
+     51,
+     153.667,
+     325.379
+    ],
+    [
+     49,
+     150.548,
+     338.761
+    ],
+    [
+     50,
+     151.701,
+     323.003
+    ],
+    [
+     44,
+     152.068,
+     289.344
+    ],
+    [
+     45,
+     150.053,
+     293.229
+    ],
+    [
+     48,
+     152.09,
+     309.028
+    ],
+    [
+     46,
+     152.112,
+     308.983
+    ],
+    [
+     46,
+     150.637,
+     318.648
+    ],
+    [
+     44,
+     150.325,
+     339.265
+    ],
+    [
+     48,
+     152.631,
+     321.035
+    ],
+    [
+     48,
+     152.265,
+     321.807
+    ],
+    [
+     47,
+     153.822,
+     299.046
+    ],
+    [
+     43,
+     141.999,
+     302.82
+    ]
+   ],
+   "detect": null,
+   "sessDone": true
+  },
+  {
+   "id": "r1792429800000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 333.25274324639963,
+   "effort1": 329.46696235107464,
+   "effort5": null,
+   "compare": "Mismo ritmo que tu última carrera parecida (11 oct).",
+   "insights": "Ritmo en tu línea habitual.",
+   "segs": [
+    [
+     52,
+     153.026,
+     339.85
+    ],
+    [
+     52,
+     152.753,
+     333.872
+    ],
+    [
+     51,
+     151.149,
+     330.799
+    ],
+    [
+     51,
+     151.399,
+     330.241
+    ],
+    [
+     51,
+     151.389,
+     336.881
+    ],
+    [
+     51,
+     152.079,
+     328.75
+    ],
+    [
+     52,
+     152.552,
+     334.313
+    ],
+    [
+     46,
+     138.598,
+     324.681
+    ],
+    [
+     51,
+     150.158,
+     332.982
+    ],
+    [
+     51,
+     151.694,
+     329.61
+    ],
+    [
+     51,
+     152.386,
+     328.114
+    ],
+    [
+     51,
+     152.934,
+     333.476
+    ],
+    [
+     50,
+     150.885,
+     331.378
+    ],
+    [
+     51,
+     151.025,
+     331.072
+    ],
+    [
+     51,
+     152.688,
+     327.464
+    ],
+    [
+     51,
+     150.449,
+     332.338
+    ],
+    [
+     29,
+     84.953,
+     329.594
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "m1792310400000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": null,
+   "effort1": null,
+   "effort5": null,
+   "compare": "15 s/km más lento que tu última carrera parecida (13 oct, 5:15/km).",
+   "insights": "Ritmo en tu línea habitual. Van 8 carreras esta semana.",
+   "segs": [],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "r1792224005000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 321.6853661510491,
+   "effort1": 318.80969898943385,
+   "effort5": null,
+   "compare": "Mismo ritmo que tu última carrera parecida (12 oct).",
+   "insights": "Has ido 9 s/km más rápido que en tus últimas carreras. Van 7 carreras esta semana.",
+   "segs": [
+    [
+     38,
+     151.332,
+     330.44
+    ],
+    [
+     39,
+     152.738,
+     301.143
+    ],
+    [
+     42,
+     152.185,
+     321.977
+    ],
+    [
+     38,
+     152.796,
+     314.144
+    ],
+    [
+     42,
+     150.388,
+     312.525
+    ],
+    [
+     36,
+     151.745,
+     349.264
+    ],
+    [
+     36,
+     150.929,
+     324.656
+    ],
+    [
+     43,
+     151.242,
+     323.985
+    ],
+    [
+     41,
+     150.892,
+     304.854
+    ],
+    [
+     36,
+     152.795,
+     333.78
+    ],
+    [
+     40,
+     154.152,
+     350.304
+    ],
+    [
+     40,
+     151.619,
+     329.774
+    ],
+    [
+     41,
+     150.319,
+     312.667
+    ],
+    [
+     40,
+     151.316,
+     317.218
+    ],
+    [
+     39,
+     154,
+     337.663
+    ],
+    [
+     40,
+     154.11,
+     304.976
+    ],
+    [
+     37,
+     152.664,
+     347.167
+    ],
+    [
+     41,
+     152.291,
+     315.187
+    ],
+    [
+     33,
+     152.36,
+     328.171
+    ],
+    [
+     40,
+     152.41,
+     314.94
+    ],
+    [
+     43,
+     153.663,
+     331.896
+    ],
+    [
+     37,
+     151.268,
+     323.929
+    ],
+    [
+     18,
+     63.483,
+     299.292
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "route-1792167600000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 333.3329884637579,
+   "effort1": 333.3324540540821,
+   "effort5": null,
+   "compare": "Mismo ritmo que tu última carrera parecida (16 oct).",
+   "insights": "Has ido 8 s/km más tranquilo que de costumbre. Parciales muy regulares. Van 6 carreras esta semana.",
+   "segs": [
+    [
+     8,
+     172,
+     333.332
+    ],
+    [
+     9,
+     153.455,
+     333.337
+    ],
+    [
+     14,
+     152.144,
+     333.33
+    ],
+    [
+     13,
+     161.189,
+     333.335
+    ],
+    [
+     4,
+     154.583,
+     333.336
+    ],
+    [
+     9,
+     154.46,
+     333.328
+    ],
+    [
+     8,
+     199.516,
+     333.337
+    ],
+    [
+     8,
+     294.584,
+     333.331
+    ],
+    [
+     5,
+     180.361,
+     333.337
+    ],
+    [
+     6,
+     153.614,
+     333.329
+    ],
+    [
+     7,
+     191.109,
+     333.334
+    ],
+    [
+     12,
+     152.666,
+     333.337
+    ],
+    [
+     17,
+     169.619,
+     333.334
+    ],
+    [
+     9,
+     170.956,
+     333.331
+    ],
+    [
+     13,
+     153.319,
+     333.332
+    ],
+    [
+     21,
+     152.251,
+     333.337
+    ],
+    [
+     11,
+     152.986,
+     333.332
+    ],
+    [
+     13,
+     150.482,
+     333.335
+    ],
+    [
+     7,
+     162.135,
+     333.333
+    ],
+    [
+     7,
+     173.604,
+     333.333
+    ],
+    [
+     14,
+     152.163,
+     333.332
+    ],
+    [
+     12,
+     155.17,
+     333.33
+    ],
+    [
+     11,
+     160.31,
+     333.335
+    ],
+    [
+     6,
+     181.492,
+     333.331
+    ],
+    [
+     6,
+     146.37,
+     333.334
+    ]
+   ],
+   "detect": {
+    "id": "rec-dehesa",
+    "name": "Dehesa de la Villa · vuelta",
+    "score": 1
+   },
+   "sessDone": null
+  },
+  {
+   "id": "r1792137605000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 297.5982177945657,
+   "effort1": 295.3139950191608,
+   "effort5": null,
+   "compare": "29 s/km más lento que tu última carrera parecida (14 oct, 5:07/km).",
+   "insights": "Has ido 10 s/km más tranquilo que de costumbre. Segunda mitad 75 s/km más rápida: bien dosificado. Van 5 carreras esta semana.",
+   "segs": [
+    [
+     48,
+     152.235,
+     381.088
+    ],
+    [
+     52,
+     152.054,
+     387.922
+    ],
+    [
+     49,
+     152.535,
+     360.574
+    ],
+    [
+     48,
+     152.466,
+     380.412
+    ],
+    [
+     50,
+     151.471,
+     369.707
+    ],
+    [
+     47,
+     150.703,
+     364.957
+    ],
+    [
+     51,
+     151.905,
+     381.819
+    ],
+    [
+     49,
+     151.459,
+     376.34
+    ],
+    [
+     51,
+     150.637,
+     378.393
+    ],
+    [
+     50,
+     151.744,
+     362.452
+    ],
+    [
+     50,
+     153.135,
+     378.751
+    ],
+    [
+     48,
+     150.386,
+     359.075
+    ],
+    [
+     49,
+     150.063,
+     379.842
+    ],
+    [
+     48,
+     151.393,
+     343.478
+    ],
+    [
+     43,
+     150.272,
+     292.802
+    ],
+    [
+     46,
+     152.735,
+     294.629
+    ],
+    [
+     46,
+     151.363,
+     297.298
+    ],
+    [
+     44,
+     150.078,
+     299.843
+    ],
+    [
+     42,
+     150.089,
+     286.496
+    ],
+    [
+     45,
+     150.891,
+     304.856
+    ],
+    [
+     44,
+     151.353,
+     297.319
+    ],
+    [
+     46,
+     152.191,
+     302.251
+    ],
+    [
+     45,
+     151.546,
+     296.939
+    ],
+    [
+     44,
+     153.394,
+     286.844
+    ],
+    [
+     42,
+     151.546,
+     303.538
+    ],
+    [
+     44,
+     150.214,
+     286.259
+    ],
+    [
+     45,
+     153.081,
+     300.495
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "r1792051205000",
+   "bestFor5": 1674.5575126233077,
+   "bestFor10": 3380.239143159691,
+   "bestFor1": 330.67416268185264,
+   "effort1": 328.37953736943325,
+   "effort5": 1670.5531187857957,
+   "compare": null,
+   "insights": "Has ido 20 s/km más tranquilo que de costumbre. Saliste 15 s/km más rápido de lo que luego pudiste mantener; la próxima, un poco más conservador al principio. Es tu carrera más larga hasta ahora.",
+   "segs": [
+    [
+     26,
+     153.03,
+     339.81
+    ],
+    [
+     25,
+     150.306,
+     319.348
+    ],
+    [
+     26,
+     154.453,
+     323.723
+    ],
+    [
+     26,
+     153.584,
+     325.555
+    ],
+    [
+     28,
+     156.221,
+     345.664
+    ],
+    [
+     27,
+     155.856,
+     333.642
+    ],
+    [
+     26,
+     150.076,
+     333.164
+    ],
+    [
+     27,
+     153.171,
+     339.49
+    ],
+    [
+     27,
+     156.17,
+     332.97
+    ],
+    [
+     26,
+     154.662,
+     323.286
+    ],
+    [
+     27,
+     156.173,
+     332.964
+    ],
+    [
+     27,
+     157.221,
+     330.745
+    ],
+    [
+     27,
+     150.636,
+     345.202
+    ],
+    [
+     26,
+     153.338,
+     326.078
+    ],
+    [
+     27,
+     151.855,
+     342.433
+    ],
+    [
+     28,
+     155.886,
+     346.407
+    ],
+    [
+     26,
+     153.503,
+     325.727
+    ],
+    [
+     26,
+     151.527,
+     329.975
+    ],
+    [
+     27,
+     151.971,
+     342.171
+    ],
+    [
+     27,
+     154.221,
+     337.179
+    ],
+    [
+     27,
+     153.691,
+     338.342
+    ],
+    [
+     27,
+     153.34,
+     339.115
+    ],
+    [
+     26,
+     152.31,
+     328.277
+    ],
+    [
+     27,
+     153.163,
+     339.508
+    ],
+    [
+     26,
+     151.113,
+     330.879
+    ],
+    [
+     27,
+     155.089,
+     335.29
+    ],
+    [
+     26,
+     150.2,
+     332.89
+    ],
+    [
+     26,
+     151.801,
+     329.378
+    ],
+    [
+     28,
+     155.116,
+     348.127
+    ],
+    [
+     27,
+     152.221,
+     341.61
+    ],
+    [
+     28,
+     154.179,
+     350.242
+    ],
+    [
+     27,
+     154.915,
+     335.669
+    ],
+    [
+     25,
+     150.762,
+     318.382
+    ],
+    [
+     27,
+     150.902,
+     344.596
+    ],
+    [
+     27,
+     154.026,
+     337.605
+    ],
+    [
+     27,
+     150.333,
+     345.899
+    ],
+    [
+     26,
+     152.386,
+     328.114
+    ],
+    [
+     27,
+     152.605,
+     340.748
+    ],
+    [
+     28,
+     154.512,
+     349.488
+    ],
+    [
+     27,
+     155.015,
+     335.452
+    ],
+    [
+     27,
+     152.686,
+     340.569
+    ],
+    [
+     27,
+     153.575,
+     338.597
+    ],
+    [
+     26,
+     150.47,
+     332.292
+    ],
+    [
+     27,
+     152.337,
+     341.348
+    ],
+    [
+     28,
+     155.24,
+     347.849
+    ],
+    [
+     27,
+     151.819,
+     342.514
+    ],
+    [
+     27,
+     151.394,
+     343.474
+    ],
+    [
+     27,
+     150.338,
+     345.887
+    ],
+    [
+     27,
+     152.944,
+     339.993
+    ],
+    [
+     27,
+     151.682,
+     342.822
+    ],
+    [
+     27,
+     154.65,
+     336.243
+    ],
+    [
+     26,
+     151.568,
+     329.884
+    ],
+    [
+     27,
+     150.074,
+     346.495
+    ],
+    [
+     28,
+     154.701,
+     349.06
+    ],
+    [
+     28,
+     153.992,
+     350.667
+    ],
+    [
+     27,
+     155.06,
+     335.355
+    ],
+    [
+     26,
+     150.232,
+     332.819
+    ],
+    [
+     27,
+     152.765,
+     340.392
+    ],
+    [
+     28,
+     154.429,
+     349.675
+    ],
+    [
+     28,
+     155.337,
+     347.631
+    ],
+    [
+     28,
+     155.579,
+     347.09
+    ],
+    [
+     26,
+     151.419,
+     330.21
+    ],
+    [
+     28,
+     155.513,
+     347.238
+    ],
+    [
+     28,
+     152.906,
+     353.158
+    ],
+    [
+     27,
+     156.137,
+     333.041
+    ],
+    [
+     27,
+     154.551,
+     336.459
+    ],
+    [
+     28,
+     155.002,
+     348.383
+    ],
+    [
+     28,
+     151.793,
+     355.748
+    ],
+    [
+     27,
+     150.23,
+     346.135
+    ],
+    [
+     28,
+     153.214,
+     352.449
+    ],
+    [
+     27,
+     152.249,
+     341.546
+    ],
+    [
+     27,
+     150.333,
+     345.898
+    ],
+    [
+     27,
+     151.43,
+     343.394
+    ],
+    [
+     27,
+     153.006,
+     339.856
+    ],
+    [
+     27,
+     152.789,
+     340.338
+    ],
+    [
+     27,
+     150.942,
+     344.504
+    ],
+    [
+     27,
+     152.486,
+     341.014
+    ],
+    [
+     27,
+     150.159,
+     346.3
+    ],
+    [
+     28,
+     152.756,
+     353.506
+    ],
+    [
+     28,
+     155.251,
+     347.823
+    ],
+    [
+     28,
+     154.738,
+     348.977
+    ],
+    [
+     28,
+     152.878,
+     353.223
+    ],
+    [
+     28,
+     154.606,
+     349.274
+    ],
+    [
+     26,
+     151.404,
+     330.242
+    ],
+    [
+     28,
+     152.125,
+     354.971
+    ],
+    [
+     27,
+     150.485,
+     345.55
+    ],
+    [
+     28,
+     154.802,
+     348.832
+    ],
+    [
+     27,
+     150.119,
+     346.393
+    ],
+    [
+     28,
+     150.773,
+     358.154
+    ],
+    [
+     28,
+     155.54,
+     347.177
+    ],
+    [
+     28,
+     155.048,
+     348.28
+    ],
+    [
+     27,
+     150.517,
+     345.468
+    ],
+    [
+     28,
+     150.605,
+     358.553
+    ],
+    [
+     29,
+     153.156,
+     365.639
+    ],
+    [
+     28,
+     153.129,
+     352.643
+    ],
+    [
+     26,
+     154.284,
+     324.077
+    ],
+    [
+     29,
+     152.009,
+     368.399
+    ],
+    [
+     28,
+     153.046,
+     352.834
+    ],
+    [
+     28,
+     154.643,
+     349.191
+    ],
+    [
+     28,
+     155.376,
+     347.543
+    ],
+    [
+     29,
+     155.692,
+     359.685
+    ],
+    [
+     27,
+     150.619,
+     345.241
+    ],
+    [
+     28,
+     154.026,
+     350.59
+    ],
+    [
+     29,
+     152.168,
+     368.013
+    ],
+    [
+     27,
+     150.908,
+     344.58
+    ],
+    [
+     28,
+     154.55,
+     349.402
+    ],
+    [
+     29,
+     154.896,
+     361.532
+    ],
+    [
+     28,
+     151.801,
+     355.729
+    ],
+    [
+     28,
+     154.804,
+     348.827
+    ],
+    [
+     28,
+     152.078,
+     355.08
+    ],
+    [
+     28,
+     154.655,
+     349.165
+    ],
+    [
+     28,
+     153.502,
+     351.786
+    ],
+    [
+     28,
+     150.948,
+     357.74
+    ],
+    [
+     28,
+     154.152,
+     350.304
+    ],
+    [
+     29,
+     153.325,
+     365.237
+    ],
+    [
+     28,
+     151.988,
+     355.291
+    ],
+    [
+     28,
+     151.067,
+     357.458
+    ],
+    [
+     28,
+     152.756,
+     353.505
+    ],
+    [
+     28,
+     153.17,
+     352.548
+    ],
+    [
+     28,
+     150.233,
+     359.441
+    ],
+    [
+     29,
+     155.138,
+     360.969
+    ],
+    [
+     27,
+     150.646,
+     345.181
+    ],
+    [
+     29,
+     150.552,
+     371.964
+    ],
+    [
+     28,
+     152.587,
+     353.897
+    ],
+    [
+     29,
+     153.919,
+     363.828
+    ],
+    [
+     28,
+     153.732,
+     351.26
+    ],
+    [
+     28,
+     153.379,
+     352.07
+    ],
+    [
+     28,
+     150.636,
+     358.48
+    ],
+    [
+     28,
+     150.537,
+     358.716
+    ],
+    [
+     28,
+     153.673,
+     351.396
+    ],
+    [
+     30,
+     153.781,
+     377.159
+    ],
+    [
+     29,
+     152.826,
+     366.429
+    ],
+    [
+     28,
+     152.69,
+     353.658
+    ],
+    [
+     28,
+     150.96,
+     357.711
+    ],
+    [
+     28,
+     151.356,
+     356.775
+    ],
+    [
+     28,
+     154.226,
+     350.135
+    ],
+    [
+     29,
+     152.398,
+     367.459
+    ],
+    [
+     29,
+     153.907,
+     363.857
+    ],
+    [
+     29,
+     154.998,
+     361.295
+    ],
+    [
+     6,
+     27.272,
+     366.682
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "r1791964805000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 304.71967771943804,
+   "effort1": 303.06087960848754,
+   "effort5": null,
+   "compare": "18 s/km más rápido que tu última carrera parecida (12 oct, 5:25/km).",
+   "insights": "Has ido 18 s/km más rápido que en tus últimas carreras. Parciales muy regulares. Van 3 carreras esta semana.",
+   "segs": [
+    [
+     47,
+     151.054,
+     311.155
+    ],
+    [
+     46,
+     150.518,
+     305.612
+    ],
+    [
+     47,
+     152.616,
+     307.963
+    ],
+    [
+     45,
+     152.046,
+     309.116
+    ],
+    [
+     46,
+     151.801,
+     296.44
+    ],
+    [
+     45,
+     151.2,
+     310.847
+    ],
+    [
+     44,
+     150.645,
+     298.716
+    ],
+    [
+     46,
+     154.157,
+     311.371
+    ],
+    [
+     45,
+     153.5,
+     306.189
+    ],
+    [
+     46,
+     151.65,
+     303.33
+    ],
+    [
+     44,
+     152.325,
+     308.552
+    ],
+    [
+     47,
+     152.584,
+     308.027
+    ],
+    [
+     44,
+     150.203,
+     292.938
+    ],
+    [
+     47,
+     151.93,
+     309.354
+    ],
+    [
+     45,
+     153.327,
+     300.012
+    ],
+    [
+     46,
+     152.886,
+     307.418
+    ],
+    [
+     48,
+     152.592,
+     321.111
+    ],
+    [
+     45,
+     150.619,
+     298.766
+    ],
+    [
+     46,
+     150.663,
+     311.955
+    ],
+    [
+     17,
+     339.228,
+     315.422
+    ],
+    [
+     48,
+     151.877,
+     309.461
+    ],
+    [
+     45,
+     154.557,
+     304.095
+    ],
+    [
+     45,
+     153.034,
+     287.518
+    ],
+    [
+     47,
+     152.477,
+     321.361
+    ],
+    [
+     45,
+     151.035,
+     304.566
+    ],
+    [
+     28,
+     91.217,
+     295.997
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "r1791878405000",
+   "bestFor5": 1574.5347659252209,
+   "bestFor10": null,
+   "bestFor1": 312.15463056157984,
+   "effort1": 307.9071385995982,
+   "effort5": 1569.9208500742898,
+   "compare": null,
+   "insights": "Has ido 22 s/km más rápido que en tus últimas carreras. Parciales muy regulares. Es tu carrera más larga hasta ahora.",
+   "segs": [
+    [
+     46,
+     150.523,
+     325.538
+    ],
+    [
+     45,
+     153.565,
+     293.036
+    ],
+    [
+     46,
+     150.672,
+     311.936
+    ],
+    [
+     44,
+     151.773,
+     316.255
+    ],
+    [
+     45,
+     150.936,
+     311.39
+    ],
+    [
+     45,
+     150.116,
+     339.738
+    ],
+    [
+     44,
+     150.805,
+     318.291
+    ],
+    [
+     48,
+     151.854,
+     316.092
+    ],
+    [
+     45,
+     150.509,
+     305.63
+    ],
+    [
+     46,
+     152.363,
+     295.348
+    ],
+    [
+     47,
+     151.797,
+     309.625
+    ],
+    [
+     46,
+     152.107,
+     315.568
+    ],
+    [
+     46,
+     152.117,
+     315.546
+    ],
+    [
+     48,
+     153.707,
+     344.813
+    ],
+    [
+     47,
+     153.69,
+     318.823
+    ],
+    [
+     46,
+     150.396,
+     319.158
+    ],
+    [
+     45,
+     150.179,
+     299.642
+    ],
+    [
+     45,
+     153.538,
+     306.113
+    ],
+    [
+     46,
+     151.839,
+     302.953
+    ],
+    [
+     46,
+     151.938,
+     309.337
+    ],
+    [
+     46,
+     150.99,
+     324.526
+    ],
+    [
+     51,
+     153.667,
+     325.379
+    ],
+    [
+     49,
+     150.548,
+     338.761
+    ],
+    [
+     50,
+     151.701,
+     323.003
+    ],
+    [
+     44,
+     152.068,
+     289.344
+    ],
+    [
+     45,
+     150.053,
+     293.229
+    ],
+    [
+     48,
+     152.09,
+     309.028
+    ],
+    [
+     46,
+     152.112,
+     308.983
+    ],
+    [
+     46,
+     150.637,
+     318.648
+    ],
+    [
+     44,
+     150.325,
+     339.265
+    ],
+    [
+     48,
+     152.631,
+     321.035
+    ],
+    [
+     48,
+     152.265,
+     321.807
+    ],
+    [
+     47,
+     153.822,
+     299.046
+    ],
+    [
+     43,
+     141.999,
+     302.82
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "r1791792005000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 324.00314489637657,
+   "effort1": 321.1236393581683,
+   "effort5": null,
+   "compare": null,
+   "insights": "",
+   "segs": [
+    [
+     48,
+     150.067,
+     346.531
+    ],
+    [
+     46,
+     153.204,
+     313.308
+    ],
+    [
+     48,
+     151.927,
+     329.106
+    ],
+    [
+     45,
+     152.468,
+     314.819
+    ],
+    [
+     46,
+     151.108,
+     324.272
+    ],
+    [
+     46,
+     150.656,
+     325.244
+    ],
+    [
+     48,
+     152.937,
+     346.528
+    ],
+    [
+     46,
+     150.677,
+     318.563
+    ],
+    [
+     46,
+     150.487,
+     325.61
+    ],
+    [
+     47,
+     151.897,
+     322.587
+    ],
+    [
+     46,
+     150.877,
+     318.139
+    ],
+    [
+     49,
+     152.448,
+     334.541
+    ],
+    [
+     47,
+     150.127,
+     319.73
+    ],
+    [
+     22,
+     75.521,
+     317.792
+    ],
+    [
+     45,
+     150.626,
+     312.031
+    ],
+    [
+     47,
+     152.317,
+     328.263
+    ],
+    [
+     45,
+     150.21,
+     319.553
+    ],
+    [
+     51,
+     152.159,
+     335.175
+    ],
+    [
+     47,
+     152.563,
+     314.624
+    ],
+    [
+     47,
+     151.37,
+     336.922
+    ],
+    [
+     46,
+     150.972,
+     317.94
+    ],
+    [
+     46,
+     152.267,
+     321.804
+    ],
+    [
+     46,
+     150.554,
+     312.18
+    ],
+    [
+     49,
+     152.862,
+     327.093
+    ],
+    [
+     29,
+     89.123,
+     336.615
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  },
+  {
+   "id": "r1791705605000",
+   "bestFor5": null,
+   "bestFor10": null,
+   "bestFor1": 333.25274324639963,
+   "effort1": 329.46696235107464,
+   "effort5": null,
+   "compare": null,
+   "insights": "",
+   "segs": [
+    [
+     52,
+     153.026,
+     339.85
+    ],
+    [
+     52,
+     152.753,
+     333.872
+    ],
+    [
+     51,
+     151.149,
+     330.799
+    ],
+    [
+     51,
+     151.399,
+     330.241
+    ],
+    [
+     51,
+     151.389,
+     336.881
+    ],
+    [
+     51,
+     152.079,
+     328.75
+    ],
+    [
+     52,
+     152.552,
+     334.313
+    ],
+    [
+     46,
+     138.598,
+     324.681
+    ],
+    [
+     51,
+     150.158,
+     332.982
+    ],
+    [
+     51,
+     151.694,
+     329.61
+    ],
+    [
+     51,
+     152.386,
+     328.114
+    ],
+    [
+     51,
+     152.934,
+     333.476
+    ],
+    [
+     50,
+     150.885,
+     331.378
+    ],
+    [
+     51,
+     151.025,
+     331.072
+    ],
+    [
+     51,
+     152.688,
+     327.464
+    ],
+    [
+     51,
+     150.449,
+     332.338
+    ],
+    [
+     29,
+     84.953,
+     329.594
+    ]
+   ],
+   "detect": null,
+   "sessDone": null
+  }
+ ],
+ "bestOnRoute": [
+  "route-1792167600000",
+  null,
+  null
+ ],
+ "ghost": [
+  0,
+  90.00024102795706,
+  359.9994102884716,
+  4200.537435272172,
+  0,
+  166.6665075558848,
+  333.3329884637579,
+  1400.179
+ ],
+ "history": {
+  "monthKm": "62,0",
+  "monthStats": "Carreras11 Tiempo5:43:09 Ritmo medio5:32/km",
+  "weeksSub": "media 15,5 km/sem",
+  "weekAxis": "3 ago31 ago28 sept19 oct",
+  "weeksBars": "3528",
+  "calTitle": "Octubre de 2026",
+  "calSub": "10 días corriendo · 62,0 km",
+  "monthGoal": "Objetivo del mes62 de 80 kmFaltan 18,0 km: unos 11,4 km por semana. Vas bien.",
+  "challenges": "Retos del mes3 de 4 · quedan 10 días✓ Constancia · 8 salidas este mesHecho✓ Tirada larga · Una carrera de 5 km o másHechoExplorador · 2 rutas recomendadas distintas1 / 2✓ Cuestas · 200 m de desnivel acumuladoHecho",
+  "trendNote": "Ritmo estable: unos 5:28/km de media. Si quieres mejorar, mete una sesión de series o tempo a la semana.",
+  "trendSub": "últimas 11 carreras",
+  "monthsSub": "",
+  "months": "",
+  "paces": "Tus ritmossegún tu mejor 10 km5 km27:0110 km56:20Media2:04:18Suave6:10/kmLargo5:56/kmTempo5:07/kmSeries4:44/km",
+  "records": "Mejor km04:58vie, 16 octMejor 5 km26:15mar, 20 octMejor 10 km56:20jue, 15 octMás larga21,29 kmjue, 15 octMás desnivel+108 mvie, 16 oct",
+  "list": [
+   "Carrera de la mañana mar, 20 oct · 07:40 · 5:15 /km 5,15km",
+   "Carrera de la mañana lun, 19 oct · 19:10 · 5:36 /km · bien · 📝 2,50km",
+   "Cinta del gimnasio dom, 18 oct · 10:00 · 5:30 /km 6,00km",
+   "Carrera de la mañana sáb, 17 oct · 10:00 · 5:24 /km 3,41km",
+   "Por la Dehesa vie, 16 oct · 18:20 · 5:33 /km 4,20km",
+   "Carrera de la mañana vie, 16 oct · 10:00 · 5:36 /km 4,11km",
+   "Carrera de la mañanaRécord jue, 15 oct · 10:00 · 5:46 /km 21,29km",
+   "Carrera de la mañana mié, 14 oct · 10:00 · 5:07 /km 4,08km",
+   "Carrera de la mañana mar, 13 oct · 10:00 · 5:15 /km 5,15km",
+   "Carrera de la mañana lun, 12 oct · 10:00 · 5:25 /km 3,65km",
+   "Carrera de la mañana dom, 11 oct · 10:00 · 5:36 /km 2,50km"
+  ]
+ },
+ "profile": {
+  "goal": "Objetivo: 4 carreras a la semana · 1 sem seguidas",
+  "stats": "Carreras11 Total62km Este año62km",
+  "prs": "1 km16 oct 202604:555K20 oct 2026Nueva26:1010K15 oct 202656:17Media maratón15 oct 20262:01:31MaratónAún sin marca—",
+  "badgeCount": "7 de 16",
+  "shoes": "Pegasus 41En uso128km"
+ },
+ "home": {
+  "date": "Miércoles, 21 de octubre",
+  "hello": "Hola, Miguel",
+  "weekKm": "7,6",
+  "weekGoal": "Objetivo 4 carreras",
+  "weekStats": "Carreras2de 4 Tiempo41:01 Seguidas1sem",
+  "nudge": "Te faltan 2 carreras para el objetivo",
+  "plan": "Plan 10K · semana 3 de 8 · 40 días2/4 El viernesRodaje suave · 3 kmRitmo fácil. Si no puedes hablar, frena. Semana pasada: 4 de 4 sesiones, 17,9 de 24 km. Vas según lo previsto. Sigo con el plan tal cual.",
+  "recap": "La semana pasada Carreras8Km51,9Tiempo4:48:07 +1975 % respecto a la anterior. La más larga: Carrera de la mañana, 21,29 km. Objetivo semanal cumplido.",
+  "last": "Última carreraCarrera de la mañanamar, 20 oct · 07:40 Distancia5,15km Ritmo5:15/km Tiempo27:01"
+ },
+ "plan": {
+  "factor": [
+   1,
+   0.9,
+   0.9,
+   0.9,
+   0.9,
+   0.9,
+   0.9,
+   0.9
+  ],
+  "reviewed": 2,
+  "lastReview": {
+   "week": 1,
+   "done": 4,
+   "total": 4,
+   "doneKm": 17929.70020854415,
+   "planKm": 24000,
+   "text": "Vas según lo previsto. Sigo con el plan tal cual."
+  },
+  "weekKm": [
+   16,
+   16.8,
+   19.2,
+   16.2,
+   24,
+   26.400000000000002,
+   28.8,
+   8.64
+  ],
+  "hist": {
+   "km": 13.59648892176669,
+   "n": 9
+  },
+  "sessions": [
+   [
+    {
+     "key": "w0d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3500,
+     "dayIdx": 0,
+     "date": 1791151200000,
+     "state": "skip",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w0d2",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3500,
+     "dayIdx": 2,
+     "date": 1791324000000,
+     "state": "miss",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w0d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3500,
+     "dayIdx": 4,
+     "date": 1791496800000,
+     "state": "miss",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w0d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 6000,
+     "dayIdx": 6,
+     "date": 1791669600000,
+     "state": "ok",
+     "run": "r1791705605000",
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w1d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1791756000000,
+     "state": "ok",
+     "run": "r1791792005000",
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w1d2",
+     "type": "series",
+     "title": "Series 7×800 m",
+     "desc": "Calienta 1,5 km, 7 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 11000,
+     "dayIdx": 2,
+     "date": 1791928800000,
+     "state": "ok",
+     "run": "r1791964805000",
+     "moved": false,
+     "struct": {
+      "warm": 1500,
+      "reps": 7,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w1d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1792101600000,
+     "state": "ok",
+     "run": "route-1792167600000",
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w1d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 6500,
+     "dayIdx": 6,
+     "date": 1792274400000,
+     "state": "ok",
+     "run": "m1792310400000",
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w2d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1792360800000,
+     "state": "ok",
+     "run": "r1792429800000",
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w2d2",
+     "type": "series",
+     "title": "Series 7×800 m",
+     "desc": "Calienta 1,5 km, 7 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 11000,
+     "dayIdx": 2,
+     "date": 1792533600000,
+     "state": "ok",
+     "run": "r1792474800000",
+     "moved": true,
+     "struct": {
+      "warm": 1500,
+      "reps": 7,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w2d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1792706400000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w2d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 7500,
+     "dayIdx": 6,
+     "date": 1792879200000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w3d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1792965600000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w3d2",
+     "type": "series",
+     "title": "Series 8×800 m",
+     "desc": "Calienta 1,5 km, 8 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 12000,
+     "dayIdx": 2,
+     "date": 1793138400000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": {
+      "warm": 1500,
+      "reps": 8,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w3d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1793311200000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w3d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 6000,
+     "dayIdx": 6,
+     "date": 1793484000000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w4d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1793570400000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w4d2",
+     "type": "series",
+     "title": "Series 8×800 m",
+     "desc": "Calienta 1,5 km, 8 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 12000,
+     "dayIdx": 2,
+     "date": 1793743200000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": {
+      "warm": 1500,
+      "reps": 8,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w4d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1793916000000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w4d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 9000,
+     "dayIdx": 6,
+     "date": 1794088800000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w5d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1794175200000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w5d2",
+     "type": "series",
+     "title": "Series 9×800 m",
+     "desc": "Calienta 1,5 km, 9 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 13500,
+     "dayIdx": 2,
+     "date": 1794348000000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": {
+      "warm": 1500,
+      "reps": 9,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w5d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1794520800000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w5d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 10000,
+     "dayIdx": 6,
+     "date": 1794693600000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w6d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1794780000000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w6d2",
+     "type": "series",
+     "title": "Series 9×800 m",
+     "desc": "Calienta 1,5 km, 9 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 13500,
+     "dayIdx": 2,
+     "date": 1794952800000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": {
+      "warm": 1500,
+      "reps": 9,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w6d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1795125600000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w6d6",
+     "type": "largo",
+     "title": "Rodaje largo",
+     "desc": "Ritmo cómodo, puedes hablar. Es la sesión que más te hace mejorar.",
+     "m": 11000,
+     "dayIdx": 6,
+     "date": 1795298400000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    }
+   ],
+   [
+    {
+     "key": "w7d0",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 0,
+     "date": 1795384800000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w7d2",
+     "type": "series",
+     "title": "Series 9×800 m",
+     "desc": "Calienta 1,5 km, 9 repeticiones fuertes de 800 m con 400 m al trote entre ellas, y 1 km suave para acabar.",
+     "m": 13500,
+     "dayIdx": 2,
+     "date": 1795557600000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": {
+      "warm": 1500,
+      "reps": 9,
+      "on": 800,
+      "off": 400,
+      "cool": 1000
+     }
+    },
+    {
+     "key": "w7d4",
+     "type": "suave",
+     "title": "Rodaje suave",
+     "desc": "Ritmo fácil. Si no puedes hablar, frena.",
+     "m": 3000,
+     "dayIdx": 4,
+     "date": 1795730400000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    },
+    {
+     "key": "w7d6",
+     "type": "carrera",
+     "title": "Carrera: 10K",
+     "desc": "El día. Sal conservador los primeros km y disfruta.",
+     "m": 10000,
+     "dayIdx": 6,
+     "date": 1795903200000,
+     "state": "next",
+     "run": null,
+     "moved": false,
+     "struct": null
+    }
+   ]
+  ],
+  "today": null,
+  "next": "w2d4",
+  "light": [
+   [
+    "Rodaje suave · corta",
+    2000
+   ],
+   [
+    "Rodaje suave · corta",
+    2000
+   ],
+   [
+    "Rodaje suave · corta",
+    2000
+   ],
+   [
+    "Rodaje largo · corta",
+    3500
+   ],
+   [
+    "Rodaje suave · corta",
+    2000
+   ],
+   [
+    "Series 7×800 m · corta",
+    8500
+   ],
+   [
+    "Rodaje suave · corta",
+    2000
+   ],
+   [
+    "Rodaje largo · corta",
+    4000
+   ]
+  ]
+ },
+ "planScreen": {
+  "title": "Semana 3 de 8",
+  "sub": "8 semanas · lunes, miércoles, viernes y domingo",
+  "pred": "Con tu forma de hoy, tu 10K saldría en 56:20 (5:38/km), según tu mejor 10 km. Se irá ajustando con cada carrera.",
+  "week": "Esta semanaBajada del 10 % tras la revisión 7,6de 24,5 km2/4 sesiones",
+  "weeks": "117 km224 km325 km424 km527 km630 km731 km830 km",
+  "sessions": [
+   "Rodaje suavelunes 19 · hecha: 2,50 km 3km",
+   "Series 7×800 mmiércoles 21 · hecha (otro día): 5,15 km 11km",
+   "V Rodaje suaveviernes 23 3km~6:10/km",
+   "D Rodaje largodomingo 25 7,5km~5:56/km"
+  ]
+ },
+ "guide": [
+  [
+   {
+    "label": "Rodaje suave",
+    "say": "Rodaje suave, 3 kilómetros.",
+    "kind": "suave",
+    "m": 3000
+   }
+  ],
+  [
+   {
+    "label": "Calentamiento",
+    "say": "Calentamiento, 1500 metros suaves.",
+    "kind": "suave",
+    "m": 1500
+   },
+   {
+    "label": "Serie 1 de 8 · fuerte",
+    "say": "Serie 1. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 2 de 8 · fuerte",
+    "say": "Serie 2. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 3 de 8 · fuerte",
+    "say": "Serie 3. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 4 de 8 · fuerte",
+    "say": "Serie 4. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 5 de 8 · fuerte",
+    "say": "Serie 5. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 6 de 8 · fuerte",
+    "say": "Serie 6. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 7 de 8 · fuerte",
+    "say": "Serie 7. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Recupera al trote",
+    "say": "Recupera, 400 metros al trote.",
+    "kind": "suave",
+    "m": 400
+   },
+   {
+    "label": "Serie 8 de 8 · fuerte",
+    "say": "Serie 8. Fuerte, 800 metros.",
+    "kind": "fuerte",
+    "m": 800
+   },
+   {
+    "label": "Vuelta a la calma",
+    "say": "Vuelta a la calma, un kilómetro suave.",
+    "kind": "suave",
+    "m": 1000
+   }
+  ],
+  [
+   {
+    "label": "Rodaje suave",
+    "say": "Rodaje suave, 3 kilómetros.",
+    "kind": "suave",
+    "m": 3000
+   }
+  ],
+  [
+   {
+    "label": "Rodaje largo",
+    "say": "Rodaje largo, 6 kilómetros.",
+    "kind": "suave",
+    "m": 6000
+   }
+  ]
+ ],
+ "tramos": [
+  {
+   "key": "6x400",
+   "title": "6 × 400 m",
+   "desc": "Series cortas: 6 repeticiones de 400 m fuertes con 200 m al trote.",
+   "type": "series",
+   "struct": {
+    "warm": 1000,
+    "reps": 6,
+    "on": 400,
+    "off": 200,
+    "cool": 800
+   },
+   "custom": true,
+   "m": 5200
+  },
+  {
+   "key": "8x200",
+   "title": "8 × 200 m",
+   "desc": "Velocidad: 8 repeticiones de 200 m con 200 m al trote.",
+   "type": "series",
+   "struct": {
+    "warm": 1000,
+    "reps": 8,
+    "on": 200,
+    "off": 200,
+    "cool": 800
+   },
+   "custom": true,
+   "m": 4800
+  },
+  {
+   "key": "5x1000",
+   "title": "5 × 1000 m",
+   "desc": "Series largas: 5 repeticiones de 1 km con 400 m al trote.",
+   "type": "series",
+   "struct": {
+    "warm": 1200,
+    "reps": 5,
+    "on": 1000,
+    "off": 400,
+    "cool": 800
+   },
+   "custom": true,
+   "m": 8600
+  },
+  {
+   "key": "tempo4",
+   "title": "Tempo 4 km",
+   "desc": "Calienta, 4 km a ritmo controlado (incómodo pero sostenible) y vuelta a la calma.",
+   "type": "tempo",
+   "struct": {
+    "warm": 1200,
+    "reps": 1,
+    "on": 4000,
+    "off": 0,
+    "cool": 800
+   },
+   "custom": true,
+   "m": 6000
+  },
+  {
+   "key": "piramide",
+   "title": "Pirámide",
+   "desc": "200-400-600-800-600-400-200 m fuertes con 200 m al trote entre ellas.",
+   "type": "series",
+   "segs": [
+    {
+     "label": "Calentamiento",
+     "say": "Calentamiento, mil metros suaves.",
+     "kind": "suave",
+     "m": 1000
+    },
+    {
+     "label": "Tramo 1 de 7 · 200 m fuerte",
+     "say": "Tramo 1. Fuerte, 200 metros.",
+     "kind": "fuerte",
+     "m": 200
+    },
+    {
+     "label": "Recupera al trote",
+     "say": "Recupera, 200 metros al trote.",
+     "kind": "suave",
+     "m": 200
+    },
+    {
+     "label": "Tramo 2 de 7 · 400 m fuerte",
+     "say": "Tramo 2. Fuerte, 400 metros.",
+     "kind": "fuerte",
+     "m": 400
+    },
+    {
+     "label": "Recupera al trote",
+     "say": "Recupera, 200 metros al trote.",
+     "kind": "suave",
+     "m": 200
+    },
+    {
+     "label": "Tramo 3 de 7 · 600 m fuerte",
+     "say": "Tramo 3. Fuerte, 600 metros.",
+     "kind": "fuerte",
+     "m": 600
+    },
+    {
+     "label": "Recupera al trote",
+     "say": "Recupera, 200 metros al trote.",
+     "kind": "suave",
+     "m": 200
+    },
+    {
+     "label": "Tramo 4 de 7 · 800 m fuerte",
+     "say": "Tramo 4. Fuerte, 800 metros.",
+     "kind": "fuerte",
+     "m": 800
+    },
+    {
+     "label": "Recupera al trote",
+     "say": "Recupera, 200 metros al trote.",
+     "kind": "suave",
+     "m": 200
+    },
+    {
+     "label": "Tramo 5 de 7 · 600 m fuerte",
+     "say": "Tramo 5. Fuerte, 600 metros.",
+     "kind": "fuerte",
+     "m": 600
+    },
+    {
+     "label": "Recupera al trote",
+     "say": "Recupera, 200 metros al trote.",
+     "kind": "suave",
+     "m": 200
+    },
+    {
+     "label": "Tramo 6 de 7 · 400 m fuerte",
+     "say": "Tramo 6. Fuerte, 400 metros.",
+     "kind": "fuerte",
+     "m": 400
+    },
+    {
+     "label": "Recupera al trote",
+     "say": "Recupera, 200 metros al trote.",
+     "kind": "suave",
+     "m": 200
+    },
+    {
+     "label": "Tramo 7 de 7 · 200 m fuerte",
+     "say": "Tramo 7. Fuerte, 200 metros.",
+     "kind": "fuerte",
+     "m": 200
+    },
+    {
+     "label": "Vuelta a la calma",
+     "say": "Vuelta a la calma, 800 metros suaves.",
+     "kind": "suave",
+     "m": 800
+    }
+   ],
+   "custom": true,
+   "m": 6200
+  },
+  {
+   "key": "anda1",
+   "title": "Corre 1 min · anda 1,5 ×8",
+   "desc": "Para empezar a correr (semana 1): 5 min andando, 8 veces 1 min corriendo y 1,5 min andando, y 5 min andando.",
+   "type": "suave",
+   "segs": [
+    {
+     "label": "Calienta andando",
+     "say": "Empieza andando 5 min.",
+     "kind": "suave",
+     "sec": 300
+    },
+    {
+     "label": "Corre 1 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 2 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 3 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 4 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 5 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 6 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 7 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 8 de 8 · 1 min",
+     "say": "Corre, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Acaba andando",
+     "say": "Ya está. Acaba andando 5 min.",
+     "kind": "suave",
+     "sec": 300
+    }
+   ],
+   "custom": true,
+   "timed": true,
+   "min": 29,
+   "m": 3627
+  },
+  {
+   "key": "anda3",
+   "title": "Corre 3 min · anda 1,5 ×5",
+   "desc": "Siguiente paso: 5 min andando, 5 veces 3 min corriendo y 1,5 min andando, y 5 min andando.",
+   "type": "suave",
+   "segs": [
+    {
+     "label": "Calienta andando",
+     "say": "Empieza andando 5 min.",
+     "kind": "suave",
+     "sec": 300
+    },
+    {
+     "label": "Corre 1 de 5 · 3 min",
+     "say": "Corre, 3 min.",
+     "kind": "fuerte",
+     "sec": 180
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 2 de 5 · 3 min",
+     "say": "Corre, 3 min.",
+     "kind": "fuerte",
+     "sec": 180
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 3 de 5 · 3 min",
+     "say": "Corre, 3 min.",
+     "kind": "fuerte",
+     "sec": 180
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 4 de 5 · 3 min",
+     "say": "Corre, 3 min.",
+     "kind": "fuerte",
+     "sec": 180
+    },
+    {
+     "label": "Anda",
+     "say": "Anda 1,5 min.",
+     "kind": "suave",
+     "sec": 90
+    },
+    {
+     "label": "Corre 5 de 5 · 3 min",
+     "say": "Corre, 3 min.",
+     "kind": "fuerte",
+     "sec": 180
+    },
+    {
+     "label": "Acaba andando",
+     "say": "Ya está. Acaba andando 5 min.",
+     "kind": "suave",
+     "sec": 300
+    }
+   ],
+   "custom": true,
+   "timed": true,
+   "min": 31,
+   "m": 3945
+  },
+  {
+   "key": "fartlek",
+   "title": "Fartlek 10 × 1 min",
+   "desc": "Por tiempo: 10 min suaves, 10 veces 1 min fuerte y 1 min suave, y 5 min de calma.",
+   "type": "series",
+   "segs": [
+    {
+     "label": "Calentamiento suave",
+     "say": "Calentamiento, 10 min suaves.",
+     "kind": "suave",
+     "sec": 600
+    },
+    {
+     "label": "Fuerte 1 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 2 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 3 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 4 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 5 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 6 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 7 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 8 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 9 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 10 de 10 · 1 min",
+     "say": "Fuerte, 1 min.",
+     "kind": "fuerte",
+     "sec": 60
+    },
+    {
+     "label": "Vuelta a la calma",
+     "say": "Vuelta a la calma, 5 min suaves.",
+     "kind": "suave",
+     "sec": 300
+    }
+   ],
+   "custom": true,
+   "timed": true,
+   "min": 34,
+   "m": 6182
+  },
+  {
+   "key": "progresivo",
+   "title": "Progresivo 6 km",
+   "desc": "3 km suaves, 2 km a ritmo medio y 1 km fuerte: acabas más rápido de lo que empiezas.",
+   "type": "tempo",
+   "segs": [
+    {
+     "label": "Suave",
+     "say": "Empieza suave, 3 kilómetros.",
+     "kind": "suave",
+     "m": 3000
+    },
+    {
+     "label": "Ritmo medio",
+     "say": "Sube a ritmo medio, 2 kilómetros.",
+     "kind": "fuerte",
+     "m": 2000
+    },
+    {
+     "label": "Fuerte · último km",
+     "say": "Último kilómetro, fuerte.",
+     "kind": "fuerte",
+     "m": 1000
+    }
+   ],
+   "custom": true,
+   "m": 6000
+  },
+  {
+   "key": "custom",
+   "title": "5 × 600 m",
+   "desc": "5 repeticiones de 600 m fuertes con 300 m al trote.",
+   "type": "series",
+   "struct": {
+    "warm": 1000,
+    "reps": 5,
+    "on": 600,
+    "off": 300,
+    "cool": 800
+   },
+   "custom": true,
+   "m": 6000
+  },
+  {
+   "key": "custom",
+   "title": "6 × 1,5 min",
+   "desc": "6 repeticiones de 1,5 min fuertes con 1 min suaves, con 5 min de calentamiento y de calma.",
+   "type": "series",
+   "segs": [
+    {
+     "label": "Calentamiento suave",
+     "say": "Calentamiento, 5 min suaves.",
+     "kind": "suave",
+     "sec": 300
+    },
+    {
+     "label": "Fuerte 1 de 6 · 1,5 min",
+     "say": "Fuerte, 1,5 min.",
+     "kind": "fuerte",
+     "sec": 90
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 2 de 6 · 1,5 min",
+     "say": "Fuerte, 1,5 min.",
+     "kind": "fuerte",
+     "sec": 90
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 3 de 6 · 1,5 min",
+     "say": "Fuerte, 1,5 min.",
+     "kind": "fuerte",
+     "sec": 90
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 4 de 6 · 1,5 min",
+     "say": "Fuerte, 1,5 min.",
+     "kind": "fuerte",
+     "sec": 90
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 5 de 6 · 1,5 min",
+     "say": "Fuerte, 1,5 min.",
+     "kind": "fuerte",
+     "sec": 90
+    },
+    {
+     "label": "Suave",
+     "say": "Suave, 1 min.",
+     "kind": "suave",
+     "sec": 60
+    },
+    {
+     "label": "Fuerte 6 de 6 · 1,5 min",
+     "say": "Fuerte, 1,5 min.",
+     "kind": "fuerte",
+     "sec": 90
+    },
+    {
+     "label": "Vuelta a la calma",
+     "say": "Vuelta a la calma, 5 min suaves.",
+     "kind": "suave",
+     "sec": 300
+    }
+   ],
+   "custom": true,
+   "timed": true,
+   "min": 24,
+   "m": 4364
+  }
+ ],
+ "goals": [
+  {
+   "key": "goal",
+   "title": "3 km",
+   "desc": "Corre 3 km; te aviso al llegar.",
+   "goal": true,
+   "m": 3000,
+   "type": "suave",
+   "segs": [
+    {
+     "label": "Objetivo 3 km",
+     "say": "",
+     "kind": "suave",
+     "m": 3000
+    }
+   ]
+  },
+  {
+   "key": "goal",
+   "title": "5 km",
+   "desc": "Corre 5 km; te aviso al llegar.",
+   "goal": true,
+   "m": 5000,
+   "type": "suave",
+   "segs": [
+    {
+     "label": "Objetivo 5 km",
+     "say": "",
+     "kind": "suave",
+     "m": 5000
+    }
+   ]
+  },
+  {
+   "key": "goal",
+   "title": "10 km",
+   "desc": "Corre 10 km; te aviso al llegar.",
+   "goal": true,
+   "m": 10000,
+   "type": "suave",
+   "segs": [
+    {
+     "label": "Objetivo 10 km",
+     "say": "",
+     "kind": "suave",
+     "m": 10000
+    }
+   ]
+  },
+  {
+   "key": "goal",
+   "title": "20 min",
+   "desc": "Corre 20 minutos; te aviso al cumplirlos.",
+   "goal": true,
+   "min": 20,
+   "m": 0,
+   "type": "suave"
+  },
+  {
+   "key": "goal",
+   "title": "30 min",
+   "desc": "Corre 30 minutos; te aviso al cumplirlos.",
+   "goal": true,
+   "min": 30,
+   "m": 0,
+   "type": "suave"
+  },
+  {
+   "key": "goal",
+   "title": "60 min",
+   "desc": "Corre 60 minutos; te aviso al cumplirlos.",
+   "goal": true,
+   "min": 60,
+   "m": 0,
+   "type": "suave"
+  }
+ ],
+ "routes": {
+  "n": 16,
+  "meta": [
+   [
+    "rec-dehesa",
+    1974,
+    "Media"
+   ],
+   [
+    "rec-dehesa-llano",
+    1215,
+    "Fácil"
+   ],
+   [
+    "rec-sahagun",
+    993,
+    "Fácil"
+   ],
+   [
+    "rec-santander",
+    267,
+    "Fácil"
+   ],
+   [
+    "rec-cu",
+    1353,
+    "Fácil"
+   ],
+   [
+    "rec-oeste",
+    1533,
+    "Fácil"
+   ],
+   [
+    "rec-madridrio",
+    2358,
+    "Fácil"
+   ],
+   [
+    "rec-casacampo",
+    1341,
+    "Fácil"
+   ],
+   [
+    "rec-retiro",
+    1674,
+    "Fácil"
+   ],
+   [
+    "rec-pardo",
+    2385,
+    "Fácil"
+   ],
+   [
+    "rec-jc1",
+    1365,
+    "Fácil"
+   ],
+   [
+    "rec-valdebebas",
+    2322,
+    "Fácil"
+   ],
+   [
+    "rec-boqueron",
+    3666,
+    "Media"
+   ],
+   [
+    "rec-carrascon",
+    2244,
+    "Fácil"
+   ],
+   [
+    "rec-tresamigos",
+    1353,
+    "Fácil"
+   ],
+   [
+    "rec-chiclana",
+    3750,
+    "Media"
+   ]
+  ],
+  "poly": [
+   [
+    [
+     40.456845,
+     -3.719029
+    ],
+    [
+     40.456823,
+     -3.719093
+    ],
+    [
+     40.456794,
+     -3.71922
+    ],
+    [
+     40.456756,
+     -3.7197
+    ],
+    [
+     40.456949,
+     -3.719612
+    ]
+   ],
+   [
+    [
+     40.45893,
+     -3.721518
+    ],
+    [
+     40.458938,
+     -3.721572
+    ],
+    [
+     40.458948,
+     -3.721818
+    ],
+    [
+     40.45896,
+     -3.721927
+    ],
+    [
+     40.458988,
+     -3.722061
+    ]
+   ]
+  ],
+  "lists": {
+   "null||all|all|near": [
+    [
+     "rec-dehesa",
+     null
+    ],
+    [
+     "rec-dehesa-llano",
+     null
+    ],
+    [
+     "rec-sahagun",
+     null
+    ],
+    [
+     "rec-santander",
+     null
+    ],
+    [
+     "rec-cu",
+     null
+    ],
+    [
+     "rec-oeste",
+     null
+    ],
+    [
+     "rec-madridrio",
+     null
+    ],
+    [
+     "rec-casacampo",
+     null
+    ],
+    [
+     "rec-retiro",
+     null
+    ],
+    [
+     "rec-pardo",
+     null
+    ],
+    [
+     "rec-jc1",
+     null
+    ],
+    [
+     "rec-valdebebas",
+     null
+    ]
+   ],
+   "null|sanfernando|all|all|near": [
+    [
+     "rec-boqueron",
+     null
+    ],
+    [
+     "rec-carrascon",
+     null
+    ],
+    [
+     "rec-tresamigos",
+     null
+    ],
+    [
+     "rec-chiclana",
+     null
+    ]
+   ],
+   "{\"lat\":40.4153,\"lon\":-3.6845}||all|all|near": [
+    [
+     "rec-retiro",
+     0.470499
+    ],
+    [
+     "rec-oeste",
+     2.961521
+    ],
+    [
+     "rec-madridrio",
+     3.020604
+    ],
+    [
+     "rec-casacampo",
+     3.790547
+    ],
+    [
+     "rec-santander",
+     3.872396
+    ],
+    [
+     "rec-cu",
+     4.816357
+    ],
+    [
+     "rec-dehesa",
+     5.466315
+    ],
+    [
+     "rec-dehesa-llano",
+     5.775088
+    ],
+    [
+     "rec-sahagun",
+     5.948734
+    ],
+    [
+     "rec-jc1",
+     7.938245
+    ],
+    [
+     "rec-valdebebas",
+     9.410426
+    ],
+    [
+     "rec-pardo",
+     13.772693
+    ]
+   ],
+   "today": {
+    "id": "rec-oeste",
+    "why": [
+     "a 3 km",
+     "26 min a tu ritmo",
+     "aún no la has corrido",
+     "tierra"
+    ]
+   },
+   "{\"lat\":40.4153,\"lon\":-3.6845}|cerca|t30|all|near": [
+    [
+     "rec-retiro",
+     0.470499
+    ],
+    [
+     "rec-oeste",
+     2.961521
+    ],
+    [
+     "rec-casacampo",
+     3.790547
+    ],
+    [
+     "rec-cu",
+     4.816357
+    ],
+    [
+     "rec-dehesa",
+     5.466315
+    ],
+    [
+     "rec-jc1",
+     7.938245
+    ]
+   ],
+   "null|madrid|all|tierra|long": [
+    [
+     "rec-pardo",
+     null
+    ],
+    [
+     "rec-valdebebas",
+     null
+    ],
+    [
+     "rec-dehesa",
+     null
+    ],
+    [
+     "rec-oeste",
+     null
+    ],
+    [
+     "rec-casacampo",
+     null
+    ],
+    [
+     "rec-dehesa-llano",
+     null
+    ]
+   ],
+   "null|madrid|t60|all|flat": [],
+   "null|madrid|all|all|new": [
+    [
+     "rec-dehesa-llano",
+     null
+    ],
+    [
+     "rec-sahagun",
+     null
+    ],
+    [
+     "rec-santander",
+     null
+    ],
+    [
+     "rec-cu",
+     null
+    ],
+    [
+     "rec-oeste",
+     null
+    ],
+    [
+     "rec-madridrio",
+     null
+    ],
+    [
+     "rec-casacampo",
+     null
+    ],
+    [
+     "rec-retiro",
+     null
+    ],
+    [
+     "rec-pardo",
+     null
+    ],
+    [
+     "rec-jc1",
+     null
+    ],
+    [
+     "rec-valdebebas",
+     null
+    ],
+    [
+     "rec-dehesa",
+     null
+    ]
+   ],
+   "null|madrid|all|asfalto|short": [
+    [
+     "rec-cu",
+     null
+    ],
+    [
+     "rec-jc1",
+     null
+    ],
+    [
+     "rec-madridrio",
+     null
+    ]
+   ]
+  },
+  "nearCity": "sanfernando",
+  "mine": [
+   [
+    "gpx-1",
+    "Vuelta al barrio",
+    1.6,
+    null,
+    "saved",
+    "Guardada"
+   ],
+   [
+    "run-r1792474800000",
+    "Carrera de la mañana",
+    5.1,
+    20,
+    "run",
+    "mar, 20 oct · 07:40"
+   ],
+   [
+    "run-r1792429800000",
+    "Carrera de la mañana",
+    2.5,
+    0,
+    "run",
+    "lun, 19 oct · 19:10"
+   ],
+   [
+    "run-r1792224005000",
+    "Carrera de la mañana",
+    3.4,
+    0,
+    "run",
+    "sáb, 17 oct · 10:00"
+   ],
+   [
+    "run-route-1792167600000",
+    "Por la Dehesa",
+    4.2,
+    null,
+    "run",
+    "vie, 16 oct · 18:20"
+   ],
+   [
+    "run-r1792137605000",
+    "Carrera de la mañana",
+    4.1,
+    108,
+    "run",
+    "vie, 16 oct · 10:00"
+   ],
+   [
+    "run-r1792051205000",
+    "Carrera de la mañana",
+    21.3,
+    44,
+    "run",
+    "jue, 15 oct · 10:00"
+   ],
+   [
+    "run-r1791964805000",
+    "Carrera de la mañana",
+    4.1,
+    8,
+    "run",
+    "mié, 14 oct · 10:00"
+   ],
+   [
+    "run-r1791878405000",
+    "Carrera de la mañana",
+    5.1,
+    20,
+    "run",
+    "mar, 13 oct · 10:00"
+   ],
+   [
+    "run-r1791792005000",
+    "Carrera de la mañana",
+    3.6,
+    0,
+    "run",
+    "lun, 12 oct · 10:00"
+   ],
+   [
+    "run-r1791705605000",
+    "Carrera de la mañana",
+    2.5,
+    0,
+    "run",
+    "dom, 11 oct · 10:00"
+   ]
+  ]
+ },
+ "nav": [
+  {
+   "pts": 226,
+   "total": 4200.537,
+   "turns": [
+    [
+     3,
+     57.99,
+     115.07,
+     "derecha",
+     false
+    ],
+    [
+     8,
+     209,
+     -130.56,
+     "izquierda",
+     true
+    ],
+    [
+     22,
+     443.18,
+     -115.86,
+     "izquierda",
+     false
+    ],
+    [
+     63,
+     1248.23,
+     94.83,
+     "derecha",
+     false
+    ],
+    [
+     68,
+     1585.05,
+     -72.32,
+     "izquierda",
+     false
+    ],
+    [
+     86,
+     2092.98,
+     -77.42,
+     "izquierda",
+     false
+    ],
+    [
+     125,
+     2603.53,
+     70.41,
+     "derecha",
+     false
+    ],
+    [
+     134,
+     2686.06,
+     168.84,
+     "derecha",
+     true
+    ],
+    [
+     148,
+     2771.64,
+     100.55,
+     "derecha",
+     false
+    ],
+    [
+     151,
+     2845.93,
+     -91.74,
+     "izquierda",
+     false
+    ],
+    [
+     171,
+     3125.26,
+     90.99,
+     "derecha",
+     false
+    ],
+    [
+     189,
+     3489.95,
+     83.4,
+     "derecha",
+     false
+    ],
+    [
+     214,
+     3856.38,
+     -97.11,
+     "izquierda",
+     false
+    ],
+    [
+     218,
+     3972.54,
+     -93.9,
+     "izquierda",
+     false
+    ]
+   ]
+  },
+  {
+   "pts": 171,
+   "total": 2665.101,
+   "turns": [
+    [
+     23,
+     398.42,
+     100.01,
+     "derecha",
+     false
+    ],
+    [
+     33,
+     496.22,
+     -121.39,
+     "izquierda",
+     true
+    ],
+    [
+     70,
+     907.7,
+     77.42,
+     "derecha",
+     false
+    ],
+    [
+     79,
+     1158.69,
+     -123.08,
+     "izquierda",
+     true
+    ],
+    [
+     85,
+     1332.55,
+     180,
+     "derecha",
+     true
+    ],
+    [
+     91,
+     1506.41,
+     123.08,
+     "derecha",
+     true
+    ],
+    [
+     100,
+     1757.4,
+     -77.42,
+     "izquierda",
+     false
+    ],
+    [
+     137,
+     2168.88,
+     121.39,
+     "derecha",
+     true
+    ],
+    [
+     147,
+     2266.68,
+     -100.01,
+     "izquierda",
+     false
+    ]
+   ]
+  },
+  {
+   "pts": 119,
+   "total": 2251.237,
+   "turns": [
+    [
+     3,
+     197.17,
+     -87.24,
+     "izquierda",
+     false
+    ],
+    [
+     12,
+     337.75,
+     76.89,
+     "derecha",
+     false
+    ],
+    [
+     24,
+     543.76,
+     128.7,
+     "derecha",
+     true
+    ],
+    [
+     41,
+     840.54,
+     80.93,
+     "derecha",
+     false
+    ],
+    [
+     62,
+     1042.84,
+     89.47,
+     "derecha",
+     false
+    ],
+    [
+     75,
+     1134.55,
+     -83.06,
+     "izquierda",
+     false
+    ],
+    [
+     93,
+     1598.68,
+     103.76,
+     "derecha",
+     false
+    ],
+    [
+     96,
+     1674.09,
+     -95.56,
+     "izquierda",
+     false
+    ],
+    [
+     99,
+     1735.25,
+     75.23,
+     "derecha",
+     false
+    ],
+    [
+     108,
+     1999.23,
+     -71.77,
+     "izquierda",
+     false
+    ],
+    [
+     114,
+     2229.25,
+     128.36,
+     "derecha",
+     true
+    ]
+   ]
+  },
+  {
+   "pts": 25,
+   "total": 742.475,
+   "turns": [
+    [
+     4,
+     40.79,
+     -90.9,
+     "izquierda",
+     false
+    ],
+    [
+     14,
+     271.1,
+     -90.24,
+     "izquierda",
+     false
+    ],
+    [
+     17,
+     482.43,
+     -134.32,
+     "izquierda",
+     true
+    ],
+    [
+     21,
+     707.28,
+     -151.72,
+     "izquierda",
+     true
+    ]
+   ]
+  }
+ ],
+ "geo": {
+  "bearing": 37.281265125885284,
+  "dest": {
+   "lat": 40.41349016185933,
+   "lon": -3.6828862431260534
+  },
+  "compass": [
+   "norte",
+   "noreste",
+   "noreste",
+   "sur",
+   "norte",
+   "noroeste"
+  ],
+  "ang": [
+   -20,
+   20,
+   -180
+  ]
+ },
+ "gpx": {
+  "run": {
+   "id": "g1791615600000",
+   "start": 1791615600000,
+   "name": "Mi carrera & más",
+   "dist": 1645.9151103678066,
+   "dur": 531,
+   "splits": [
+    {
+     "km": 1,
+     "split": 322.4856808773005
+    },
+    {
+     "km": 2,
+     "split": 322.8200049445571,
+     "partial": true
+    }
+   ],
+   "gain": 24,
+   "n": 60
+  },
+  "route": {
+   "name": "Mi carrera & más",
+   "km": 1.6,
+   "gain": 24,
+   "n": 60
+  },
+  "out": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><gpx version=\"1.1\" creator=\"Zancada\" xmlns=\"http://www.topografix.com/GPX/1/1\"><metadata><name>Carrera de la mañana</name><time>2026-10-19T17:10:00.000Z</time></metadata><trk><name>Carrera de la mañana</name><type>running</type><trkseg><trkpt lat=\"40.415335\" lon=\"-3.684465\"><time>2026-10-19T17:10:00.000Z</time></trkpt><trkpt lat=\"40.415346\" lon=\"-3.684438\"><time>2026-10-19T17:10:02.221Z</time></trkpt><trkpt lat=\"40.415362\" lon=\"-3.684408\"><time>2026-10-19T17:10:03.158Z</time></trkpt><trkpt lat=\"40.415380\" lon=\"-3.684385\"><time>2026-10-19T17:10:04.158Z</time></trkpt><trkpt lat=\"40.415391\" lon=\"-3.684364\"><time>2026-10-19T17:10:05.044Z</time></trkpt><trkpt lat=\"40.415403\" lon=\"-3.684333\"><time>2026-10-19T17:10:06.020Z</time></trkpt><trkpt lat=\"40.415417\" lon=\"-3.684300\"><time>2026-10-19T17:10:07.020Z</time></trkpt><trkpt lat=\"40.415433\" lon=\"-3.684274\"><time>2026-10-19T17:10:08.020Z</time></trkpt><trkpt lat=\"40.415449\" lon=\"-3.684249\"><time>2026-10-19T17:10:09.020Z</time></trkpt><trkpt lat=\"40.415471\" lon=\"-3.684220\"><time>2026-10-19T17:10:10.020Z</time></trkpt><trkpt lat=\"40.415495\" lon=\"-3.684184\"><time>2026-10-19T17:10:11.020Z</time></trkpt><trkpt lat=\"40.415508\" lon=\"-3.684158\"><time>2026-10-19T17:10:12.020Z</time></trkpt><trkpt lat=\"40.415523\" lon=\"-3.684127\"><time>2026-10-19T17:10:13.020Z</time></trkpt><trkpt lat=\"40.415544\" lon=\"-3.684099\"><time>2026-10-19T17:10:14.020Z</time></trkpt><trkpt lat=\"40.415557\" lon=\"-3.684073\"><time>2026-10-19T17:10:15.014Z</time></trkpt><trkpt lat=\"40.415571\" lon=\"-3.684044\"><time>2026-10-19T17:10:16.014Z</time></trkpt><trkpt lat=\"40.415586\" lon=\"-3.684013\"><time>2026-10-19T17:10:17.014Z</time></trkpt><trkpt lat=\"40.415603\" lon=\"-3.683980\"><time>2026-10-19T17:10:18.014Z</time></trkpt><trkpt lat=\"40.415614\" lon=\"-3.683956\"><time>2026-10-19T17:10:19.014Z</time></trkpt><trkpt lat=\"40.415631\" lon=\"-3.683925\"><time>2026-10-19T17:10:20.014Z</time></trkpt><trkpt lat=\"40.415645\" lon=\"-3.683893\"><time>2026-10-19T17:10:21.014Z</time></trkpt><trkpt lat=\"40.415665\" lon=\"-3.683864\"><time>2026-10-19T17:10:22.014Z</time></trkpt><trkpt lat=\"40.415680\" lon=\"-3.683834\"><time>2026-10-19T17:10:23.006Z</time></trkpt><trkpt lat=\"40.415701\" lon=\"-3.683802\"><time>2026-10-19T17:10:24.006Z</time></trkpt><trkpt lat=\"40.415717\" lon=\"-3.683770\"><time>2026-10-19T17:10:25.006Z</time></trkpt><trkpt lat=\"40.415736\" lon=\"-3.683741\"><time>2026-10-19T17:10:26.006Z</time></trkpt><trkpt lat=\"40.415746\" lon=\"-3.683713\"><time>2026-10-19T17:10:27.006Z</time></trkpt><trkpt lat=\"40.415765\" lon=\"-3.683686\"><time>2026-10-19T17:10:28.006Z</time></trkpt><trkpt lat=\"40.415782\" lon=\"-3.683660\"><time>2026-10-19T17:10:29.006Z</time></trkpt><trkpt lat=\"40.415796\" lon=\"-3.683638\"><time>2026-10-19T17:10:30.006Z</time></trkpt><trkpt lat=\"40.415809\" lon=\"-3.683610\"><time>2026-10-19T17:10:31.006Z</time></trkpt><trkpt lat=\"40.415826\" lon=\"-3.683581\"><time>2026-10-19T17:10:32.006Z</time></trkpt><trkpt lat=\"40.415843\" lon=\"-3.683555\"><time>2026-10-19T17:10:33.006Z</time></trkpt><trkpt lat=\"40.415857\" lon=\"-3.683528\"><time>2026-10-19T17:10:34.006Z</time></trkpt><trkpt lat=\"40.415873\" lon=\"-3.683494\"><time>2026-10-19T17:10:35.006Z</time></trkpt><trkpt lat=\"40.415892\" lon=\"-3.683461\"><time>2026-10-19T17:10:36.006Z</time></trkpt><trkpt lat=\"40.415910\" lon=\"-3.683438\"><time>2026-10-19T17:10:37.006Z</time></trkpt><trkpt lat=\"40.415925\" lon=\"-3.683412\"><time>2026-10-19T17:10:38.006Z</time></trkpt><trkpt lat=\"40.415940\" lon=\"-3.683389\"><time>2026-10-19T17:10:39.006Z</time></trkpt><trkpt lat=\"40.415957\" lon=\"-3.683369\"><time>2026-10-19T17:10:40.006Z</time></trkpt><trkpt lat=\"40.415972\" lon=\"-3.683351\"><time>2026-10-19T17:10:41.006Z</time></trkpt><trkpt lat=\"40.415987\" lon=\"-3.683321\"><time>2026-10-19T17:10:42.006Z</time></trkpt><trkpt lat=\"40.415998\" lon=\"-3.683297\"><time>2026-10-19T17:10:43.006Z</time></trkpt><trkpt lat=\"40.416012\" lon=\"-3.683261\"><time>2026-10-19T17:10:44.006Z</time></trkpt><trkpt lat=\"40.416026\" lon=\"-3.683231\"><time>2026-10-19T17:10:45.006Z</time></trkpt><trkpt lat=\"40.416041\" lon=\"-3.683193\"><time>2026-10-19T17:10:46.006Z</time></trkpt><trkpt lat=\"40.416059\" lon=\"-3.683166\"><time>2026-10-19T17:10:47.006Z</time></trkpt><trkpt lat=\"40.416075\" lon=\"-3.683139\"><time>2026-10-19T17:10:48.006Z</time></trkpt><trkpt lat=\"40.416092\" lon=\"-3.683107\"><time>2026-10-19T17:10:49.006Z</time></trkpt><trkpt lat=\"40.416109\" lon=\"-3.683077\"><time>2026-10-19T17:10:50.006Z</time></trkpt><trkpt lat=\"40.416125\" lon=\"-3.683042\"><time>2026-10-19T17:10:51.006Z</time></trkpt><trkpt lat=\"40.416141\" lon=\"-3.683012\"><time>2026-10-19T17:10:52.006Z</time></trkpt><trkpt lat=\"40.416159\" lon=\"-3.682981\"><time>2026-10-19T17:10:53.006Z</time></trkpt><trkpt lat=\"40.416174\" lon=\"-3.682950\"><time>2026-10-19T17:10:54.006Z</time></trkpt><trkpt lat=\"40.416194\" lon=\"-3.682919\"><time>2026-10-19T17:10:55.006Z</time></trkpt><trkpt lat=\"40.416210\" lon=\"-3.682893\"><time>2026-10-19T17:10:56.006Z</time></trkpt><trkpt lat=\"40.416221\" lon=\"-3.682861\"><time>2026-10-19T17:10:57.006Z</time></trkpt><trkpt lat=\"40.416237\" lon=\"-3.682831\"><time>2026-10-19T17:10:58.006Z</time></trkpt><trkpt lat=\"40.416257\" lon=\"-3.682807\"><time>2026-10-19T17:10:59.006Z</time></trkpt><trkpt lat=\"40.416273\" lon=\"-3.682778\"><time>2026-10-19T17:11:00.006Z</time></trkpt><trkpt lat=\"40.416286\" lon=\"-3.682751\"><time>2026-10-19T17:11:01.006Z</time></trkpt><trkpt lat=\"40.416304\" lon=\"-3.682718\"><time>2026-10-19T17:11:02.006Z</time></trkpt><trkpt lat=\"40.416317\" lon=\"-3.682683\"><time>2026-10-19T17:11:03.006Z</time></trkpt><trkpt lat=\"40.416333\" lon=\"-3.682654\"><time>2026-10-19T17:11:04.006Z</time></trkpt><trkpt lat=\"40.416351\" lon=\"-3.682627\"><time>2026-10-19T17:11:05.006Z</time></trkpt><trkpt lat=\"40.416365\" lon=\"-3.682596\"><time>2026-10-19T17:11:06.006Z</time></trkpt><trkpt lat=\"40.416380\" lon=\"-3.682573\"><time>2026-10-19T17:11:07.006Z</time></trkpt><trkpt lat=\"40.416396\" lon=\"-3.682543\"><time>2026-10-19T17:11:08.006Z</time></trkpt><trkpt lat=\"40.416419\" lon=\"-3.682508\"><time>2026-10-19T17:11:09.006Z</time></trkpt><trkpt lat=\"40.416436\" lon=\"-3.682478\"><time>2026-10-19T17:11:10.006Z</time></trkpt><trkpt lat=\"40.416453\" lon=\"-3.682458\"><time>2026-10-19T17:11:11.006Z</time></trkpt><trkpt lat=\"40.416469\" lon=\"-3.682435\"><time>2026-10-19T17:11:12.006Z</time></trkpt><trkpt lat=\"40.416490\" lon=\"-3.682410\"><time>2026-10-19T17:11:13.006Z</time></trkpt><trkpt lat=\"40.416508\" lon=\"-3.682386\"><time>2026-10-19T17:11:14.006Z</time></trkpt><trkpt lat=\"40.416527\" lon=\"-3.682360\"><time>2026-10-19T17:11:15.006Z</time></trkpt><trkpt lat=\"40.416541\" lon=\"-3.682339\"><time>2026-10-19T17:11:16.006Z</time></trkpt><trkpt lat=\"40.416556\" lon=\"-3.682312\"><time>2026-10-19T17:11:17.006Z</time></trkpt><trkpt lat=\"40.416569\" lon=\"-3.682291\"><time>2026-10-19T17:11:18.006Z</time></trkpt><trkpt lat=\"40.416586\" lon=\"-3.682270\"><time>2026-10-19T17:11:19.006Z</time></trkpt><trkpt lat=\"40.416600\" lon=\"-3.682239\"><time>2026-10-19T17:11:20.006Z</time></trkpt><trkpt lat=\"40.416613\" lon=\"-3.682208\"><time>2026-10-19T17:11:21.006Z</time></trkpt><trkpt lat=\"40.416635\" lon=\"-3.682179\"><time>2026-10-19T17:11:22.006Z</time></trkpt><trkpt lat=\"40.416650\" lon=\"-3.682151\"><time>2026-10-19T17:11:23.006Z</time></trkpt><trkpt lat=\"40.416668\" lon=\"-3.682129\"><time>2026-10-19T17:11:24.006Z</time></trkpt><trkpt lat=\"40.416685\" lon=\"-3.682096\"><time>2026-10-19T17:11:25.006Z</time></trkpt><trkpt lat=\"40.416700\" lon=\"-3.682066\"><time>2026-10-19T17:11:26.006Z</time></trkpt><trkpt lat=\"40.416713\" lon=\"-3.682042\"><time>2026-10-19T17:11:27.006Z</time></trkpt><trkpt lat=\"40.416733\" lon=\"-3.682009\"><time>2026-10-19T17:11:28.006Z</time></trkpt><trkpt lat=\"40.416743\" lon=\"-3.681977\"><time>2026-10-19T17:11:29.006Z</time></trkpt><trkpt lat=\"40.416752\" lon=\"-3.681956\"><time>2026-10-19T17:11:30.006Z</time></trkpt><trkpt lat=\"40.416768\" lon=\"-3.681933\"><time>2026-10-19T17:11:31.006Z</time></trkpt><trkpt lat=\"40.416781\" lon=\"-3.681907\"><time>2026-10-19T17:11:32.006Z</time></trkpt><trkpt lat=\"40.416792\" lon=\"-3.681872\"><time>2026-10-19T17:11:33.006Z</time></trkpt><trkpt lat=\"40.416806\" lon=\"-3.681843\"><time>2026-10-19T17:11:34.006Z</time></trkpt><trkpt lat=\"40.416823\" lon=\"-3.681820\"><time>2026-10-19T17:11:35.006Z</time></trkpt><trkpt lat=\"40.416840\" lon=\"-3.681787\"><time>2026-10-19T17:11:36.006Z</time></trkpt><trkpt lat=\"40.416859\" lon=\"-3.681752\"><time>2026-10-19T17:11:37.006Z</time></trkpt><trkpt lat=\"40.416872\" lon=\"-3.681728\"><time>2026-10-19T17:11:38.006Z</time></trkpt><trkpt lat=\"40.416884\" lon=\"-3.681698\"><time>2026-10-19T17:11:39.006Z</time></trkpt><trkpt lat=\"40.416902\" lon=\"-3.681660\"><time>2026-10-19T17:11:40.006Z</time></trkpt><trkpt lat=\"40.416918\" lon=\"-3.681628\"><time>2026-10-19T17:11:41.006Z</time></trkpt><trkpt lat=\"40.416930\" lon=\"-3.681596\"><time>2026-10-19T17:11:42.006Z</time></trkpt><trkpt lat=\"40.416947\" lon=\"-3.681564\"><time>2026-10-19T17:11:43.006Z</time></trkpt><trkpt lat=\"40.416964\" lon=\"-3.681540\"><time>2026-10-19T17:11:44.006Z</time></trkpt><trkpt lat=\"40.416978\" lon=\"-3.681518\"><time>2026-10-19T17:11:45.006Z</time></trkpt><trkpt lat=\"40.416993\" lon=\"-3.681490\"><time>2026-10-19T17:11:46.006Z</time></trkpt><trkpt lat=\"40.417012\" lon=\"-3.681457\"><time>2026-10-19T17:11:47.006Z</time></trkpt><trkpt lat=\"40.417026\" lon=\"-3.681427\"><time>2026-10-19T17:11:48.006Z</time></trkpt><trkpt lat=\"40.417043\" lon=\"-3.681396\"><time>2026-10-19T17:11:49.006Z</time></trkpt><trkpt lat=\"40.417058\" lon=\"-3.681371\"><time>2026-10-19T17:11:50.006Z</time></trkpt><trkpt lat=\"40.417071\" lon=\"-3.681348\"><time>2026-10-19T17:11:51.006Z</time></trkpt><trkpt lat=\"40.417087\" lon=\"-3.681316\"><time>2026-10-19T17:11:52.006Z</time></trkpt><trkpt lat=\"40.417104\" lon=\"-3.681278\"><time>2026-10-19T17:11:53.006Z</time></trkpt><trkpt lat=\"40.417113\" lon=\"-3.681243\"><time>2026-10-19T17:11:54.006Z</time></trkpt><trkpt lat=\"40.417130\" lon=\"-3.681217\"><time>2026-10-19T17:11:55.006Z</time></trkpt><trkpt lat=\"40.417144\" lon=\"-3.681189\"><time>2026-10-19T17:11:56.006Z</time></trkpt><trkpt lat=\"40.417158\" lon=\"-3.681159\"><time>2026-10-19T17:11:57.006Z</time></trkpt><trkpt lat=\"40.417176\" lon=\"-3.681125\"><time>2026-10-19T17:11:58.006Z</time></trkpt><trkpt lat=\"40.417195\" lon=\"-3.681097\"><time>2026-10-19T17:11:59.006Z</time></trkpt><trkpt lat=\"40.417216\" lon=\"-3.681068\"><time>2026-10-19T17:12:00.006Z</time></trkpt><trkpt lat=\"40.417233\" lon=\"-3.681040\"><time>2026-10-19T17:12:01.006Z</time></trkpt><trkpt lat=\"40.417253\" lon=\"-3.681012\"><time>2026-10-19T17:12:02.006Z</time></trkpt><trkpt lat=\"40.417271\" lon=\"-3.680981\"><time>2026-10-19T17:12:03.006Z</time></trkpt><trkpt lat=\"40.417292\" lon=\"-3.680952\"><time>2026-10-19T17:12:04.006Z</time></trkpt><trkpt lat=\"40.417309\" lon=\"-3.680920\"><time>2026-10-19T17:12:05.006Z</time></trkpt><trkpt lat=\"40.417326\" lon=\"-3.680893\"><time>2026-10-19T17:12:06.006Z</time></trkpt><trkpt lat=\"40.417340\" lon=\"-3.680860\"><time>2026-10-19T17:12:07.006Z</time></trkpt><trkpt lat=\"40.417354\" lon=\"-3.680837\"><time>2026-10-19T17:12:08.006Z</time></trkpt><trkpt lat=\"40.417369\" lon=\"-3.680812\"><time>2026-10-19T17:12:09.006Z</time></trkpt><trkpt lat=\"40.417388\" lon=\"-3.680780\"><time>2026-10-19T17:12:10.006Z</time></trkpt><trkpt lat=\"40.417406\" lon=\"-3.680751\"><time>2026-10-19T17:12:11.006Z</time></trkpt><trkpt lat=\"40.417434\" lon=\"-3.680724\"><time>2026-10-19T17:12:12.006Z</time></trkpt><trkpt lat=\"40.417445\" lon=\"-3.680693\"><time>2026-10-19T17:12:13.006Z</time></trkpt><trkpt lat=\"40.417462\" lon=\"-3.680664\"><time>2026-10-19T17:12:14.006Z</time></trkpt><trkpt lat=\"40.417477\" lon=\"-3.680639\"><time>2026-10-19T17:12:15.006Z</time></trkpt><trkpt lat=\"40.417499\" lon=\"-3.680615\"><time>2026-10-19T17:12:16.006Z</time></trkpt><trkpt lat=\"40.417516\" lon=\"-3.680585\"><time>2026-10-19T17:12:17.006Z</time></trkpt><trkpt lat=\"40.417531\" lon=\"-3.680562\"><time>2026-10-19T17:12:18.006Z</time></trkpt><trkpt lat=\"40.417545\" lon=\"-3.680538\"><time>2026-10-19T17:12:19.006Z</time></trkpt><trkpt lat=\"40.417562\" lon=\"-3.680512\"><time>2026-10-19T17:12:20.006Z</time></trkpt><trkpt lat=\"40.417575\" lon=\"-3.680488\"><time>2026-10-19T17:12:21.006Z</time></trkpt><trkpt lat=\"40.417593\" lon=\"-3.680458\"><time>2026-10-19T17:12:22.006Z</time></trkpt><trkpt lat=\"40.417609\" lon=\"-3.680438\"><time>2026-10-19T17:12:23.006Z</time></trkpt><trkpt lat=\"40.417625\" lon=\"-3.680417\"><time>2026-10-19T17:12:24.006Z</time></trkpt><trkpt lat=\"40.417641\" lon=\"-3.680388\"><time>2026-10-19T17:12:25.006Z</time></trkpt><trkpt lat=\"40.417657\" lon=\"-3.680362\"><time>2026-10-19T17:12:26.006Z</time></trkpt><trkpt lat=\"40.417670\" lon=\"-3.680323\"><time>2026-10-19T17:12:27.006Z</time></trkpt><trkpt lat=\"40.417688\" lon=\"-3.680294\"><time>2026-10-19T17:12:28.006Z</time></trkpt><trkpt lat=\"40.417701\" lon=\"-3.680262\"><time>2026-10-19T17:12:29.006Z</time></trkpt><trkpt lat=\"40.417721\" lon=\"-3.680234\"><time>2026-10-19T17:12:30.006Z</time></trkpt><trkpt lat=\"40.417728\" lon=\"-3.680210\"><time>2026-10-19T17:12:31.006Z</time></trkpt><trkpt lat=\"40.417745\" lon=\"-3.680182\"><time>2026-10-19T17:12:32.006Z</time></trkpt><trkpt lat=\"40.417767\" lon=\"-3.680156\"><time>2026-10-19T17:12:33.006Z</time></trkpt><trkpt lat=\"40.417786\" lon=\"-3.680128\"><time>2026-10-19T17:12:34.006Z</time></trkpt><trkpt lat=\"40.417802\" lon=\"-3.680102\"><time>2026-10-19T17:12:35.006Z</time></trkpt><trkpt lat=\"40.417823\" lon=\"-3.680076\"><time>2026-10-19T17:12:36.006Z</time></trkpt><trkpt lat=\"40.417834\" lon=\"-3.680051\"><time>2026-10-19T17:12:37.006Z</time></trkpt><trkpt lat=\"40.417851\" lon=\"-3.680022\"><time>2026-10-19T17:12:38.006Z</time></trkpt><trkpt lat=\"40.417876\" lon=\"-3.679988\"><time>2026-10-19T17:12:39.006Z</time></trkpt><trkpt lat=\"40.417889\" lon=\"-3.679959\"><time>2026-10-19T17:12:40.006Z</time></trkpt><trkpt lat=\"40.417905\" lon=\"-3.679931\"><time>2026-10-19T17:12:41.006Z</time></trkpt><trkpt lat=\"40.417922\" lon=\"-3.679889\"><time>2026-10-19T17:12:42.006Z</time></trkpt><trkpt lat=\"40.417936\" lon=\"-3.679869\"><time>2026-10-19T17:12:43.006Z</time></trkpt><trkpt lat=\"40.417961\" lon=\"-3.679845\"><time>2026-10-19T17:12:44.006Z</time></trkpt><trkpt lat=\"40.417972\" lon=\"-3.679810\"><time>2026-10-19T17:12:45.006Z</time></trkpt><trkpt lat=\"40.417993\" lon=\"-3.679781\"><time>2026-10-19T17:12:46.006Z</time></trkpt><trkpt lat=\"40.418001\" lon=\"-3.679757\"><time>2026-10-19T17:12:47.006Z</time></trkpt><trkpt lat=\"40.418019\" lon=\"-3.679732\"><time>2026-10-19T17:12:48.006Z</time></trkpt><trkpt lat=\"40.418030\" lon=\"-3.679692\"><time>2026-10-19T17:12:49.006Z</time></trkpt><trkpt lat=\"40.418043\" lon=\"-3.679664\"><time>2026-10-19T17:12:50.006Z</time></trkpt><trkpt lat=\"40.418063\" lon=\"-3.679632\"><time>2026-10-19T17:12:51.006Z</time></trkpt><trkpt lat=\"40.418078\" lon=\"-3.679608\"><time>2026-10-19T17:12:52.006Z</time></trkpt><trkpt lat=\"40.418094\" lon=\"-3.679577\"><time>2026-10-19T17:12:53.006Z</time></trkpt><trkpt lat=\"40.418112\" lon=\"-3.679548\"><time>2026-10-19T17:12:54.006Z</time></trkpt><trkpt lat=\"40.418122\" lon=\"-3.679517\"><time>2026-10-19T17:12:55.006Z</time></trkpt><trkpt lat=\"40.418134\" lon=\"-3.679485\"><time>2026-10-19T17:12:56.006Z</time></trkpt><trkpt lat=\"40.418152\" lon=\"-3.679456\"><time>2026-10-19T17:12:57.006Z</time></trkpt><trkpt lat=\"40.418163\" lon=\"-3.679429\"><time>2026-10-19T17:12:58.006Z</time></trkpt><trkpt lat=\"40.418183\" lon=\"-3.679404\"><time>2026-10-19T17:12:59.006Z</time></trkpt><trkpt lat=\"40.418199\" lon=\"-3.679376\"><time>2026-10-19T17:13:00.006Z</time></trkpt><trkpt lat=\"40.418213\" lon=\"-3.679347\"><time>2026-10-19T17:13:01.006Z</time></trkpt><trkpt lat=\"40.418230\" lon=\"-3.679314\"><time>2026-10-19T17:13:02.006Z</time></trkpt><trkpt lat=\"40.418242\" lon=\"-3.679286\"><time>2026-10-19T17:13:03.006Z</time></trkpt><trkpt lat=\"40.418261\" lon=\"-3.679259\"><time>2026-10-19T17:13:04.006Z</time></trkpt><trkpt lat=\"40.418281\" lon=\"-3.679233\"><time>2026-10-19T17:13:05.006Z</time></trkpt><trkpt lat=\"40.418295\" lon=\"-3.679206\"><time>2026-10-19T17:13:06.006Z</time></trkpt><trkpt lat=\"40.418307\" lon=\"-3.679169\"><time>2026-10-19T17:13:07.006Z</time></trkpt><trkpt lat=\"40.418327\" lon=\"-3.679149\"><time>2026-10-19T17:13:08.006Z</time></trkpt><trkpt lat=\"40.418342\" lon=\"-3.679130\"><time>2026-10-19T17:13:09.006Z</time></trkpt><trkpt lat=\"40.418359\" lon=\"-3.679103\"><time>2026-10-19T17:13:10.006Z</time></trkpt><trkpt lat=\"40.418378\" lon=\"-3.679076\"><time>2026-10-19T17:13:11.006Z</time></trkpt><trkpt lat=\"40.418395\" lon=\"-3.679051\"><time>2026-10-19T17:13:12.006Z</time></trkpt><trkpt lat=\"40.418412\" lon=\"-3.679020\"><time>2026-10-19T17:13:13.006Z</time></trkpt><trkpt lat=\"40.418432\" lon=\"-3.678997\"><time>2026-10-19T17:13:14.006Z</time></trkpt><trkpt lat=\"40.418447\" lon=\"-3.678973\"><time>2026-10-19T17:13:15.006Z</time></trkpt><trkpt lat=\"40.418462\" lon=\"-3.678940\"><time>2026-10-19T17:13:16.006Z</time></trkpt><trkpt lat=\"40.418478\" lon=\"-3.678917\"><time>2026-10-19T17:13:17.006Z</time></trkpt><trkpt lat=\"40.418496\" lon=\"-3.678887\"><time>2026-10-19T17:13:18.006Z</time></trkpt><trkpt lat=\"40.418507\" lon=\"-3.678860\"><time>2026-10-19T17:13:19.006Z</time></trkpt><trkpt lat=\"40.418520\" lon=\"-3.678826\"><time>2026-10-19T17:13:20.006Z</time></trkpt><trkpt lat=\"40.418542\" lon=\"-3.678795\"><time>2026-10-19T17:13:21.006Z</time></trkpt><trkpt lat=\"40.418558\" lon=\"-3.678767\"><time>2026-10-19T17:13:22.004Z</time></trkpt><trkpt lat=\"40.418574\" lon=\"-3.678735\"><time>2026-10-19T17:13:23.004Z</time></trkpt><trkpt lat=\"40.418591\" lon=\"-3.678694\"><time>2026-10-19T17:13:24.004Z</time></trkpt><trkpt lat=\"40.418611\" lon=\"-3.678665\"><time>2026-10-19T17:13:25.004Z</time></trkpt><trkpt lat=\"40.418636\" lon=\"-3.678620\"><time>2026-10-19T17:13:27.004Z</time></trkpt><trkpt lat=\"40.418653\" lon=\"-3.678593\"><time>2026-10-19T17:13:28.004Z</time></trkpt><trkpt lat=\"40.418668\" lon=\"-3.678571\"><time>2026-10-19T17:13:29.004Z</time></trkpt><trkpt lat=\"40.418686\" lon=\"-3.678544\"><time>2026-10-19T17:13:30.004Z</time></trkpt><trkpt lat=\"40.418702\" lon=\"-3.678520\"><time>2026-10-19T17:13:31.004Z</time></trkpt><trkpt lat=\"40.418714\" lon=\"-3.678492\"><time>2026-10-19T17:13:32.004Z</time></trkpt><trkpt lat=\"40.418730\" lon=\"-3.678466\"><time>2026-10-19T17:13:33.004Z</time></trkpt><trkpt lat=\"40.418749\" lon=\"-3.678435\"><time>2026-10-19T17:13:34.004Z</time></trkpt><trkpt lat=\"40.418767\" lon=\"-3.678398\"><time>2026-10-19T17:13:35.004Z</time></trkpt><trkpt lat=\"40.418783\" lon=\"-3.678370\"><time>2026-10-19T17:13:36.004Z</time></trkpt><trkpt lat=\"40.418795\" lon=\"-3.678342\"><time>2026-10-19T17:13:37.004Z</time></trkpt><trkpt lat=\"40.418806\" lon=\"-3.678314\"><time>2026-10-19T17:13:38.004Z</time></trkpt><trkpt lat=\"40.418816\" lon=\"-3.678287\"><time>2026-10-19T17:13:39.004Z</time></trkpt><trkpt lat=\"40.418835\" lon=\"-3.678256\"><time>2026-10-19T17:13:40.004Z</time></trkpt><trkpt lat=\"40.418854\" lon=\"-3.678231\"><time>2026-10-19T17:13:41.004Z</time></trkpt><trkpt lat=\"40.418868\" lon=\"-3.678204\"><time>2026-10-19T17:13:42.004Z</time></trkpt><trkpt lat=\"40.418890\" lon=\"-3.678172\"><time>2026-10-19T17:13:43.004Z</time></trkpt><trkpt lat=\"40.418911\" lon=\"-3.678148\"><time>2026-10-19T17:13:44.004Z</time></trkpt><trkpt lat=\"40.418928\" lon=\"-3.678119\"><time>2026-10-19T17:13:45.004Z</time></trkpt><trkpt lat=\"40.418948\" lon=\"-3.678088\"><time>2026-10-19T17:13:46.004Z</time></trkpt><trkpt lat=\"40.418964\" lon=\"-3.678065\"><time>2026-10-19T17:13:47.004Z</time></trkpt><trkpt lat=\"40.418981\" lon=\"-3.678026\"><time>2026-10-19T17:13:48.004Z</time></trkpt><trkpt lat=\"40.418994\" lon=\"-3.677997\"><time>2026-10-19T17:13:49.004Z</time></trkpt><trkpt lat=\"40.419006\" lon=\"-3.677969\"><time>2026-10-19T17:13:50.004Z</time></trkpt><trkpt lat=\"40.419024\" lon=\"-3.677938\"><time>2026-10-19T17:13:51.004Z</time></trkpt><trkpt lat=\"40.419043\" lon=\"-3.677903\"><time>2026-10-19T17:13:52.004Z</time></trkpt><trkpt lat=\"40.419059\" lon=\"-3.677879\"><time>2026-10-19T17:13:53.004Z</time></trkpt><trkpt lat=\"40.419075\" lon=\"-3.677845\"><time>2026-10-19T17:13:54.004Z</time></trkpt><trkpt lat=\"40.419087\" lon=\"-3.677822\"><time>2026-10-19T17:13:55.004Z</time></trkpt><trkpt lat=\"40.419110\" lon=\"-3.677793\"><time>2026-10-19T17:13:56.004Z</time></trkpt><trkpt lat=\"40.419122\" lon=\"-3.677770\"><time>2026-10-19T17:13:57.004Z</time></trkpt><trkpt lat=\"40.419139\" lon=\"-3.677736\"><time>2026-10-19T17:13:58.004Z</time></trkpt><trkpt lat=\"40.419162\" lon=\"-3.677714\"><time>2026-10-19T17:13:59.004Z</time></trkpt><trkpt lat=\"40.419174\" lon=\"-3.677690\"><time>2026-10-19T17:14:00.004Z</time></trkpt><trkpt lat=\"40.419192\" lon=\"-3.677662\"><time>2026-10-19T17:14:01.004Z</time></trkpt><trkpt lat=\"40.419207\" lon=\"-3.677632\"><time>2026-10-19T17:14:02.004Z</time></trkpt><trkpt lat=\"40.419221\" lon=\"-3.677609\"><time>2026-10-19T17:14:03.004Z</time></trkpt><trkpt lat=\"40.419236\" lon=\"-3.677579\"><time>2026-10-19T17:14:04.004Z</time></trkpt><trkpt lat=\"40.419249\" lon=\"-3.677551\"><time>2026-10-19T17:14:05.004Z</time></trkpt><trkpt lat=\"40.419267\" lon=\"-3.677528\"><time>2026-10-19T17:14:06.004Z</time></trkpt><trkpt lat=\"40.419282\" lon=\"-3.677500\"><time>2026-10-19T17:14:07.004Z</time></trkpt><trkpt lat=\"40.419293\" lon=\"-3.677473\"><time>2026-10-19T17:14:08.004Z</time></trkpt><trkpt lat=\"40.419314\" lon=\"-3.677445\"><time>2026-10-19T17:14:09.004Z</time></trkpt><trkpt lat=\"40.419329\" lon=\"-3.677416\"><time>2026-10-19T17:14:10.004Z</time></trkpt><trkpt lat=\"40.419345\" lon=\"-3.677398\"><time>2026-10-19T17:14:11.004Z</time></trkpt><trkpt lat=\"40.419361\" lon=\"-3.677374\"><time>2026-10-19T17:14:12.004Z</time></trkpt><trkpt lat=\"40.419372\" lon=\"-3.677348\"><time>2026-10-19T17:14:13.004Z</time></trkpt><trkpt lat=\"40.419394\" lon=\"-3.677321\"><time>2026-10-19T17:14:14.004Z</time></trkpt><trkpt lat=\"40.419412\" lon=\"-3.677290\"><time>2026-10-19T17:14:15.004Z</time></trkpt><trkpt lat=\"40.419424\" lon=\"-3.677265\"><time>2026-10-19T17:14:16.004Z</time></trkpt><trkpt lat=\"40.419441\" lon=\"-3.677230\"><time>2026-10-19T17:14:17.004Z</time></trkpt><trkpt lat=\"40.419457\" lon=\"-3.677205\"><time>2026-10-19T17:14:18.004Z</time></trkpt><trkpt lat=\"40.419481\" lon=\"-3.677183\"><time>2026-10-19T17:14:19.004Z</time></trkpt><trkpt lat=\"40.419500\" lon=\"-3.677147\"><time>2026-10-19T17:14:20.004Z</time></trkpt><trkpt lat=\"40.419515\" lon=\"-3.677118\"><time>2026-10-19T17:14:21.004Z</time></trkpt><trkpt lat=\"40.419525\" lon=\"-3.677092\"><time>2026-10-19T17:14:22.004Z</time></trkpt><trkpt lat=\"40.419541\" lon=\"-3.677064\"><time>2026-10-19T17:14:23.004Z</time></trkpt><trkpt lat=\"40.419558\" lon=\"-3.677030\"><time>2026-10-19T17:14:24.004Z</time></trkpt><trkpt lat=\"40.419577\" lon=\"-3.676998\"><time>2026-10-19T17:14:25.004Z</time></trkpt><trkpt lat=\"40.419589\" lon=\"-3.676968\"><time>2026-10-19T17:14:26.004Z</time></trkpt><trkpt lat=\"40.419609\" lon=\"-3.676949\"><time>2026-10-19T17:14:27.004Z</time></trkpt><trkpt lat=\"40.419632\" lon=\"-3.676918\"><time>2026-10-19T17:14:28.004Z</time></trkpt><trkpt lat=\"40.419652\" lon=\"-3.676889\"><time>2026-10-19T17:14:29.000Z</time></trkpt><trkpt lat=\"40.419666\" lon=\"-3.676865\"><time>2026-10-19T17:14:30.000Z</time></trkpt><trkpt lat=\"40.419682\" lon=\"-3.676833\"><time>2026-10-19T17:14:31.000Z</time></trkpt><trkpt lat=\"40.419699\" lon=\"-3.676811\"><time>2026-10-19T17:14:32.000Z</time></trkpt><trkpt lat=\"40.419710\" lon=\"-3.676779\"><time>2026-10-19T17:14:33.000Z</time></trkpt><trkpt lat=\"40.419728\" lon=\"-3.676753\"><time>2026-10-19T17:14:34.000Z</time></trkpt><trkpt lat=\"40.419747\" lon=\"-3.676727\"><time>2026-10-19T17:14:35.000Z</time></trkpt><trkpt lat=\"40.419763\" lon=\"-3.676700\"><time>2026-10-19T17:14:36.000Z</time></trkpt><trkpt lat=\"40.419777\" lon=\"-3.676676\"><time>2026-10-19T17:14:37.000Z</time></trkpt><trkpt lat=\"40.419793\" lon=\"-3.676650\"><time>2026-10-19T17:14:38.000Z</time></trkpt><trkpt lat=\"40.419817\" lon=\"-3.676620\"><time>2026-10-19T17:14:39.000Z</time></trkpt><trkpt lat=\"40.419834\" lon=\"-3.676595\"><time>2026-10-19T17:14:40.000Z</time></trkpt><trkpt lat=\"40.419857\" lon=\"-3.676562\"><time>2026-10-19T17:14:41.000Z</time></trkpt><trkpt lat=\"40.419874\" lon=\"-3.676535\"><time>2026-10-19T17:14:42.000Z</time></trkpt><trkpt lat=\"40.419883\" lon=\"-3.676503\"><time>2026-10-19T17:14:43.000Z</time></trkpt><trkpt lat=\"40.419894\" lon=\"-3.676471\"><time>2026-10-19T17:14:44.000Z</time></trkpt><trkpt lat=\"40.419915\" lon=\"-3.676440\"><time>2026-10-19T17:14:45.000Z</time></trkpt><trkpt lat=\"40.419933\" lon=\"-3.676409\"><time>2026-10-19T17:14:46.000Z</time></trkpt><trkpt lat=\"40.419946\" lon=\"-3.676379\"><time>2026-10-19T17:14:47.000Z</time></trkpt><trkpt lat=\"40.419957\" lon=\"-3.676352\"><time>2026-10-19T17:14:48.000Z</time></trkpt><trkpt lat=\"40.419973\" lon=\"-3.676327\"><time>2026-10-19T17:14:49.000Z</time></trkpt><trkpt lat=\"40.419988\" lon=\"-3.676300\"><time>2026-10-19T17:14:50.000Z</time></trkpt><trkpt lat=\"40.420007\" lon=\"-3.676268\"><time>2026-10-19T17:14:51.000Z</time></trkpt><trkpt lat=\"40.420025\" lon=\"-3.676239\"><time>2026-10-19T17:14:52.000Z</time></trkpt><trkpt lat=\"40.420037\" lon=\"-3.676211\"><time>2026-10-19T17:14:53.000Z</time></trkpt><trkpt lat=\"40.420053\" lon=\"-3.676186\"><time>2026-10-19T17:14:54.000Z</time></trkpt><trkpt lat=\"40.420070\" lon=\"-3.676162\"><time>2026-10-19T17:14:55.000Z</time></trkpt><trkpt lat=\"40.420087\" lon=\"-3.676139\"><time>2026-10-19T17:14:56.000Z</time></trkpt><trkpt lat=\"40.420105\" lon=\"-3.676110\"><time>2026-10-19T17:14:57.000Z</time></trkpt><trkpt lat=\"40.420122\" lon=\"-3.676075\"><time>2026-10-19T17:14:58.000Z</time></trkpt><trkpt lat=\"40.420140\" lon=\"-3.676046\"><time>2026-10-19T17:14:59.000Z</time></trkpt><trkpt lat=\"40.420159\" lon=\"-3.676023\"><time>2026-10-19T17:15:00.000Z</time></trkpt><trkpt lat=\"40.420177\" lon=\"-3.675987\"><time>2026-10-19T17:15:01.000Z</time></trkpt><trkpt lat=\"40.420187\" lon=\"-3.675959\"><time>2026-10-19T17:15:02.000Z</time></trkpt><trkpt lat=\"40.420204\" lon=\"-3.675937\"><time>2026-10-19T17:15:03.000Z</time></trkpt><trkpt lat=\"40.420224\" lon=\"-3.675910\"><time>2026-10-19T17:15:04.000Z</time></trkpt><trkpt lat=\"40.420243\" lon=\"-3.675878\"><time>2026-10-19T17:15:05.000Z</time></trkpt><trkpt lat=\"40.420252\" lon=\"-3.675856\"><time>2026-10-19T17:15:06.000Z</time></trkpt><trkpt lat=\"40.420268\" lon=\"-3.675824\"><time>2026-10-19T17:15:07.000Z</time></trkpt><trkpt lat=\"40.420282\" lon=\"-3.675797\"><time>2026-10-19T17:15:08.000Z</time></trkpt><trkpt lat=\"40.420302\" lon=\"-3.675769\"><time>2026-10-19T17:15:09.000Z</time></trkpt><trkpt lat=\"40.420319\" lon=\"-3.675740\"><time>2026-10-19T17:15:10.000Z</time></trkpt><trkpt lat=\"40.420333\" lon=\"-3.675708\"><time>2026-10-19T17:15:11.000Z</time></trkpt><trkpt lat=\"40.420352\" lon=\"-3.675685\"><time>2026-10-19T17:15:12.000Z</time></trkpt><trkpt lat=\"40.420373\" lon=\"-3.675657\"><time>2026-10-19T17:15:13.000Z</time></trkpt><trkpt lat=\"40.420393\" lon=\"-3.675629\"><time>2026-10-19T17:15:14.000Z</time></trkpt><trkpt lat=\"40.420412\" lon=\"-3.675597\"><time>2026-10-19T17:15:15.000Z</time></trkpt><trkpt lat=\"40.420433\" lon=\"-3.675564\"><time>2026-10-19T17:15:16.000Z</time></trkpt><trkpt lat=\"40.420445\" lon=\"-3.675540\"><time>2026-10-19T17:15:17.000Z</time></trkpt><trkpt lat=\"40.420459\" lon=\"-3.675512\"><time>2026-10-19T17:15:18.000Z</time></trkpt><trkpt lat=\"40.420476\" lon=\"-3.675481\"><time>2026-10-19T17:15:19.000Z</time></trkpt><trkpt lat=\"40.420491\" lon=\"-3.675455\"><time>2026-10-19T17:15:20.000Z</time></trkpt><trkpt lat=\"40.420511\" lon=\"-3.675421\"><time>2026-10-19T17:15:21.000Z</time></trkpt><trkpt lat=\"40.420530\" lon=\"-3.675394\"><time>2026-10-19T17:15:22.000Z</time></trkpt><trkpt lat=\"40.420545\" lon=\"-3.675362\"><time>2026-10-19T17:15:23.000Z</time></trkpt><trkpt lat=\"40.420563\" lon=\"-3.675324\"><time>2026-10-19T17:15:24.000Z</time></trkpt><trkpt lat=\"40.420578\" lon=\"-3.675300\"><time>2026-10-19T17:15:25.000Z</time></trkpt><trkpt lat=\"40.420596\" lon=\"-3.675275\"><time>2026-10-19T17:15:26.000Z</time></trkpt><trkpt lat=\"40.420616\" lon=\"-3.675248\"><time>2026-10-19T17:15:27.000Z</time></trkpt><trkpt lat=\"40.420630\" lon=\"-3.675220\"><time>2026-10-19T17:15:28.000Z</time></trkpt><trkpt lat=\"40.420644\" lon=\"-3.675199\"><time>2026-10-19T17:15:29.000Z</time></trkpt><trkpt lat=\"40.420653\" lon=\"-3.675171\"><time>2026-10-19T17:15:30.000Z</time></trkpt><trkpt lat=\"40.420669\" lon=\"-3.675145\"><time>2026-10-19T17:15:31.000Z</time></trkpt><trkpt lat=\"40.420680\" lon=\"-3.675119\"><time>2026-10-19T17:15:32.000Z</time></trkpt><trkpt lat=\"40.420695\" lon=\"-3.675089\"><time>2026-10-19T17:15:33.000Z</time></trkpt><trkpt lat=\"40.420718\" lon=\"-3.675065\"><time>2026-10-19T17:15:34.000Z</time></trkpt><trkpt lat=\"40.420734\" lon=\"-3.675038\"><time>2026-10-19T17:15:35.000Z</time></trkpt><trkpt lat=\"40.420747\" lon=\"-3.675011\"><time>2026-10-19T17:15:36.000Z</time></trkpt><trkpt lat=\"40.420761\" lon=\"-3.674980\"><time>2026-10-19T17:15:37.000Z</time></trkpt><trkpt lat=\"40.420777\" lon=\"-3.674952\"><time>2026-10-19T17:15:38.000Z</time></trkpt><trkpt lat=\"40.420792\" lon=\"-3.674924\"><time>2026-10-19T17:15:39.000Z</time></trkpt><trkpt lat=\"40.420814\" lon=\"-3.674896\"><time>2026-10-19T17:15:40.000Z</time></trkpt><trkpt lat=\"40.420826\" lon=\"-3.674869\"><time>2026-10-19T17:15:41.000Z</time></trkpt><trkpt lat=\"40.420842\" lon=\"-3.674846\"><time>2026-10-19T17:15:42.000Z</time></trkpt><trkpt lat=\"40.420860\" lon=\"-3.674822\"><time>2026-10-19T17:15:43.000Z</time></trkpt><trkpt lat=\"40.420875\" lon=\"-3.674791\"><time>2026-10-19T17:15:44.000Z</time></trkpt><trkpt lat=\"40.420892\" lon=\"-3.674761\"><time>2026-10-19T17:15:45.000Z</time></trkpt><trkpt lat=\"40.420910\" lon=\"-3.674729\"><time>2026-10-19T17:15:46.000Z</time></trkpt><trkpt lat=\"40.420930\" lon=\"-3.674701\"><time>2026-10-19T17:15:47.000Z</time></trkpt><trkpt lat=\"40.420941\" lon=\"-3.674674\"><time>2026-10-19T17:15:48.000Z</time></trkpt><trkpt lat=\"40.420955\" lon=\"-3.674643\"><time>2026-10-19T17:15:49.000Z</time></trkpt><trkpt lat=\"40.420969\" lon=\"-3.674622\"><time>2026-10-19T17:15:50.000Z</time></trkpt><trkpt lat=\"40.420985\" lon=\"-3.674593\"><time>2026-10-19T17:15:51.000Z</time></trkpt><trkpt lat=\"40.421002\" lon=\"-3.674562\"><time>2026-10-19T17:15:52.000Z</time></trkpt><trkpt lat=\"40.421018\" lon=\"-3.674533\"><time>2026-10-19T17:15:53.000Z</time></trkpt><trkpt lat=\"40.421030\" lon=\"-3.674508\"><time>2026-10-19T17:15:54.000Z</time></trkpt><trkpt lat=\"40.421051\" lon=\"-3.674483\"><time>2026-10-19T17:15:55.000Z</time></trkpt><trkpt lat=\"40.421068\" lon=\"-3.674453\"><time>2026-10-19T17:15:56.000Z</time></trkpt><trkpt lat=\"40.421079\" lon=\"-3.674425\"><time>2026-10-19T17:15:57.000Z</time></trkpt><trkpt lat=\"40.421093\" lon=\"-3.674393\"><time>2026-10-19T17:15:58.000Z</time></trkpt><trkpt lat=\"40.421108\" lon=\"-3.674368\"><time>2026-10-19T17:15:59.000Z</time></trkpt><trkpt lat=\"40.421124\" lon=\"-3.674344\"><time>2026-10-19T17:16:00.000Z</time></trkpt><trkpt lat=\"40.421137\" lon=\"-3.674311\"><time>2026-10-19T17:16:01.000Z</time></trkpt><trkpt lat=\"40.421157\" lon=\"-3.674283\"><time>2026-10-19T17:16:02.000Z</time></trkpt><trkpt lat=\"40.421169\" lon=\"-3.674257\"><time>2026-10-19T17:16:03.000Z</time></trkpt><trkpt lat=\"40.421187\" lon=\"-3.674229\"><time>2026-10-19T17:16:04.000Z</time></trkpt><trkpt lat=\"40.421212\" lon=\"-3.674197\"><time>2026-10-19T17:16:05.000Z</time></trkpt><trkpt lat=\"40.421227\" lon=\"-3.674164\"><time>2026-10-19T17:16:06.000Z</time></trkpt><trkpt lat=\"40.421247\" lon=\"-3.674134\"><time>2026-10-19T17:16:07.000Z</time></trkpt><trkpt lat=\"40.421261\" lon=\"-3.674105\"><time>2026-10-19T17:16:08.000Z</time></trkpt><trkpt lat=\"40.421282\" lon=\"-3.674081\"><time>2026-10-19T17:16:09.000Z</time></trkpt><trkpt lat=\"40.421292\" lon=\"-3.674053\"><time>2026-10-19T17:16:10.000Z</time></trkpt><trkpt lat=\"40.421309\" lon=\"-3.674024\"><time>2026-10-19T17:16:11.000Z</time></trkpt><trkpt lat=\"40.421325\" lon=\"-3.673995\"><time>2026-10-19T17:16:12.000Z</time></trkpt><trkpt lat=\"40.421340\" lon=\"-3.673964\"><time>2026-10-19T17:16:13.000Z</time></trkpt><trkpt lat=\"40.421357\" lon=\"-3.673933\"><time>2026-10-19T17:16:14.000Z</time></trkpt><trkpt lat=\"40.421372\" lon=\"-3.673893\"><time>2026-10-19T17:16:15.000Z</time></trkpt><trkpt lat=\"40.421386\" lon=\"-3.673867\"><time>2026-10-19T17:16:16.000Z</time></trkpt><trkpt lat=\"40.421399\" lon=\"-3.673835\"><time>2026-10-19T17:16:17.000Z</time></trkpt><trkpt lat=\"40.421413\" lon=\"-3.673803\"><time>2026-10-19T17:16:18.000Z</time></trkpt><trkpt lat=\"40.421431\" lon=\"-3.673782\"><time>2026-10-19T17:16:19.000Z</time></trkpt><trkpt lat=\"40.421447\" lon=\"-3.673751\"><time>2026-10-19T17:16:20.000Z</time></trkpt><trkpt lat=\"40.421468\" lon=\"-3.673717\"><time>2026-10-19T17:16:21.000Z</time></trkpt><trkpt lat=\"40.421483\" lon=\"-3.673688\"><time>2026-10-19T17:16:22.000Z</time></trkpt><trkpt lat=\"40.421501\" lon=\"-3.673660\"><time>2026-10-19T17:16:23.000Z</time></trkpt><trkpt lat=\"40.421517\" lon=\"-3.673635\"><time>2026-10-19T17:16:24.000Z</time></trkpt><trkpt lat=\"40.421536\" lon=\"-3.673601\"><time>2026-10-19T17:16:25.000Z</time></trkpt><trkpt lat=\"40.421545\" lon=\"-3.673567\"><time>2026-10-19T17:16:26.000Z</time></trkpt><trkpt lat=\"40.421557\" lon=\"-3.673541\"><time>2026-10-19T17:16:27.000Z</time></trkpt><trkpt lat=\"40.421577\" lon=\"-3.673521\"><time>2026-10-19T17:16:28.000Z</time></trkpt><trkpt lat=\"40.421591\" lon=\"-3.673495\"><time>2026-10-19T17:16:29.000Z</time></trkpt><trkpt lat=\"40.421612\" lon=\"-3.673461\"><time>2026-10-19T17:16:30.000Z</time></trkpt><trkpt lat=\"40.421629\" lon=\"-3.673435\"><time>2026-10-19T17:16:31.000Z</time></trkpt><trkpt lat=\"40.421645\" lon=\"-3.673401\"><time>2026-10-19T17:16:32.000Z</time></trkpt><trkpt lat=\"40.421662\" lon=\"-3.673370\"><time>2026-10-19T17:16:33.000Z</time></trkpt><trkpt lat=\"40.421680\" lon=\"-3.673337\"><time>2026-10-19T17:16:34.000Z</time></trkpt><trkpt lat=\"40.421701\" lon=\"-3.673308\"><time>2026-10-19T17:16:35.000Z</time></trkpt><trkpt lat=\"40.421718\" lon=\"-3.673283\"><time>2026-10-19T17:16:36.000Z</time></trkpt><trkpt lat=\"40.421733\" lon=\"-3.673249\"><time>2026-10-19T17:16:37.000Z</time></trkpt><trkpt lat=\"40.421748\" lon=\"-3.673221\"><time>2026-10-19T17:16:38.000Z</time></trkpt><trkpt lat=\"40.421769\" lon=\"-3.673198\"><time>2026-10-19T17:16:39.000Z</time></trkpt><trkpt lat=\"40.421783\" lon=\"-3.673172\"><time>2026-10-19T17:16:40.000Z</time></trkpt><trkpt lat=\"40.421851\" lon=\"-3.673040\"><time>2026-10-19T17:16:50.371Z</time></trkpt><trkpt lat=\"40.421867\" lon=\"-3.673007\"><time>2026-10-19T17:16:51.371Z</time></trkpt><trkpt lat=\"40.421879\" lon=\"-3.672973\"><time>2026-10-19T17:16:52.371Z</time></trkpt><trkpt lat=\"40.421895\" lon=\"-3.672943\"><time>2026-10-19T17:16:53.371Z</time></trkpt><trkpt lat=\"40.421907\" lon=\"-3.672915\"><time>2026-10-19T17:16:54.371Z</time></trkpt><trkpt lat=\"40.421925\" lon=\"-3.672886\"><time>2026-10-19T17:16:55.371Z</time></trkpt><trkpt lat=\"40.421936\" lon=\"-3.672856\"><time>2026-10-19T17:16:56.371Z</time></trkpt><trkpt lat=\"40.421955\" lon=\"-3.672824\"><time>2026-10-19T17:16:57.371Z</time></trkpt><trkpt lat=\"40.421964\" lon=\"-3.672788\"><time>2026-10-19T17:16:58.371Z</time></trkpt><trkpt lat=\"40.421981\" lon=\"-3.672754\"><time>2026-10-19T17:16:59.371Z</time></trkpt><trkpt lat=\"40.421996\" lon=\"-3.672723\"><time>2026-10-19T17:17:00.371Z</time></trkpt><trkpt lat=\"40.422014\" lon=\"-3.672697\"><time>2026-10-19T17:17:01.371Z</time></trkpt><trkpt lat=\"40.422030\" lon=\"-3.672673\"><time>2026-10-19T17:17:02.371Z</time></trkpt><trkpt lat=\"40.422040\" lon=\"-3.672645\"><time>2026-10-19T17:17:03.371Z</time></trkpt><trkpt lat=\"40.422062\" lon=\"-3.672616\"><time>2026-10-19T17:17:04.371Z</time></trkpt><trkpt lat=\"40.422074\" lon=\"-3.672586\"><time>2026-10-19T17:17:05.371Z</time></trkpt><trkpt lat=\"40.422083\" lon=\"-3.672563\"><time>2026-10-19T17:17:06.371Z</time></trkpt><trkpt lat=\"40.422102\" lon=\"-3.672533\"><time>2026-10-19T17:17:07.371Z</time></trkpt><trkpt lat=\"40.422117\" lon=\"-3.672505\"><time>2026-10-19T17:17:08.371Z</time></trkpt><trkpt lat=\"40.422135\" lon=\"-3.672477\"><time>2026-10-19T17:17:09.371Z</time></trkpt><trkpt lat=\"40.422153\" lon=\"-3.672449\"><time>2026-10-19T17:17:10.371Z</time></trkpt><trkpt lat=\"40.422167\" lon=\"-3.672420\"><time>2026-10-19T17:17:11.371Z</time></trkpt><trkpt lat=\"40.422182\" lon=\"-3.672387\"><time>2026-10-19T17:17:12.371Z</time></trkpt><trkpt lat=\"40.422195\" lon=\"-3.672356\"><time>2026-10-19T17:17:13.371Z</time></trkpt><trkpt lat=\"40.422211\" lon=\"-3.672335\"><time>2026-10-19T17:17:14.371Z</time></trkpt><trkpt lat=\"40.422229\" lon=\"-3.672311\"><time>2026-10-19T17:17:15.371Z</time></trkpt><trkpt lat=\"40.422252\" lon=\"-3.672278\"><time>2026-10-19T17:17:16.371Z</time></trkpt><trkpt lat=\"40.422271\" lon=\"-3.672248\"><time>2026-10-19T17:17:17.371Z</time></trkpt><trkpt lat=\"40.422288\" lon=\"-3.672224\"><time>2026-10-19T17:17:18.371Z</time></trkpt><trkpt lat=\"40.422302\" lon=\"-3.672193\"><time>2026-10-19T17:17:19.371Z</time></trkpt><trkpt lat=\"40.422320\" lon=\"-3.672161\"><time>2026-10-19T17:17:20.371Z</time></trkpt><trkpt lat=\"40.422332\" lon=\"-3.672130\"><time>2026-10-19T17:17:21.371Z</time></trkpt><trkpt lat=\"40.422347\" lon=\"-3.672102\"><time>2026-10-19T17:17:22.371Z</time></trkpt><trkpt lat=\"40.422365\" lon=\"-3.672074\"><time>2026-10-19T17:17:23.371Z</time></trkpt><trkpt lat=\"40.422382\" lon=\"-3.672042\"><time>2026-10-19T17:17:24.371Z</time></trkpt><trkpt lat=\"40.422398\" lon=\"-3.672013\"><time>2026-10-19T17:17:25.371Z</time></trkpt><trkpt lat=\"40.422413\" lon=\"-3.671989\"><time>2026-10-19T17:17:26.371Z</time></trkpt><trkpt lat=\"40.422429\" lon=\"-3.671957\"><time>2026-10-19T17:17:27.371Z</time></trkpt><trkpt lat=\"40.422449\" lon=\"-3.671930\"><time>2026-10-19T17:17:28.371Z</time></trkpt><trkpt lat=\"40.422465\" lon=\"-3.671907\"><time>2026-10-19T17:17:29.371Z</time></trkpt><trkpt lat=\"40.422476\" lon=\"-3.671882\"><time>2026-10-19T17:17:30.371Z</time></trkpt><trkpt lat=\"40.422490\" lon=\"-3.671858\"><time>2026-10-19T17:17:31.371Z</time></trkpt><trkpt lat=\"40.422505\" lon=\"-3.671829\"><time>2026-10-19T17:17:32.371Z</time></trkpt><trkpt lat=\"40.422520\" lon=\"-3.671800\"><time>2026-10-19T17:17:33.371Z</time></trkpt><trkpt lat=\"40.422535\" lon=\"-3.671770\"><time>2026-10-19T17:17:34.371Z</time></trkpt><trkpt lat=\"40.422555\" lon=\"-3.671743\"><time>2026-10-19T17:17:35.371Z</time></trkpt><trkpt lat=\"40.422571\" lon=\"-3.671712\"><time>2026-10-19T17:17:36.371Z</time></trkpt><trkpt lat=\"40.422591\" lon=\"-3.671687\"><time>2026-10-19T17:17:37.371Z</time></trkpt><trkpt lat=\"40.422598\" lon=\"-3.671658\"><time>2026-10-19T17:17:38.371Z</time></trkpt><trkpt lat=\"40.422616\" lon=\"-3.671633\"><time>2026-10-19T17:17:39.371Z</time></trkpt><trkpt lat=\"40.422630\" lon=\"-3.671605\"><time>2026-10-19T17:17:40.371Z</time></trkpt><trkpt lat=\"40.422644\" lon=\"-3.671576\"><time>2026-10-19T17:17:41.371Z</time></trkpt><trkpt lat=\"40.422665\" lon=\"-3.671548\"><time>2026-10-19T17:17:42.371Z</time></trkpt><trkpt lat=\"40.422687\" lon=\"-3.671527\"><time>2026-10-19T17:17:43.371Z</time></trkpt><trkpt lat=\"40.422700\" lon=\"-3.671499\"><time>2026-10-19T17:17:44.371Z</time></trkpt><trkpt lat=\"40.422713\" lon=\"-3.671470\"><time>2026-10-19T17:17:45.371Z</time></trkpt><trkpt lat=\"40.422727\" lon=\"-3.671444\"><time>2026-10-19T17:17:46.371Z</time></trkpt><trkpt lat=\"40.422742\" lon=\"-3.671415\"><time>2026-10-19T17:17:47.371Z</time></trkpt><trkpt lat=\"40.422754\" lon=\"-3.671389\"><time>2026-10-19T17:17:48.371Z</time></trkpt><trkpt lat=\"40.422774\" lon=\"-3.671364\"><time>2026-10-19T17:17:49.371Z</time></trkpt><trkpt lat=\"40.422788\" lon=\"-3.671331\"><time>2026-10-19T17:17:50.371Z</time></trkpt><trkpt lat=\"40.422804\" lon=\"-3.671300\"><time>2026-10-19T17:17:51.371Z</time></trkpt><trkpt lat=\"40.422826\" lon=\"-3.671266\"><time>2026-10-19T17:17:52.371Z</time></trkpt><trkpt lat=\"40.422840\" lon=\"-3.671239\"><time>2026-10-19T17:17:53.371Z</time></trkpt><trkpt lat=\"40.422858\" lon=\"-3.671212\"><time>2026-10-19T17:17:54.371Z</time></trkpt><trkpt lat=\"40.422875\" lon=\"-3.671180\"><time>2026-10-19T17:17:55.371Z</time></trkpt><trkpt lat=\"40.422890\" lon=\"-3.671155\"><time>2026-10-19T17:17:56.371Z</time></trkpt><trkpt lat=\"40.422908\" lon=\"-3.671125\"><time>2026-10-19T17:17:57.371Z</time></trkpt><trkpt lat=\"40.422922\" lon=\"-3.671098\"><time>2026-10-19T17:17:58.371Z</time></trkpt><trkpt lat=\"40.422934\" lon=\"-3.671066\"><time>2026-10-19T17:17:59.371Z</time></trkpt><trkpt lat=\"40.422952\" lon=\"-3.671037\"><time>2026-10-19T17:18:00.371Z</time></trkpt><trkpt lat=\"40.422970\" lon=\"-3.671010\"><time>2026-10-19T17:18:01.371Z</time></trkpt><trkpt lat=\"40.422989\" lon=\"-3.670981\"><time>2026-10-19T17:18:02.371Z</time></trkpt><trkpt lat=\"40.423006\" lon=\"-3.670958\"><time>2026-10-19T17:18:03.371Z</time></trkpt><trkpt lat=\"40.423026\" lon=\"-3.670931\"><time>2026-10-19T17:18:04.371Z</time></trkpt><trkpt lat=\"40.423045\" lon=\"-3.670901\"><time>2026-10-19T17:18:05.371Z</time></trkpt><trkpt lat=\"40.423057\" lon=\"-3.670875\"><time>2026-10-19T17:18:06.371Z</time></trkpt><trkpt lat=\"40.423076\" lon=\"-3.670838\"><time>2026-10-19T17:18:07.371Z</time></trkpt><trkpt lat=\"40.423097\" lon=\"-3.670811\"><time>2026-10-19T17:18:08.371Z</time></trkpt><trkpt lat=\"40.423117\" lon=\"-3.670778\"><time>2026-10-19T17:18:09.371Z</time></trkpt><trkpt lat=\"40.423134\" lon=\"-3.670751\"><time>2026-10-19T17:18:10.371Z</time></trkpt><trkpt lat=\"40.423153\" lon=\"-3.670724\"><time>2026-10-19T17:18:11.371Z</time></trkpt><trkpt lat=\"40.423166\" lon=\"-3.670698\"><time>2026-10-19T17:18:12.371Z</time></trkpt><trkpt lat=\"40.423181\" lon=\"-3.670668\"><time>2026-10-19T17:18:13.371Z</time></trkpt><trkpt lat=\"40.423196\" lon=\"-3.670640\"><time>2026-10-19T17:18:14.371Z</time></trkpt><trkpt lat=\"40.423216\" lon=\"-3.670616\"><time>2026-10-19T17:18:15.371Z</time></trkpt><trkpt lat=\"40.423233\" lon=\"-3.670597\"><time>2026-10-19T17:18:16.371Z</time></trkpt><trkpt lat=\"40.423254\" lon=\"-3.670570\"><time>2026-10-19T17:18:17.371Z</time></trkpt><trkpt lat=\"40.423272\" lon=\"-3.670548\"><time>2026-10-19T17:18:18.371Z</time></trkpt><trkpt lat=\"40.423290\" lon=\"-3.670516\"><time>2026-10-19T17:18:19.371Z</time></trkpt><trkpt lat=\"40.423307\" lon=\"-3.670479\"><time>2026-10-19T17:18:20.371Z</time></trkpt><trkpt lat=\"40.423317\" lon=\"-3.670452\"><time>2026-10-19T17:18:21.371Z</time></trkpt><trkpt lat=\"40.423333\" lon=\"-3.670422\"><time>2026-10-19T17:18:22.371Z</time></trkpt><trkpt lat=\"40.423351\" lon=\"-3.670392\"><time>2026-10-19T17:18:23.371Z</time></trkpt><trkpt lat=\"40.423372\" lon=\"-3.670370\"><time>2026-10-19T17:18:24.371Z</time></trkpt><trkpt lat=\"40.423391\" lon=\"-3.670349\"><time>2026-10-19T17:18:25.371Z</time></trkpt><trkpt lat=\"40.423403\" lon=\"-3.670324\"><time>2026-10-19T17:18:26.371Z</time></trkpt><trkpt lat=\"40.423424\" lon=\"-3.670291\"><time>2026-10-19T17:18:27.371Z</time></trkpt><trkpt lat=\"40.423441\" lon=\"-3.670264\"><time>2026-10-19T17:18:28.371Z</time></trkpt><trkpt lat=\"40.423452\" lon=\"-3.670234\"><time>2026-10-19T17:18:29.371Z</time></trkpt><trkpt lat=\"40.423471\" lon=\"-3.670209\"><time>2026-10-19T17:18:30.371Z</time></trkpt><trkpt lat=\"40.423486\" lon=\"-3.670185\"><time>2026-10-19T17:18:31.371Z</time></trkpt><trkpt lat=\"40.423503\" lon=\"-3.670154\"><time>2026-10-19T17:18:32.371Z</time></trkpt><trkpt lat=\"40.423521\" lon=\"-3.670127\"><time>2026-10-19T17:18:33.371Z</time></trkpt><trkpt lat=\"40.423530\" lon=\"-3.670101\"><time>2026-10-19T17:18:34.371Z</time></trkpt><trkpt lat=\"40.423548\" lon=\"-3.670077\"><time>2026-10-19T17:18:35.371Z</time></trkpt><trkpt lat=\"40.423564\" lon=\"-3.670048\"><time>2026-10-19T17:18:36.371Z</time></trkpt><trkpt lat=\"40.423579\" lon=\"-3.670018\"><time>2026-10-19T17:18:37.371Z</time></trkpt><trkpt lat=\"40.423596\" lon=\"-3.669986\"><time>2026-10-19T17:18:38.371Z</time></trkpt><trkpt lat=\"40.423613\" lon=\"-3.669963\"><time>2026-10-19T17:18:39.371Z</time></trkpt><trkpt lat=\"40.423626\" lon=\"-3.669935\"><time>2026-10-19T17:18:40.371Z</time></trkpt><trkpt lat=\"40.423641\" lon=\"-3.669907\"><time>2026-10-19T17:18:41.371Z</time></trkpt><trkpt lat=\"40.423669\" lon=\"-3.669875\"><time>2026-10-19T17:18:42.371Z</time></trkpt><trkpt lat=\"40.423686\" lon=\"-3.669844\"><time>2026-10-19T17:18:43.371Z</time></trkpt><trkpt lat=\"40.423705\" lon=\"-3.669816\"><time>2026-10-19T17:18:44.371Z</time></trkpt><trkpt lat=\"40.423725\" lon=\"-3.669786\"><time>2026-10-19T17:18:45.371Z</time></trkpt><trkpt lat=\"40.423738\" lon=\"-3.669757\"><time>2026-10-19T17:18:46.371Z</time></trkpt><trkpt lat=\"40.423755\" lon=\"-3.669720\"><time>2026-10-19T17:18:47.371Z</time></trkpt><trkpt lat=\"40.423773\" lon=\"-3.669687\"><time>2026-10-19T17:18:48.371Z</time></trkpt><trkpt lat=\"40.423791\" lon=\"-3.669662\"><time>2026-10-19T17:18:49.371Z</time></trkpt><trkpt lat=\"40.423805\" lon=\"-3.669632\"><time>2026-10-19T17:18:50.371Z</time></trkpt><trkpt lat=\"40.423822\" lon=\"-3.669597\"><time>2026-10-19T17:18:51.371Z</time></trkpt><trkpt lat=\"40.423842\" lon=\"-3.669574\"><time>2026-10-19T17:18:52.371Z</time></trkpt><trkpt lat=\"40.423857\" lon=\"-3.669547\"><time>2026-10-19T17:18:53.371Z</time></trkpt><trkpt lat=\"40.423873\" lon=\"-3.669510\"><time>2026-10-19T17:18:54.371Z</time></trkpt><trkpt lat=\"40.423890\" lon=\"-3.669478\"><time>2026-10-19T17:18:55.371Z</time></trkpt><trkpt lat=\"40.423910\" lon=\"-3.669439\"><time>2026-10-19T17:18:56.371Z</time></trkpt><trkpt lat=\"40.423921\" lon=\"-3.669413\"><time>2026-10-19T17:18:57.371Z</time></trkpt><trkpt lat=\"40.423929\" lon=\"-3.669386\"><time>2026-10-19T17:18:58.371Z</time></trkpt><trkpt lat=\"40.423949\" lon=\"-3.669363\"><time>2026-10-19T17:18:59.371Z</time></trkpt><trkpt lat=\"40.423967\" lon=\"-3.669330\"><time>2026-10-19T17:19:00.371Z</time></trkpt><trkpt lat=\"40.423984\" lon=\"-3.669306\"><time>2026-10-19T17:19:01.371Z</time></trkpt><trkpt lat=\"40.423995\" lon=\"-3.669282\"><time>2026-10-19T17:19:02.371Z</time></trkpt><trkpt lat=\"40.424011\" lon=\"-3.669252\"><time>2026-10-19T17:19:03.371Z</time></trkpt><trkpt lat=\"40.424032\" lon=\"-3.669230\"><time>2026-10-19T17:19:04.371Z</time></trkpt><trkpt lat=\"40.424048\" lon=\"-3.669203\"><time>2026-10-19T17:19:05.371Z</time></trkpt><trkpt lat=\"40.424063\" lon=\"-3.669171\"><time>2026-10-19T17:19:06.371Z</time></trkpt><trkpt lat=\"40.424080\" lon=\"-3.669135\"><time>2026-10-19T17:19:07.371Z</time></trkpt><trkpt lat=\"40.424099\" lon=\"-3.669104\"><time>2026-10-19T17:19:08.371Z</time></trkpt><trkpt lat=\"40.424119\" lon=\"-3.669064\"><time>2026-10-19T17:19:09.371Z</time></trkpt><trkpt lat=\"40.424130\" lon=\"-3.669039\"><time>2026-10-19T17:19:10.371Z</time></trkpt><trkpt lat=\"40.424143\" lon=\"-3.669007\"><time>2026-10-19T17:19:11.371Z</time></trkpt><trkpt lat=\"40.424160\" lon=\"-3.668984\"><time>2026-10-19T17:19:12.371Z</time></trkpt><trkpt lat=\"40.424177\" lon=\"-3.668962\"><time>2026-10-19T17:19:13.371Z</time></trkpt><trkpt lat=\"40.424191\" lon=\"-3.668935\"><time>2026-10-19T17:19:14.371Z</time></trkpt><trkpt lat=\"40.424203\" lon=\"-3.668906\"><time>2026-10-19T17:19:15.371Z</time></trkpt><trkpt lat=\"40.424212\" lon=\"-3.668877\"><time>2026-10-19T17:19:16.371Z</time></trkpt><trkpt lat=\"40.424227\" lon=\"-3.668849\"><time>2026-10-19T17:19:17.371Z</time></trkpt><trkpt lat=\"40.424247\" lon=\"-3.668823\"><time>2026-10-19T17:19:18.371Z</time></trkpt><trkpt lat=\"40.424262\" lon=\"-3.668795\"><time>2026-10-19T17:19:19.371Z</time></trkpt><trkpt lat=\"40.424279\" lon=\"-3.668770\"><time>2026-10-19T17:19:20.371Z</time></trkpt><trkpt lat=\"40.424296\" lon=\"-3.668744\"><time>2026-10-19T17:19:21.371Z</time></trkpt><trkpt lat=\"40.424317\" lon=\"-3.668714\"><time>2026-10-19T17:19:22.371Z</time></trkpt><trkpt lat=\"40.424340\" lon=\"-3.668687\"><time>2026-10-19T17:19:23.371Z</time></trkpt><trkpt lat=\"40.424349\" lon=\"-3.668655\"><time>2026-10-19T17:19:24.371Z</time></trkpt><trkpt lat=\"40.424361\" lon=\"-3.668619\"><time>2026-10-19T17:19:25.371Z</time></trkpt><trkpt lat=\"40.424382\" lon=\"-3.668601\"><time>2026-10-19T17:19:26.371Z</time></trkpt><trkpt lat=\"40.424403\" lon=\"-3.668579\"><time>2026-10-19T17:19:27.371Z</time></trkpt><trkpt lat=\"40.424418\" lon=\"-3.668553\"><time>2026-10-19T17:19:28.371Z</time></trkpt><trkpt lat=\"40.424431\" lon=\"-3.668527\"><time>2026-10-19T17:19:29.371Z</time></trkpt><trkpt lat=\"40.424449\" lon=\"-3.668499\"><time>2026-10-19T17:19:30.371Z</time></trkpt><trkpt lat=\"40.424463\" lon=\"-3.668467\"><time>2026-10-19T17:19:31.371Z</time></trkpt><trkpt lat=\"40.424481\" lon=\"-3.668442\"><time>2026-10-19T17:19:32.371Z</time></trkpt><trkpt lat=\"40.424502\" lon=\"-3.668412\"><time>2026-10-19T17:19:33.371Z</time></trkpt><trkpt lat=\"40.424518\" lon=\"-3.668383\"><time>2026-10-19T17:19:34.371Z</time></trkpt><trkpt lat=\"40.424535\" lon=\"-3.668345\"><time>2026-10-19T17:19:35.371Z</time></trkpt><trkpt lat=\"40.424552\" lon=\"-3.668307\"><time>2026-10-19T17:19:36.371Z</time></trkpt><trkpt lat=\"40.424569\" lon=\"-3.668274\"><time>2026-10-19T17:19:37.371Z</time></trkpt><trkpt lat=\"40.424580\" lon=\"-3.668250\"><time>2026-10-19T17:19:38.371Z</time></trkpt><trkpt lat=\"40.424597\" lon=\"-3.668213\"><time>2026-10-19T17:19:39.371Z</time></trkpt><trkpt lat=\"40.424603\" lon=\"-3.668182\"><time>2026-10-19T17:19:40.371Z</time></trkpt><trkpt lat=\"40.424615\" lon=\"-3.668153\"><time>2026-10-19T17:19:41.371Z</time></trkpt><trkpt lat=\"40.424629\" lon=\"-3.668132\"><time>2026-10-19T17:19:42.371Z</time></trkpt><trkpt lat=\"40.424643\" lon=\"-3.668109\"><time>2026-10-19T17:19:43.371Z</time></trkpt><trkpt lat=\"40.424661\" lon=\"-3.668088\"><time>2026-10-19T17:19:44.371Z</time></trkpt><trkpt lat=\"40.424681\" lon=\"-3.668067\"><time>2026-10-19T17:19:45.371Z</time></trkpt><trkpt lat=\"40.424709\" lon=\"-3.668041\"><time>2026-10-19T17:19:46.371Z</time></trkpt><trkpt lat=\"40.424729\" lon=\"-3.668013\"><time>2026-10-19T17:19:47.371Z</time></trkpt><trkpt lat=\"40.424749\" lon=\"-3.667983\"><time>2026-10-19T17:19:48.371Z</time></trkpt><trkpt lat=\"40.424763\" lon=\"-3.667950\"><time>2026-10-19T17:19:49.371Z</time></trkpt><trkpt lat=\"40.424778\" lon=\"-3.667924\"><time>2026-10-19T17:19:50.371Z</time></trkpt><trkpt lat=\"40.424795\" lon=\"-3.667901\"><time>2026-10-19T17:19:51.371Z</time></trkpt><trkpt lat=\"40.424820\" lon=\"-3.667852\"><time>2026-10-19T17:19:53.371Z</time></trkpt><trkpt lat=\"40.424832\" lon=\"-3.667829\"><time>2026-10-19T17:19:54.371Z</time></trkpt><trkpt lat=\"40.424851\" lon=\"-3.667802\"><time>2026-10-19T17:19:55.371Z</time></trkpt><trkpt lat=\"40.424873\" lon=\"-3.667775\"><time>2026-10-19T17:19:56.371Z</time></trkpt><trkpt lat=\"40.424891\" lon=\"-3.667749\"><time>2026-10-19T17:19:57.371Z</time></trkpt><trkpt lat=\"40.424906\" lon=\"-3.667721\"><time>2026-10-19T17:19:58.371Z</time></trkpt><trkpt lat=\"40.424919\" lon=\"-3.667688\"><time>2026-10-19T17:19:59.371Z</time></trkpt><trkpt lat=\"40.424935\" lon=\"-3.667662\"><time>2026-10-19T17:20:00.371Z</time></trkpt><trkpt lat=\"40.424954\" lon=\"-3.667630\"><time>2026-10-19T17:20:01.371Z</time></trkpt><trkpt lat=\"40.424970\" lon=\"-3.667601\"><time>2026-10-19T17:20:02.371Z</time></trkpt><trkpt lat=\"40.424988\" lon=\"-3.667565\"><time>2026-10-19T17:20:03.371Z</time></trkpt><trkpt lat=\"40.425004\" lon=\"-3.667543\"><time>2026-10-19T17:20:04.371Z</time></trkpt><trkpt lat=\"40.425014\" lon=\"-3.667517\"><time>2026-10-19T17:20:05.371Z</time></trkpt><trkpt lat=\"40.425027\" lon=\"-3.667485\"><time>2026-10-19T17:20:06.371Z</time></trkpt><trkpt lat=\"40.425044\" lon=\"-3.667455\"><time>2026-10-19T17:20:07.371Z</time></trkpt><trkpt lat=\"40.425062\" lon=\"-3.667425\"><time>2026-10-19T17:20:08.371Z</time></trkpt><trkpt lat=\"40.425078\" lon=\"-3.667405\"><time>2026-10-19T17:20:09.371Z</time></trkpt><trkpt lat=\"40.425091\" lon=\"-3.667379\"><time>2026-10-19T17:20:10.371Z</time></trkpt><trkpt lat=\"40.425107\" lon=\"-3.667351\"><time>2026-10-19T17:20:11.371Z</time></trkpt><trkpt lat=\"40.425123\" lon=\"-3.667330\"><time>2026-10-19T17:20:12.371Z</time></trkpt><trkpt lat=\"40.425146\" lon=\"-3.667300\"><time>2026-10-19T17:20:13.371Z</time></trkpt><trkpt lat=\"40.425161\" lon=\"-3.667273\"><time>2026-10-19T17:20:14.371Z</time></trkpt><trkpt lat=\"40.425175\" lon=\"-3.667241\"><time>2026-10-19T17:20:15.371Z</time></trkpt><trkpt lat=\"40.425195\" lon=\"-3.667217\"><time>2026-10-19T17:20:16.371Z</time></trkpt><trkpt lat=\"40.425204\" lon=\"-3.667191\"><time>2026-10-19T17:20:17.371Z</time></trkpt><trkpt lat=\"40.425220\" lon=\"-3.667154\"><time>2026-10-19T17:20:18.371Z</time></trkpt><trkpt lat=\"40.425239\" lon=\"-3.667125\"><time>2026-10-19T17:20:19.371Z</time></trkpt><trkpt lat=\"40.425258\" lon=\"-3.667097\"><time>2026-10-19T17:20:20.371Z</time></trkpt><trkpt lat=\"40.425271\" lon=\"-3.667066\"><time>2026-10-19T17:20:21.371Z</time></trkpt><trkpt lat=\"40.425286\" lon=\"-3.667034\"><time>2026-10-19T17:20:22.371Z</time></trkpt><trkpt lat=\"40.425302\" lon=\"-3.667009\"><time>2026-10-19T17:20:23.371Z</time></trkpt><trkpt lat=\"40.425319\" lon=\"-3.666979\"><time>2026-10-19T17:20:24.371Z</time></trkpt><trkpt lat=\"40.425334\" lon=\"-3.666950\"><time>2026-10-19T17:20:25.371Z</time></trkpt><trkpt lat=\"40.425354\" lon=\"-3.666929\"><time>2026-10-19T17:20:26.371Z</time></trkpt><trkpt lat=\"40.425370\" lon=\"-3.666892\"><time>2026-10-19T17:20:27.371Z</time></trkpt><trkpt lat=\"40.425384\" lon=\"-3.666861\"><time>2026-10-19T17:20:28.371Z</time></trkpt><trkpt lat=\"40.425400\" lon=\"-3.666833\"><time>2026-10-19T17:20:29.371Z</time></trkpt><trkpt lat=\"40.425416\" lon=\"-3.666798\"><time>2026-10-19T17:20:30.371Z</time></trkpt><trkpt lat=\"40.425429\" lon=\"-3.666769\"><time>2026-10-19T17:20:31.371Z</time></trkpt><trkpt lat=\"40.425446\" lon=\"-3.666745\"><time>2026-10-19T17:20:32.371Z</time></trkpt><trkpt lat=\"40.425455\" lon=\"-3.666720\"><time>2026-10-19T17:20:33.371Z</time></trkpt><trkpt lat=\"40.425473\" lon=\"-3.666690\"><time>2026-10-19T17:20:34.371Z</time></trkpt><trkpt lat=\"40.425488\" lon=\"-3.666662\"><time>2026-10-19T17:20:35.371Z</time></trkpt><trkpt lat=\"40.425505\" lon=\"-3.666630\"><time>2026-10-19T17:20:36.371Z</time></trkpt><trkpt lat=\"40.425529\" lon=\"-3.666604\"><time>2026-10-19T17:20:37.371Z</time></trkpt><trkpt lat=\"40.425545\" lon=\"-3.666577\"><time>2026-10-19T17:20:38.371Z</time></trkpt><trkpt lat=\"40.425559\" lon=\"-3.666550\"><time>2026-10-19T17:20:39.371Z</time></trkpt><trkpt lat=\"40.425575\" lon=\"-3.666517\"><time>2026-10-19T17:20:40.371Z</time></trkpt><trkpt lat=\"40.425592\" lon=\"-3.666490\"><time>2026-10-19T17:20:41.371Z</time></trkpt><trkpt lat=\"40.425608\" lon=\"-3.666463\"><time>2026-10-19T17:20:42.371Z</time></trkpt><trkpt lat=\"40.425627\" lon=\"-3.666427\"><time>2026-10-19T17:20:43.371Z</time></trkpt><trkpt lat=\"40.425642\" lon=\"-3.666394\"><time>2026-10-19T17:20:44.371Z</time></trkpt><trkpt lat=\"40.425660\" lon=\"-3.666366\"><time>2026-10-19T17:20:45.371Z</time></trkpt><trkpt lat=\"40.425675\" lon=\"-3.666339\"><time>2026-10-19T17:20:46.371Z</time></trkpt><trkpt lat=\"40.425692\" lon=\"-3.666315\"><time>2026-10-19T17:20:47.371Z</time></trkpt><trkpt lat=\"40.425713\" lon=\"-3.666281\"><time>2026-10-19T17:20:48.371Z</time></trkpt><trkpt lat=\"40.425732\" lon=\"-3.666254\"><time>2026-10-19T17:20:49.371Z</time></trkpt><trkpt lat=\"40.425750\" lon=\"-3.666232\"><time>2026-10-19T17:20:50.371Z</time></trkpt><trkpt lat=\"40.425773\" lon=\"-3.666200\"><time>2026-10-19T17:20:51.371Z</time></trkpt><trkpt lat=\"40.425791\" lon=\"-3.666176\"><time>2026-10-19T17:20:52.371Z</time></trkpt><trkpt lat=\"40.425806\" lon=\"-3.666155\"><time>2026-10-19T17:20:53.371Z</time></trkpt><trkpt lat=\"40.425822\" lon=\"-3.666130\"><time>2026-10-19T17:20:54.371Z</time></trkpt><trkpt lat=\"40.425847\" lon=\"-3.666083\"><time>2026-10-19T17:20:56.371Z</time></trkpt><trkpt lat=\"40.425864\" lon=\"-3.666059\"><time>2026-10-19T17:20:57.371Z</time></trkpt><trkpt lat=\"40.425873\" lon=\"-3.666028\"><time>2026-10-19T17:20:58.371Z</time></trkpt><trkpt lat=\"40.425885\" lon=\"-3.665996\"><time>2026-10-19T17:20:59.371Z</time></trkpt><trkpt lat=\"40.425907\" lon=\"-3.665968\"><time>2026-10-19T17:21:00.371Z</time></trkpt><trkpt lat=\"40.425922\" lon=\"-3.665941\"><time>2026-10-19T17:21:01.371Z</time></trkpt><trkpt lat=\"40.425934\" lon=\"-3.665912\"><time>2026-10-19T17:21:02.371Z</time></trkpt><trkpt lat=\"40.425951\" lon=\"-3.665885\"><time>2026-10-19T17:21:03.371Z</time></trkpt><trkpt lat=\"40.425971\" lon=\"-3.665856\"><time>2026-10-19T17:21:04.371Z</time></trkpt><trkpt lat=\"40.425988\" lon=\"-3.665827\"><time>2026-10-19T17:21:05.371Z</time></trkpt><trkpt lat=\"40.426000\" lon=\"-3.665801\"><time>2026-10-19T17:21:06.371Z</time></trkpt><trkpt lat=\"40.426020\" lon=\"-3.665771\"><time>2026-10-19T17:21:07.371Z</time></trkpt><trkpt lat=\"40.426027\" lon=\"-3.665741\"><time>2026-10-19T17:21:08.371Z</time></trkpt><trkpt lat=\"40.426042\" lon=\"-3.665712\"><time>2026-10-19T17:21:09.371Z</time></trkpt><trkpt lat=\"40.426057\" lon=\"-3.665685\"><time>2026-10-19T17:21:10.371Z</time></trkpt><trkpt lat=\"40.426076\" lon=\"-3.665666\"><time>2026-10-19T17:21:11.371Z</time></trkpt><trkpt lat=\"40.426095\" lon=\"-3.665634\"><time>2026-10-19T17:21:12.371Z</time></trkpt><trkpt lat=\"40.426114\" lon=\"-3.665607\"><time>2026-10-19T17:21:13.371Z</time></trkpt><trkpt lat=\"40.426137\" lon=\"-3.665578\"><time>2026-10-19T17:21:14.371Z</time></trkpt><trkpt lat=\"40.426156\" lon=\"-3.665554\"><time>2026-10-19T17:21:15.371Z</time></trkpt><trkpt lat=\"40.426170\" lon=\"-3.665520\"><time>2026-10-19T17:21:16.371Z</time></trkpt><trkpt lat=\"40.426188\" lon=\"-3.665487\"><time>2026-10-19T17:21:17.371Z</time></trkpt><trkpt lat=\"40.426200\" lon=\"-3.665456\"><time>2026-10-19T17:21:18.371Z</time></trkpt><trkpt lat=\"40.426210\" lon=\"-3.665422\"><time>2026-10-19T17:21:19.371Z</time></trkpt><trkpt lat=\"40.426225\" lon=\"-3.665397\"><time>2026-10-19T17:21:20.371Z</time></trkpt><trkpt lat=\"40.426239\" lon=\"-3.665365\"><time>2026-10-19T17:21:21.371Z</time></trkpt><trkpt lat=\"40.426256\" lon=\"-3.665331\"><time>2026-10-19T17:21:22.371Z</time></trkpt><trkpt lat=\"40.426275\" lon=\"-3.665303\"><time>2026-10-19T17:21:23.371Z</time></trkpt><trkpt lat=\"40.426287\" lon=\"-3.665276\"><time>2026-10-19T17:21:24.371Z</time></trkpt><trkpt lat=\"40.426299\" lon=\"-3.665247\"><time>2026-10-19T17:21:25.371Z</time></trkpt><trkpt lat=\"40.426311\" lon=\"-3.665225\"><time>2026-10-19T17:21:26.371Z</time></trkpt><trkpt lat=\"40.426327\" lon=\"-3.665197\"><time>2026-10-19T17:21:27.371Z</time></trkpt><trkpt lat=\"40.426346\" lon=\"-3.665166\"><time>2026-10-19T17:21:28.371Z</time></trkpt><trkpt lat=\"40.426363\" lon=\"-3.665139\"><time>2026-10-19T17:21:29.371Z</time></trkpt><trkpt lat=\"40.426377\" lon=\"-3.665115\"><time>2026-10-19T17:21:30.371Z</time></trkpt><trkpt lat=\"40.426397\" lon=\"-3.665090\"><time>2026-10-19T17:21:31.371Z</time></trkpt><trkpt lat=\"40.426412\" lon=\"-3.665066\"><time>2026-10-19T17:21:32.371Z</time></trkpt><trkpt lat=\"40.426430\" lon=\"-3.665039\"><time>2026-10-19T17:21:33.371Z</time></trkpt><trkpt lat=\"40.426447\" lon=\"-3.665006\"><time>2026-10-19T17:21:34.371Z</time></trkpt><trkpt lat=\"40.426467\" lon=\"-3.664977\"><time>2026-10-19T17:21:35.371Z</time></trkpt><trkpt lat=\"40.426485\" lon=\"-3.664947\"><time>2026-10-19T17:21:36.371Z</time></trkpt><trkpt lat=\"40.426502\" lon=\"-3.664914\"><time>2026-10-19T17:21:37.371Z</time></trkpt><trkpt lat=\"40.426518\" lon=\"-3.664886\"><time>2026-10-19T17:21:38.371Z</time></trkpt><trkpt lat=\"40.426536\" lon=\"-3.664855\"><time>2026-10-19T17:21:39.371Z</time></trkpt><trkpt lat=\"40.426551\" lon=\"-3.664827\"><time>2026-10-19T17:21:40.371Z</time></trkpt><trkpt lat=\"40.426568\" lon=\"-3.664792\"><time>2026-10-19T17:21:41.371Z</time></trkpt><trkpt lat=\"40.426580\" lon=\"-3.664770\"><time>2026-10-19T17:21:42.371Z</time></trkpt><trkpt lat=\"40.426592\" lon=\"-3.664749\"><time>2026-10-19T17:21:43.371Z</time></trkpt><trkpt lat=\"40.426607\" lon=\"-3.664717\"><time>2026-10-19T17:21:44.371Z</time></trkpt><trkpt lat=\"40.426622\" lon=\"-3.664681\"><time>2026-10-19T17:21:45.371Z</time></trkpt><trkpt lat=\"40.426640\" lon=\"-3.664660\"><time>2026-10-19T17:21:46.371Z</time></trkpt><trkpt lat=\"40.426656\" lon=\"-3.664636\"><time>2026-10-19T17:21:47.371Z</time></trkpt><trkpt lat=\"40.426674\" lon=\"-3.664603\"><time>2026-10-19T17:21:48.371Z</time></trkpt><trkpt lat=\"40.426690\" lon=\"-3.664575\"><time>2026-10-19T17:21:49.371Z</time></trkpt><trkpt lat=\"40.426708\" lon=\"-3.664545\"><time>2026-10-19T17:21:50.371Z</time></trkpt><trkpt lat=\"40.426727\" lon=\"-3.664516\"><time>2026-10-19T17:21:51.371Z</time></trkpt><trkpt lat=\"40.426742\" lon=\"-3.664486\"><time>2026-10-19T17:21:52.371Z</time></trkpt><trkpt lat=\"40.426752\" lon=\"-3.664455\"><time>2026-10-19T17:21:53.371Z</time></trkpt><trkpt lat=\"40.426769\" lon=\"-3.664422\"><time>2026-10-19T17:21:54.371Z</time></trkpt><trkpt lat=\"40.426785\" lon=\"-3.664399\"><time>2026-10-19T17:21:55.371Z</time></trkpt><trkpt lat=\"40.426799\" lon=\"-3.664373\"><time>2026-10-19T17:21:56.371Z</time></trkpt><trkpt lat=\"40.426819\" lon=\"-3.664349\"><time>2026-10-19T17:21:57.371Z</time></trkpt><trkpt lat=\"40.426831\" lon=\"-3.664318\"><time>2026-10-19T17:21:58.371Z</time></trkpt><trkpt lat=\"40.426846\" lon=\"-3.664299\"><time>2026-10-19T17:21:59.371Z</time></trkpt><trkpt lat=\"40.426862\" lon=\"-3.664270\"><time>2026-10-19T17:22:00.371Z</time></trkpt><trkpt lat=\"40.426880\" lon=\"-3.664240\"><time>2026-10-19T17:22:01.371Z</time></trkpt><trkpt lat=\"40.426892\" lon=\"-3.664217\"><time>2026-10-19T17:22:02.371Z</time></trkpt><trkpt lat=\"40.426904\" lon=\"-3.664185\"><time>2026-10-19T17:22:03.371Z</time></trkpt><trkpt lat=\"40.426926\" lon=\"-3.664152\"><time>2026-10-19T17:22:04.371Z</time></trkpt><trkpt lat=\"40.426942\" lon=\"-3.664116\"><time>2026-10-19T17:22:05.371Z</time></trkpt><trkpt lat=\"40.426962\" lon=\"-3.664085\"><time>2026-10-19T17:22:06.371Z</time></trkpt><trkpt lat=\"40.426981\" lon=\"-3.664061\"><time>2026-10-19T17:22:07.371Z</time></trkpt><trkpt lat=\"40.427000\" lon=\"-3.664028\"><time>2026-10-19T17:22:08.371Z</time></trkpt><trkpt lat=\"40.427017\" lon=\"-3.663994\"><time>2026-10-19T17:22:09.371Z</time></trkpt><trkpt lat=\"40.427028\" lon=\"-3.663965\"><time>2026-10-19T17:22:10.371Z</time></trkpt><trkpt lat=\"40.427047\" lon=\"-3.663934\"><time>2026-10-19T17:22:11.371Z</time></trkpt><trkpt lat=\"40.427057\" lon=\"-3.663899\"><time>2026-10-19T17:22:12.371Z</time></trkpt><trkpt lat=\"40.427073\" lon=\"-3.663869\"><time>2026-10-19T17:22:13.371Z</time></trkpt><trkpt lat=\"40.427088\" lon=\"-3.663835\"><time>2026-10-19T17:22:14.371Z</time></trkpt><trkpt lat=\"40.427103\" lon=\"-3.663810\"><time>2026-10-19T17:22:15.371Z</time></trkpt><trkpt lat=\"40.427112\" lon=\"-3.663784\"><time>2026-10-19T17:22:16.371Z</time></trkpt><trkpt lat=\"40.427127\" lon=\"-3.663764\"><time>2026-10-19T17:22:17.371Z</time></trkpt><trkpt lat=\"40.427150\" lon=\"-3.663733\"><time>2026-10-19T17:22:18.371Z</time></trkpt><trkpt lat=\"40.427170\" lon=\"-3.663702\"><time>2026-10-19T17:22:19.371Z</time></trkpt><trkpt lat=\"40.427190\" lon=\"-3.663679\"><time>2026-10-19T17:22:20.371Z</time></trkpt><trkpt lat=\"40.427203\" lon=\"-3.663656\"><time>2026-10-19T17:22:21.371Z</time></trkpt><trkpt lat=\"40.427222\" lon=\"-3.663622\"><time>2026-10-19T17:22:22.371Z</time></trkpt><trkpt lat=\"40.427240\" lon=\"-3.663595\"><time>2026-10-19T17:22:23.371Z</time></trkpt><trkpt lat=\"40.427248\" lon=\"-3.663562\"><time>2026-10-19T17:22:24.371Z</time></trkpt><trkpt lat=\"40.427264\" lon=\"-3.663536\"><time>2026-10-19T17:22:25.371Z</time></trkpt><trkpt lat=\"40.427280\" lon=\"-3.663514\"><time>2026-10-19T17:22:26.371Z</time></trkpt><trkpt lat=\"40.427298\" lon=\"-3.663485\"><time>2026-10-19T17:22:27.371Z</time></trkpt><trkpt lat=\"40.427313\" lon=\"-3.663445\"><time>2026-10-19T17:22:28.371Z</time></trkpt><trkpt lat=\"40.427326\" lon=\"-3.663413\"><time>2026-10-19T17:22:29.371Z</time></trkpt><trkpt lat=\"40.427343\" lon=\"-3.663382\"><time>2026-10-19T17:22:30.371Z</time></trkpt><trkpt lat=\"40.427359\" lon=\"-3.663349\"><time>2026-10-19T17:22:31.371Z</time></trkpt><trkpt lat=\"40.427376\" lon=\"-3.663322\"><time>2026-10-19T17:22:32.371Z</time></trkpt><trkpt lat=\"40.427395\" lon=\"-3.663298\"><time>2026-10-19T17:22:33.371Z</time></trkpt><trkpt lat=\"40.427420\" lon=\"-3.663269\"><time>2026-10-19T17:22:34.371Z</time></trkpt><trkpt lat=\"40.427436\" lon=\"-3.663244\"><time>2026-10-19T17:22:35.371Z</time></trkpt><trkpt lat=\"40.427458\" lon=\"-3.663220\"><time>2026-10-19T17:22:36.371Z</time></trkpt><trkpt lat=\"40.427475\" lon=\"-3.663194\"><time>2026-10-19T17:22:37.371Z</time></trkpt><trkpt lat=\"40.427489\" lon=\"-3.663174\"><time>2026-10-19T17:22:38.371Z</time></trkpt><trkpt lat=\"40.427504\" lon=\"-3.663145\"><time>2026-10-19T17:22:39.371Z</time></trkpt><trkpt lat=\"40.427518\" lon=\"-3.663106\"><time>2026-10-19T17:22:40.371Z</time></trkpt><trkpt lat=\"40.427528\" lon=\"-3.663072\"><time>2026-10-19T17:22:41.371Z</time></trkpt><trkpt lat=\"40.427549\" lon=\"-3.663046\"><time>2026-10-19T17:22:42.371Z</time></trkpt><trkpt lat=\"40.427564\" lon=\"-3.663014\"><time>2026-10-19T17:22:43.371Z</time></trkpt><trkpt lat=\"40.427582\" lon=\"-3.662985\"><time>2026-10-19T17:22:44.371Z</time></trkpt><trkpt lat=\"40.427602\" lon=\"-3.662962\"><time>2026-10-19T17:22:45.371Z</time></trkpt><trkpt lat=\"40.427615\" lon=\"-3.662934\"><time>2026-10-19T17:22:46.371Z</time></trkpt><trkpt lat=\"40.427628\" lon=\"-3.662907\"><time>2026-10-19T17:22:47.371Z</time></trkpt><trkpt lat=\"40.427644\" lon=\"-3.662875\"><time>2026-10-19T17:22:48.371Z</time></trkpt><trkpt lat=\"40.427664\" lon=\"-3.662848\"><time>2026-10-19T17:22:49.371Z</time></trkpt><trkpt lat=\"40.427681\" lon=\"-3.662820\"><time>2026-10-19T17:22:50.371Z</time></trkpt><trkpt lat=\"40.427694\" lon=\"-3.662791\"><time>2026-10-19T17:22:51.371Z</time></trkpt><trkpt lat=\"40.427713\" lon=\"-3.662765\"><time>2026-10-19T17:22:52.371Z</time></trkpt><trkpt lat=\"40.427730\" lon=\"-3.662734\"><time>2026-10-19T17:22:53.371Z</time></trkpt><trkpt lat=\"40.427741\" lon=\"-3.662710\"><time>2026-10-19T17:22:54.371Z</time></trkpt><trkpt lat=\"40.427757\" lon=\"-3.662679\"><time>2026-10-19T17:22:55.371Z</time></trkpt><trkpt lat=\"40.427776\" lon=\"-3.662659\"><time>2026-10-19T17:22:56.371Z</time></trkpt><trkpt lat=\"40.427793\" lon=\"-3.662634\"><time>2026-10-19T17:22:57.371Z</time></trkpt><trkpt lat=\"40.427814\" lon=\"-3.662608\"><time>2026-10-19T17:22:58.371Z</time></trkpt><trkpt lat=\"40.427835\" lon=\"-3.662584\"><time>2026-10-19T17:22:59.371Z</time></trkpt><trkpt lat=\"40.427856\" lon=\"-3.662557\"><time>2026-10-19T17:23:00.371Z</time></trkpt><trkpt lat=\"40.427873\" lon=\"-3.662537\"><time>2026-10-19T17:23:01.371Z</time></trkpt><trkpt lat=\"40.427889\" lon=\"-3.662513\"><time>2026-10-19T17:23:02.371Z</time></trkpt><trkpt lat=\"40.427904\" lon=\"-3.662487\"><time>2026-10-19T17:23:03.371Z</time></trkpt><trkpt lat=\"40.427922\" lon=\"-3.662464\"><time>2026-10-19T17:23:04.371Z</time></trkpt><trkpt lat=\"40.427938\" lon=\"-3.662435\"><time>2026-10-19T17:23:05.371Z</time></trkpt><trkpt lat=\"40.427952\" lon=\"-3.662405\"><time>2026-10-19T17:23:06.371Z</time></trkpt><trkpt lat=\"40.427972\" lon=\"-3.662368\"><time>2026-10-19T17:23:07.371Z</time></trkpt><trkpt lat=\"40.427993\" lon=\"-3.662335\"><time>2026-10-19T17:23:08.371Z</time></trkpt><trkpt lat=\"40.428004\" lon=\"-3.662307\"><time>2026-10-19T17:23:09.371Z</time></trkpt><trkpt lat=\"40.428020\" lon=\"-3.662275\"><time>2026-10-19T17:23:10.371Z</time></trkpt><trkpt lat=\"40.428039\" lon=\"-3.662253\"><time>2026-10-19T17:23:11.371Z</time></trkpt><trkpt lat=\"40.428053\" lon=\"-3.662224\"><time>2026-10-19T17:23:12.371Z</time></trkpt><trkpt lat=\"40.428074\" lon=\"-3.662195\"><time>2026-10-19T17:23:13.371Z</time></trkpt><trkpt lat=\"40.428091\" lon=\"-3.662170\"><time>2026-10-19T17:23:14.371Z</time></trkpt><trkpt lat=\"40.428109\" lon=\"-3.662133\"><time>2026-10-19T17:23:15.371Z</time></trkpt><trkpt lat=\"40.428126\" lon=\"-3.662104\"><time>2026-10-19T17:23:16.371Z</time></trkpt><trkpt lat=\"40.428143\" lon=\"-3.662076\"><time>2026-10-19T17:23:17.371Z</time></trkpt><trkpt lat=\"40.428163\" lon=\"-3.662043\"><time>2026-10-19T17:23:18.371Z</time></trkpt><trkpt lat=\"40.428181\" lon=\"-3.662011\"><time>2026-10-19T17:23:19.371Z</time></trkpt><trkpt lat=\"40.428197\" lon=\"-3.661984\"><time>2026-10-19T17:23:20.371Z</time></trkpt><trkpt lat=\"40.428210\" lon=\"-3.661947\"><time>2026-10-19T17:23:21.371Z</time></trkpt><trkpt lat=\"40.428221\" lon=\"-3.661917\"><time>2026-10-19T17:23:22.371Z</time></trkpt><trkpt lat=\"40.428236\" lon=\"-3.661892\"><time>2026-10-19T17:23:23.371Z</time></trkpt><trkpt lat=\"40.428253\" lon=\"-3.661868\"><time>2026-10-19T17:23:24.371Z</time></trkpt><trkpt lat=\"40.428270\" lon=\"-3.661834\"><time>2026-10-19T17:23:25.371Z</time></trkpt><trkpt lat=\"40.428288\" lon=\"-3.661811\"><time>2026-10-19T17:23:26.371Z</time></trkpt><trkpt lat=\"40.428296\" lon=\"-3.661780\"><time>2026-10-19T17:23:27.371Z</time></trkpt><trkpt lat=\"40.428307\" lon=\"-3.661760\"><time>2026-10-19T17:23:28.371Z</time></trkpt><trkpt lat=\"40.428318\" lon=\"-3.661735\"><time>2026-10-19T17:23:29.371Z</time></trkpt><trkpt lat=\"40.428334\" lon=\"-3.661706\"><time>2026-10-19T17:23:30.371Z</time></trkpt><trkpt lat=\"40.428355\" lon=\"-3.661683\"><time>2026-10-19T17:23:31.371Z</time></trkpt><trkpt lat=\"40.428368\" lon=\"-3.661652\"><time>2026-10-19T17:23:32.371Z</time></trkpt><trkpt lat=\"40.428386\" lon=\"-3.661622\"><time>2026-10-19T17:23:33.371Z</time></trkpt><trkpt lat=\"40.428402\" lon=\"-3.661589\"><time>2026-10-19T17:23:34.371Z</time></trkpt><trkpt lat=\"40.428413\" lon=\"-3.661560\"><time>2026-10-19T17:23:35.371Z</time></trkpt><trkpt lat=\"40.428424\" lon=\"-3.661529\"><time>2026-10-19T17:23:36.371Z</time></trkpt><trkpt lat=\"40.428436\" lon=\"-3.661497\"><time>2026-10-19T17:23:37.371Z</time></trkpt><trkpt lat=\"40.428454\" lon=\"-3.661467\"><time>2026-10-19T17:23:38.371Z</time></trkpt><trkpt lat=\"40.428472\" lon=\"-3.661449\"><time>2026-10-19T17:23:39.371Z</time></trkpt><trkpt lat=\"40.428492\" lon=\"-3.661424\"><time>2026-10-19T17:23:40.371Z</time></trkpt><trkpt lat=\"40.428507\" lon=\"-3.661406\"><time>2026-10-19T17:23:41.371Z</time></trkpt><trkpt lat=\"40.428522\" lon=\"-3.661370\"><time>2026-10-19T17:23:42.371Z</time></trkpt><trkpt lat=\"40.428539\" lon=\"-3.661335\"><time>2026-10-19T17:23:43.371Z</time></trkpt><trkpt lat=\"40.428557\" lon=\"-3.661304\"><time>2026-10-19T17:23:44.371Z</time></trkpt><trkpt lat=\"40.428570\" lon=\"-3.661281\"><time>2026-10-19T17:23:45.371Z</time></trkpt><trkpt lat=\"40.428582\" lon=\"-3.661250\"><time>2026-10-19T17:23:46.371Z</time></trkpt><trkpt lat=\"40.428600\" lon=\"-3.661215\"><time>2026-10-19T17:23:47.371Z</time></trkpt><trkpt lat=\"40.428614\" lon=\"-3.661185\"><time>2026-10-19T17:23:48.371Z</time></trkpt><trkpt lat=\"40.428631\" lon=\"-3.661163\"><time>2026-10-19T17:23:49.371Z</time></trkpt><trkpt lat=\"40.428650\" lon=\"-3.661135\"><time>2026-10-19T17:23:50.371Z</time></trkpt><trkpt lat=\"40.428669\" lon=\"-3.661109\"><time>2026-10-19T17:23:51.371Z</time></trkpt><trkpt lat=\"40.428687\" lon=\"-3.661084\"><time>2026-10-19T17:23:52.371Z</time></trkpt><trkpt lat=\"40.428702\" lon=\"-3.661058\"><time>2026-10-19T17:23:53.371Z</time></trkpt><trkpt lat=\"40.428717\" lon=\"-3.661025\"><time>2026-10-19T17:23:54.371Z</time></trkpt><trkpt lat=\"40.428732\" lon=\"-3.660998\"><time>2026-10-19T17:23:55.371Z</time></trkpt><trkpt lat=\"40.428755\" lon=\"-3.660971\"><time>2026-10-19T17:23:56.371Z</time></trkpt><trkpt lat=\"40.428768\" lon=\"-3.660942\"><time>2026-10-19T17:23:57.371Z</time></trkpt><trkpt lat=\"40.428790\" lon=\"-3.660907\"><time>2026-10-19T17:23:58.371Z</time></trkpt><trkpt lat=\"40.428803\" lon=\"-3.660880\"><time>2026-10-19T17:23:59.371Z</time></trkpt></trkseg></trk></gpx>"
+ },
+ "wx": [
+  "3 °C (sensación 1) · viento 30 km/h · lluvia 60 %\nManga larga, mallas y guantes · lluvia probable (60 %): cortavientos · viento fuerte (30 km/h).",
+  "15 °C · viento 8 km/h · lluvia 10 %\nCamiseta técnica, perfecto para correr.",
+  "27 °C (sensación 29) · viento 5 km/h · lluvia 0 %\nCalor: lo más fresco posible, agua y ritmo tranquilo · está lloviendo: chubasquero.",
+  "20 °C (sensación 21) · viento 12 km/h · lluvia 50 %\nCamiseta ligera y lleva agua · lluvia probable (50 %): cortavientos."
+ ],
+ "bestHour": [
+  {
+   "h": 15,
+   "t": 14,
+   "rain": 5
+  },
+  null
+ ],
+ "coach": {
+  "ctx": "Nombre: Miguel. Ritmo habitual: 5:30/km.\nPlan: 10K en 8 semanas, va por la semana 3, corre 4 días por semana, nivel intermedio.\nEsta semana: Rodaje suave 3 km (pendiente); Series 7×800 m 11 km (pendiente); Rodaje suave 3 km (pendiente); Rodaje largo 7,5 km (pendiente).\nÚltima revisión del plan: Vas según lo previsto. Sigo con el plan tal cual.\nÚltimas carreras: 20/10/2026: 5,15 km en 27:01 (5:15/km), Rodaje suave; 19/10/2026: 2,50 km en 14:01 (5:36/km), sensación 4/5; 18/10/2026: 6,00 km en 33:00 (5:30/km); 17/10/2026: 3,41 km en 18:26 (5:24/km); 16/10/2026: 4,20 km en 23:20 (5:33/km); 16/10/2026: 4,11 km en 22:58 (5:36/km).\nRécords: Mejor km: 04:58, Mejor 5 km: 26:15, Mejor 10 km: 56:20, Más larga: 21,29 km, Más desnivel: +108 m.\nHoy es miércoles, 21 de octubre.",
+  "clean": "Hola **tú**."
+ },
+ "misc": {
+  "feel": [
+   "",
+   "Muy duro",
+   "Duro",
+   "Normal",
+   "Bien",
+   "Volando"
+  ],
+  "stretches": 7,
+  "warmup": 6,
+  "demo": [
+   400,
+   4487.818
+  ]
+ }
+}
