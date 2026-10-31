@@ -1066,8 +1066,8 @@ function bearing(a, b) { const r = Math.PI / 180, la1 = a.lat * r, la2 = b.lat *
 const angDiff = (a, b) => ((b - a + 540) % 360) - 180;   // de a hacia b, −180..180; positivo = a la derecha
 const fmtM = (m) => m < 950 ? `${Math.max(10, Math.round(m / 10) * 10)} m` : `${fmtKmS(m)} km`;
 function buildNav(ll) {
-  const pts = ll.map(([lat, lon]) => ({ lat, lon })), cum = [0];
-  for (let i = 1; i < pts.length; i++) cum[i] = cum[i - 1] + haversine(pts[i - 1], pts[i]);
+  const pts = [], cum = [0];
+  ll.forEach(([lat, lon]) => { const q = { lat, lon }; if (!pts.length) pts.push(q); else { const d = haversine(pts[pts.length - 1], q); if (d >= 1) { cum.push(cum[cum.length - 1] + d); pts.push(q); } } });   // sin puntos repetidos (uniones de tramos)
   const total = cum[cum.length - 1], turns = [];
   let lo = 0, hi = 0;
   for (let i = 1; i < pts.length - 1; i++) {
@@ -1109,7 +1109,7 @@ function updateNav(p) {
     } else {
       if (run.off >= 2) toast('De vuelta en la ruta', 2000); run.off = 0;
       target = navAt(n, here + 40);
-      const t = n.turns.find((x) => x.i > n.idx + 1), dt = t ? t.d - here : Infinity;
+      const t = n.turns.find((x) => x.i > n.idx), dt = t ? t.d - here : Infinity;
       if (left <= 40) { main = 'Fin de la ruta'; sub = 'lo que corras ahora suma'; if (!n.done) { n.done = true; toast('Ruta completada', 3000); speak('Fin de la ruta. Lo que corras ahora suma.'); } }
       else if (t && dt <= 120) { main = `${t.dir === 'derecha' ? 'Derecha' : 'Izquierda'} en ${fmtM(dt)}`; sub = `quedan ${fmtKmS(left)} km`; if (dt <= 90 && n.turnSaid !== t.i) { n.turnSaid = t.i; speak(`En ${fmtM(dt).replace(' m', ' metros')}, ${t.sharp ? 'giro cerrado a la ' : 'a la '}${t.dir}.`); } }
       else { main = t ? `Sigue ${fmtM(dt)}, luego ${t.dir}` : 'Sigue por la ruta'; sub = `quedan ${fmtKmS(left)} km`; }
@@ -1154,7 +1154,7 @@ function prepStartHint() {
   if (!lastFix) { $('#prepRouteSub').textContent = `${km} · te guío por el camino`; return; }
   const d = haversine(lastFix, st);
   $('#prepRouteSub').textContent = d <= 50 ? `${km} · estás en la salida` : d <= 2500 ? `${km} · salida a ${fmtM(d)}, te llevo hasta allí` : `${km} · salida a ${fmtM(d)}: mejor ve en transporte (Cómo llegar, en Rutas)`;
-  if (d > 50 && d <= 2500) { const ll = [[lastFix.lat, lastFix.lon], [st.lat, st.lon]]; if (prep.toStart) prep.toStart.setLatLngs(ll); else prep.toStart = L.polyline(ll, { color: VOLT, weight: 4, opacity: .9, dashArray: '1 8', lineCap: 'round' }).addTo(prepMap); }
+  if (d > 50 && d <= 2500) { const ll = [[lastFix.lat, lastFix.lon], [st.lat, st.lon]]; if (prep.toStart) prep.toStart.setLatLngs(ll); else { prep.toStart = L.polyline(ll, { color: VOLT, weight: 4, opacity: .9, dashArray: '1 8', lineCap: 'round' }).addTo(prepMap); setTimeout(() => prepMap.fitBounds(L.latLngBounds(pickedRoute.ll).extend(ll[0]), { paddingTopLeft: [30, 90], paddingBottomRight: [30, 340] }), 120); } }
   else if (prep.toStart) { prepMap.removeLayer(prep.toStart); prep.toStart = null; }
 }
 $$('#prepMode [data-pm]').forEach((b) => b.onclick = () => { prepMode = b.dataset.pm; renderPrepSheet(); });
