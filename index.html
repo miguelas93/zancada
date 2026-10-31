@@ -120,7 +120,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .setrow{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:500;padding:6px 0}
 .pr{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
 .pr:first-of-type{border-top:0}
-.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.badge{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px 10px;border-radius:18px;background:var(--surface2);text-align:center;position:relative}.badge .num{font-size:18px;line-height:1}.badge small{font-size:11px;line-height:1.25;color:var(--muted)}.badge.on{background:var(--bar);color:var(--on-bar)}.badge.on .num{color:var(--volt)}.badge.on small{color:var(--on-bar-muted)}.badge .new{position:absolute;top:-6px;right:-4px}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.badge{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border-radius:18px;background:var(--surface2);text-align:center;position:relative;border:0;font:inherit;color:var(--ink);cursor:pointer}.badge svg{display:block;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}.badge:not(.on) svg{filter:none;opacity:.55}.badge small{font-size:11px;line-height:1.25;color:var(--muted)}.badge.on small b{color:var(--ink);font-weight:600}.badge .new{position:absolute;top:-6px;right:-4px}@keyframes medalIn{0%{transform:scale(.2) rotate(-25deg);opacity:0}65%{transform:scale(1.12) rotate(5deg);opacity:1}100%{transform:none}}@keyframes medalShine{0%,100%{transform:translateX(-80px)}50%{transform:translateX(80px)}}.medal-pop{animation:medalIn .7s cubic-bezier(.2,.9,.3,1.2) both}.medal-shine{animation:medalShine 2.6s ease-in-out infinite}.coach-b{max-width:88%;padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.45;white-space:normal;word-wrap:break-word}.coach-b.me{align-self:flex-end;background:var(--bar);color:var(--on-bar);border-bottom-right-radius:6px}.coach-b.ai{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:6px}.coach-b.err{background:transparent;border:1px dashed var(--line);color:var(--muted);font-size:13px}@keyframes dots{0%,80%,100%{opacity:.25}40%{opacity:1}}.coach-dots i{display:inline-block;width:7px;height:7px;border-radius:4px;background:currentColor;margin-right:4px;animation:dots 1.2s infinite}.coach-dots i:nth-child(2){animation-delay:.2s}.coach-dots i:nth-child(3){animation-delay:.4s}.rphoto{flex:none;width:210px;height:150px;border-radius:14px;overflow:hidden;padding:0;border:0;background:var(--surface2)}.rphoto img{width:100%;height:100%;object-fit:cover;display:block}
 .feel{display:flex;gap:6px}.feel button{flex:1;height:40px;border-radius:12px;background:var(--surface2);color:var(--ink);font-weight:600;font-size:12px}.feel button.on{background:var(--bar);color:var(--volt)}
 .note{width:100%;min-height:64px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:14px;padding:10px 12px;resize:vertical}
 #sTitleIn{font:inherit;font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.03em;width:100%;background:transparent;border:0;border-bottom:2px solid var(--volt);color:var(--ink);padding:0}
@@ -170,6 +170,8 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="stretchModal" role="dialog" aria-modal="true" aria-label="Estiramientos y calentamiento guiados"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl" id="stStep">Estiramientos</span><button class="sub" id="stClose" style="font-size:13px;text-decoration:underline">Cerrar</button></div><h1 style="font-size:28px" id="stName">—</h1><p class="sub" id="stHow" style="margin:0;font-size:15px;line-height:1.45"></p><div style="display:flex;align-items:baseline;gap:6px"><span class="num" id="stLeft" style="font-size:72px;letter-spacing:-.04em">40</span><span class="unit">s</span></div><div class="track"><i id="stTrack" style="width:0"></i></div><div style="display:flex;gap:8px"><button class="btn sec" id="stPause" style="height:48px;font-size:15px;flex:1">Pausa</button><button class="btn sec" id="stSkip" style="height:48px;font-size:15px;flex:1">Siguiente</button></div><p class="sub" style="margin:0;font-size:11px">Suave y sin rebotes: tensión, nunca dolor.</p></div></div>
+<div class="modal" id="medalModal" role="dialog" aria-modal="true" aria-label="Insignia" style="align-items:center"><div class="card col" style="gap:10px;width:100%;max-width:360px;margin:0 auto;align-items:center;text-align:center;padding:28px 22px 22px;overflow:hidden"><div id="mmMedal" style="position:relative"></div><span class="lbl" id="mmTier"></span><h1 id="mmName" style="font-size:26px"></h1><p class="sub" id="mmWhen" style="margin:0;font-size:14px;line-height:1.45"></p><button class="btn" id="mmOk" style="height:48px;font-size:15px;margin-top:6px">Cerrar</button></div></div>
+<div class="modal" id="photoModal" role="dialog" aria-modal="true" aria-label="Foto del sitio" style="align-items:center;background:rgba(0,0,0,.92)"><div class="col" style="gap:10px;width:100%;max-width:720px;margin:0 auto"><img id="pmImg" alt="" style="width:100%;max-height:72vh;object-fit:contain;border-radius:12px"><p id="pmCredit" style="margin:0;font-size:12px;color:#ccc;text-align:center"></p><div style="display:flex;gap:8px"><button class="btn sec" id="pmPrev" style="height:46px;font-size:14px;flex:1">Anterior</button><button class="btn" id="pmClose" style="height:46px;font-size:14px;flex:1">Cerrar</button><button class="btn sec" id="pmNext" style="height:46px;font-size:14px;flex:1">Siguiente</button></div></div></div>
 <div class="modal" id="newsModal" role="dialog" aria-modal="true" aria-label="Novedades"><div class="card col" style="gap:12px;width:100%;max-width:520px;margin:0 auto;max-height:86vh;overflow:auto"><span class="lbl" id="newsVer">Novedades</span><h1 style="font-size:26px">Esta noche, Zancada ha cambiado mucho</h1><ul id="newsList" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px;font-size:15px;line-height:1.4"></ul><div style="display:flex;gap:8px"><a class="btn sec" id="newsAll" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="height:48px;font-size:14px;text-decoration:none;flex:1;width:auto;min-width:0;padding:0 8px">Ver todo</a><button class="btn" id="newsOk" style="height:48px;font-size:15px;flex:1;width:auto;min-width:0;padding:0 8px">A correr</button></div></div></div>
 <div class="modal" id="cintaModal" role="dialog" aria-modal="true" aria-label="Cronómetro de cinta"><div class="card col" style="gap:14px;width:100%;max-width:520px;margin:0 auto"><div class="between"><span class="lbl">Cinta · sin GPS</span><button class="sub" id="cClose" style="font-size:13px;text-decoration:underline">Cancelar</button></div><span class="num" id="cTime" style="font-size:84px;letter-spacing:-.04em;text-align:center">0:00</span><p class="sub" id="cHint" style="margin:0;text-align:center;font-size:14px">Te aviso por voz cada 5 minutos. Al terminar, apunta los km que marca la cinta.</p><div style="display:flex;gap:8px"><button class="btn sec" id="cPause" style="height:52px;font-size:15px;flex:1">Pausa</button><button class="btn" id="cEnd" style="height:52px;font-size:15px;flex:1">Terminar</button></div></div></div>
 <div class="modal" id="manualModal" role="dialog" aria-modal="true" aria-label="Añadir carrera a mano"><form class="card col" style="gap:12px" id="manualForm">
@@ -332,7 +334,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.55 · rutas arregladas · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.56 · entrenador IA y medallas · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -363,12 +365,14 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 
 <!-- FICHA DE RUTA -->
 <section class="screen scroll" id="routeDetail" style="padding:0">
-  <div style="position:relative;height:46vh;flex:none"><div id="rdMap" style="position:absolute;inset:0"></div>
+  <div id="rdMapWrap" style="position:relative;height:46vh;flex:none;transition:height .25s"><div id="rdMap" style="position:absolute;inset:0"></div>
     <div class="fab"><button class="icon" data-go="routes" aria-label="Volver a rutas"><svg class="i" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><button class="icon" id="rdSave" aria-label="Guardar en mis recorridos"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div>
+    <div style="position:absolute;right:14px;bottom:14px;z-index:500;display:flex;gap:8px"><button class="chipb" id="rdLayer" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--surface)">Satélite</button><button class="chipb" id="rdBig" style="box-shadow:0 2px 8px rgba(0,0,0,.18);background:var(--surface)">Ampliar mapa</button></div>
   </div>
   <div class="col" style="gap:14px;padding:18px 20px calc(var(--sab) + 100px)">
     <div><span class="lbl" id="rdZone"></span><h1 id="rdName" style="margin-top:4px;font-size:26px"></h1></div>
     <div class="card stats" id="rdStats" style="padding:18px 20px"></div>
+    <div class="card col" id="rdPhotosCard" style="display:none;gap:10px;padding:18px 0 14px"><div class="between" style="padding:0 20px"><h2>Cómo es el sitio</h2><span class="sub" id="rdPhotosSub"></span></div><div id="rdPhotos" style="display:flex;gap:8px;overflow-x:auto;padding:0 20px;scrollbar-width:none"></div><p class="sub" style="padding:0 20px;font-size:11px;margin:0">Fotos de la zona en Wikimedia Commons · toca para ampliar</p></div>
     <p class="sub" id="rdPois" style="display:none;margin:-4px 4px 0;font-size:13px;line-height:1.45"></p>
     <div class="card col" id="rdProfileCard" style="gap:8px;padding:18px 20px"><div class="between"><h2>Perfil</h2><span class="sub" id="rdProfileSub"></span></div><div id="rdProfile" style="color:var(--ink)"></div></div>
     <div class="card col" id="rdAbout" style="gap:8px;padding:18px 20px"><h2 id="rdSurface"></h2><p id="rdWhy" style="margin:0;font-size:14px;line-height:1.45"></p><p id="rdAccess" class="sub" style="margin:0;font-size:13px;line-height:1.45"></p></div>
@@ -394,7 +398,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
       <p class="sub" style="margin:4px 0 0;font-size:12px" id="planRemindHint"></p>
       <button class="btn sec" id="planIcs" style="height:46px;font-size:14px;margin-top:10px">Añadir el plan a mi calendario</button>
     </div>
-    <div class="card col" style="gap:8px;padding:18px 20px"><h2>Pregúntale a tu entrenador IA</h2><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Preparo un resumen con tu plan y tus últimas carreras para que se lo pegues a ChatGPT, Gemini o Claude y le preguntes lo que quieras. No sale nada de tu móvil hasta que tú lo pegues.</p><div class="chips" id="aiQs" style="margin:4px -20px 0;padding:0 20px"><button class="chipb on" data-q="">Sin pregunta</button><button class="chipb" data-q="¿Cómo afronto la semana que viene?">Semana que viene</button><button class="chipb" data-q="¿Estoy entrenando demasiado o demasiado poco?">¿Voy bien de carga?</button><button class="chipb" data-q="Me molesta un poco al correr (dime qué preguntarme para saber si debo parar).">Me duele algo</button><button class="chipb" data-q="Diseña mi próxima sesión de series con calentamiento y vuelta a la calma.">Series para el próximo día</button><button class="chipb" data-q="¿Qué tiempo realista puedo hacer en mi próxima carrera y cómo correrla?">Estrategia de carrera</button></div><div style="display:flex;gap:8px"><button class="btn sec" id="askAiBtn" style="height:48px;font-size:14px;flex:1;width:auto;min-width:0;padding:0 8px">Copiar</button><button class="btn sec" id="aiChatGpt" style="height:48px;font-size:14px;flex:1;width:auto;min-width:0;padding:0 8px">ChatGPT</button><button class="btn sec" id="aiClaude" style="height:48px;font-size:14px;flex:1;width:auto;min-width:0;padding:0 8px">Claude</button></div><p class="sub" style="margin:0;font-size:11px">ChatGPT y Claude se abren con el texto ya escrito; solo tienes que enviarlo.</p></div>
+    <div class="card col" id="coachCard" style="gap:12px;padding:18px 20px"><div class="between"><h2>Tu entrenador IA</h2><button class="sub" id="coachNew" style="font-size:13px;text-decoration:underline;background:none;border:0;display:none">Nueva charla</button></div><div id="coachLog" class="col" style="gap:8px;max-height:56vh;overflow:auto"></div><div class="chips" id="aiQs" style="margin:0 -20px;padding:0 20px"><button class="chipb" data-q="¿Cómo afronto la semana que viene?">Semana que viene</button><button class="chipb" data-q="¿Estoy entrenando demasiado o demasiado poco?">¿Voy bien de carga?</button><button class="chipb" data-q="Me molesta algo al correr. ¿Qué hago?">Me duele algo</button><button class="chipb" data-q="Diseña mi próxima sesión de series con calentamiento y vuelta a la calma.">Series para el próximo día</button><button class="chipb" data-q="¿Qué tiempo realista puedo hacer en mi carrera y cómo la corro?">Estrategia de carrera</button><button class="chipb" data-q="¿Qué como antes y después de correr?">Comida</button></div><form id="coachForm" style="display:flex;gap:8px;margin:0"><input id="coachIn" maxlength="400" placeholder="Pregúntale lo que quieras" autocomplete="off" style="flex:1;min-width:0;height:48px;border-radius:14px;border:1px solid var(--line);padding:0 14px;background:var(--surface2);color:var(--ink);font:inherit;font-size:15px"><button class="btn" id="coachSend" type="submit" style="height:48px;font-size:15px;width:auto;flex:none;padding:0 18px">Enviar</button></form><p class="sub" style="margin:0;font-size:11px;line-height:1.4">Conoce tu plan, tus últimas carreras y tus récords. Es una IA gratuita (Pollinations): puede equivocarse, y si algo duele de verdad, consulta a un profesional.</p></div>
     <button class="btn sec" id="planEdit">Cambiar objetivo, días o nivel</button>
     <button class="btn ghost" id="planDelete" style="color:var(--danger)">Eliminar el plan</button>
   </div>
@@ -499,6 +503,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 <!-- TERMINADA -->
 <section class="screen dark" id="cele" style="background:var(--bar);gap:20px">
   <span class="lbl">Carrera terminada</span>
+  <div id="cMedals" style="display:none;gap:14px;justify-content:center;margin-top:12px"></div>
   <div class="grow"></div>
   <div class="col" style="gap:8px">
     <div><span class="num" id="cDist" style="font-size:112px;letter-spacing:-.05em;color:var(--volt)">0,00</span><span class="unit" style="font-size:26px;font-weight:600">km</span></div>
@@ -1093,11 +1098,38 @@ function streakWhen(R, n) {
   for (let i = 0; i < weeks.length; i++) { const ok = byWeek[weeks[i]] >= GOAL_OF(); run0 = ok && i && weeks[i] - weeks[i - 1] === 7 * 864e5 && run0 ? run0 + 1 : ok ? 1 : 0; if (run0 >= n) { const rs = R.filter((r) => weekStart(r.start) === weeks[i]).sort((a, b) => a.start - b.start); return rs[Math.min(rs.length, GOAL_OF()) - 1].start; } }
   return 0;
 }
+const TIER = { '10k': 's', km100: 's', rutas5: 's', sem10: 's', x50: 'g', '21k': 'g', km500: 'g', km1000: 'g' };
+const METAL = { b: ['#FBD3B0', '#CD8450', '#7E4420', '#4A230C', 'Medalla de bronce'], s: ['#FFFFFF', '#B9C2CB', '#6C7680', '#2B333B', 'Medalla de plata'], g: ['#FFF4B0', '#F4C531', '#A3740A', '#4F3600', 'Medalla de oro'] };
+const RIBBON = { b: ['#E5533D', '#A8301F'], s: ['#3B82F6', '#1E4FA8'], g: ['#D4FF3A', '#0B0C0B'] };
+let medalN = 0;
+function medalSvg(b, size = 64, shine = false) {
+  const t = TIER[b.id] || 'b', [hi, mid, lo, txt] = METAL[t], [r1, r2] = RIBBON[t], u = 'md' + (medalN++), h = size * 1.2;
+  const fs = b.short.length <= 2 ? 26 : b.short.length <= 3 ? 22 : b.short.length <= 4 ? 18 : 14;
+  if (!b.when) return `<svg width="${size}" height="${h}" viewBox="0 0 100 120" aria-hidden="true"><path d="M32 0h16l8 40-14 6zM68 0H52l-8 40 14 6z" fill="var(--line)"/><circle cx="50" cy="78" r="34" fill="var(--surface)" stroke="var(--line)" stroke-width="3" stroke-dasharray="6 5"/><text x="50" y="${78 + fs * 0.35}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="var(--muted)" font-family="inherit">${b.short}</text></svg>`;
+  return `<svg width="${size}" height="${h}" viewBox="0 0 100 120" aria-hidden="true"><defs><linearGradient id="${u}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${hi}"/><stop offset=".45" stop-color="${mid}"/><stop offset="1" stop-color="${lo}"/></linearGradient><linearGradient id="${u}r" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${hi}"/><stop offset=".5" stop-color="${lo}"/><stop offset="1" stop-color="${mid}"/></linearGradient><clipPath id="${u}c"><circle cx="50" cy="78" r="34"/></clipPath></defs>`
+    + `<path d="M30 0h18l8 42-16 7z" fill="${r1}"/><path d="M70 0H52l-8 42 16 7z" fill="${r2}"/><path d="M39 0h4l7 40-4 2z" fill="#fff" opacity=".35"/>`
+    + `<circle cx="50" cy="78" r="36" fill="${lo}"/><circle cx="50" cy="78" r="34" fill="url(#${u}g)"/><circle cx="50" cy="78" r="26" fill="none" stroke="url(#${u}r)" stroke-width="3"/>`
+    + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((k) => { const a = k * Math.PI / 6, x = 50 + Math.cos(a) * 30.5, y = 78 + Math.sin(a) * 30.5; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.3" fill="${hi}" opacity=".8"/>`; }).join('')
+    + `<text x="50" y="${78 + fs * 0.36}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="${txt}" font-family="inherit" letter-spacing="-.5">${b.short}</text>`
+    + `<ellipse cx="38" cy="62" rx="14" ry="8" fill="#fff" opacity=".35" transform="rotate(-30 38 62)"/>`
+    + (shine ? `<g clip-path="url(#${u}c)"><rect class="medal-shine" x="30" y="30" width="14" height="100" fill="#fff" opacity=".45" transform="skewX(-20)"/></g>` : '') + `</svg>`;
+}
+function openMedal(b) {
+  $('#mmMedal').innerHTML = `<div class="${b.when ? 'medal-pop' : ''}">${medalSvg(b, 150, !!b.when)}</div>`;
+  $('#mmTier').textContent = b.when ? METAL[TIER[b.id] || 'b'][4] : 'Por conseguir';
+  $('#mmName').textContent = b.name;
+  $('#mmWhen').textContent = b.when ? `Conseguida el ${new Date(b.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}.` : 'Aún no la tienes. Sigue sumando carreras: te avisaré en cuanto la consigas.';
+  $('#medalModal').classList.add('on'); if (b.when) buzz && buzz([30, 60, 30]);
+}
+$('#mmOk').onclick = () => $('#medalModal').classList.remove('on');
+$('#medalModal').onclick = (e) => { if (e.target.id === 'medalModal') $('#medalModal').classList.remove('on'); };
 function badges(R = runs) { return BADGE_DEFS.map(([id, short, name, f]) => ({ id, short, name, when: f(R) || 0 })); }
 function renderBadges() {
   const B = badges(), got = B.filter((b) => b.when);
   $('#badgeCount').textContent = `${got.length} de ${B.length}`;
-  $('#badgeGrid').innerHTML = B.map((b) => `<div class="badge ${b.when ? 'on' : ''}" title="${b.name}">${b.when && !badgeSeen.includes(b.id) ? '<span class="chip new" style="font-size:9px;padding:2px 7px">Nueva</span>' : ''}<span class="num">${b.short}</span><small>${b.name}${b.when ? '<br>' + new Date(b.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : ''}</small></div>`).join('');
+  const order = B.filter((b) => b.when).concat(B.filter((b) => !b.when));
+  $('#badgeGrid').innerHTML = order.map((b) => `<button class="badge ${b.when ? 'on' : ''}" data-badge="${b.id}" aria-label="${b.name}${b.when ? ', conseguida' : ', por conseguir'}">${b.when && !badgeSeen.includes(b.id) ? '<span class="chip new" style="font-size:9px;padding:2px 7px;z-index:1">Nueva</span>' : ''}<span class="${b.when && !badgeSeen.includes(b.id) ? 'medal-pop' : ''}">${medalSvg(b, 58)}</span><small>${b.when ? '<b>' + b.name + '</b><br>' + new Date(b.when).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : b.name}</small></button>`).join('');
+  $$('#badgeGrid [data-badge]').forEach((el) => el.onclick = () => openMedal(B.find((b) => b.id === el.dataset.badge)));
   badgeSeen = got.map((b) => b.id); save(BADGES, badgeSeen);
 }
 // ---------- clima (open-meteo, sin clave) ----------
@@ -1282,7 +1314,71 @@ function renderPlanCard() {
     <div class="track"><i style="width:${total ? done / total * 100 : 0}%"></i></div>${rev}</button>`;
   $('#planOpen').onclick = () => { planView = null; go('plan'); };
 }
-let planView = null, aiQ = '';
+let planView = null;
+// ---------- Entrenador IA dentro de la app ----------
+// Pollinations (text.pollinations.ai): IA gratuita, sin cuenta ni clave, con CORS. Anónimo = una petición cada ~30 s por IP.
+const COACH = 'zancada.coach.v1'; let coach = load(COACH, []), coachBusy = false;
+function coachCtx() {
+  const lines = [];
+  lines.push(`Nombre: ${profile.name || 'sin nombre'}. Ritmo habitual: ${fmtPace(userPace())}/km.`);
+  if (plan) {
+    const g = GOALS[plan.goal], wi = curWeek(plan), st = planStatus(plan);
+    lines.push(`Plan: ${g.name} en ${plan.weeks} semanas, va por la semana ${wi + 1}, corre ${plan.days.length} días por semana, nivel ${({ inicio: 'principiante', medio: 'intermedio', avanzado: 'avanzado' })[plan.level] || plan.level}.`);
+    const week = (st[wi] || []).map((x) => `${x.title} ${fmtKmS(x.m)} km (${x.state === 'done' ? 'hecha' : x.state === 'miss' ? 'no hecha' : 'pendiente'})`).join('; ');
+    if (week) lines.push('Esta semana: ' + week + '.');
+    if (plan.lastReview) lines.push('Última revisión del plan: ' + plan.lastReview.text);
+  }
+  const last = runs.slice(0, 6).map((r) => `${new Date(r.start).toLocaleDateString('es-ES')}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))}/km)${r.session ? ', ' + r.session.title : ''}${r.feel ? ', sensación ' + r.feel + '/5' : ''}`).join('; ');
+  lines.push('Últimas carreras: ' + (last || 'ninguna todavía') + '.');
+  const recs = personalRecords().filter((x) => x.r).map((x) => `${x.label}: ${x.val}`).join(', ');
+  if (recs) lines.push('Récords: ' + recs + '.');
+  lines.push('Hoy es ' + new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) + '.');
+  return lines.join('\n');
+}
+const coachSys = () => 'Eres el entrenador de running de la app Zancada. Hablas en español de España, de tú, cercano y motivador pero honesto. Respuestas cortas (máximo 130 palabras), concretas y accionables: ritmos en min/km, distancias en km. Sin tablas ni títulos; como mucho una lista corta con guiones. Usa los datos del corredor. Si menciona dolor fuerte, punzante, que cojea o que no mejora, dile que pare y consulte a un profesional sanitario. No inventes datos que no tienes.\n\nDatos del corredor:\n' + coachCtx();
+function coachHtml(t) {
+  const e = String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return e.replace(/\*\*(.+?)\*\*/g, '<b style="font-weight:600">$1</b>').replace(/^#{1,4}\s*/gm, '').replace(/^\s*[-*•]\s+/gm, '• ').replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+}
+function coachClean(t) {
+  // quita posibles bloques de patrocinio que añade el servicio gratuito
+  return String(t || '').replace(/\n+-{3,}[\s\S]*?(sponsor|pollinations|🌸)[\s\S]*$/i, '').replace(/\n.*🌸.*$/s, '').trim();
+}
+function renderCoach() {
+  const log = $('#coachLog'); if (!log) return;
+  const hello = `<div class="coach-b ai">Hola${profile.name ? ', ' + profile.name : ''}. Soy tu entrenador. Conozco tu plan y tus carreras: pregúntame lo que quieras o toca una de las sugerencias.</div>`;
+  log.innerHTML = hello + coach.map((m) => `<div class="coach-b ${m.role === 'user' ? 'me' : m.err ? 'ai err' : 'ai'}">${coachHtml(m.content)}</div>`).join('') + (coachBusy ? '<div class="coach-b ai coach-dots" id="coachTyping" aria-label="Escribiendo"><i></i><i></i><i></i></div>' : '');
+  log.scrollTop = log.scrollHeight;
+  $('#coachNew').style.display = coach.length ? '' : 'none';
+  $('#coachSend').disabled = coachBusy;
+}
+async function coachCall(msgs) {
+  const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 60000);
+  try {
+    let res = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'openai', messages: msgs, private: true, referrer: 'zancada' }), signal: ctl.signal });
+    if (res.status === 402 || res.status === 429) return { wait: Number(res.headers.get('Retry-After')) || 30 };
+    if (res.ok) { const j = await res.json(); const c = j.choices?.[0]?.message?.content; if (c) return { text: coachClean(c) }; }
+    res = await fetch('https://text.pollinations.ai/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'openai', messages: msgs, private: true, referrer: 'zancada' }), signal: ctl.signal });
+    if (res.status === 402 || res.status === 429) return { wait: Number(res.headers.get('Retry-After')) || 30 };
+    if (res.ok) { const t = coachClean(await res.text()); if (t) return { text: t }; }
+    return { error: true };
+  } catch (e) { return { error: true }; } finally { clearTimeout(tm); }
+}
+async function coachAsk(q) {
+  q = String(q || '').trim(); if (!q || coachBusy) return;
+  if (!navigator.onLine) { toast('Sin conexión: el entrenador necesita internet.'); return; }
+  coach = coach.filter((m) => !m.err); coach.push({ role: 'user', content: q }); coachBusy = true; renderCoach();
+  const msgs = [{ role: 'system', content: coachSys() }].concat(coach.slice(-12).map((m) => ({ role: m.role, content: m.content })));
+  let r = await coachCall(msgs);
+  if (r.wait && r.wait <= 45) { const tl = $('#coachTyping'); if (tl) tl.insertAdjacentHTML('afterend', `<div class="coach-b ai err" id="coachWait">Hay cola en la IA gratuita. Lo intento de nuevo en ${r.wait} s…</div>`); await new Promise((ok) => setTimeout(ok, r.wait * 1000 + 500)); r = await coachCall(msgs); }
+  coachBusy = false;
+  if (r.text) coach.push({ role: 'assistant', content: r.text });
+  else coach.push({ role: 'assistant', err: true, content: r.wait ? 'La IA gratuita está saturada ahora mismo. Vuelve a enviar la pregunta en un minuto.' : 'No he podido contestar (sin conexión o el servicio no responde). Vuelve a intentarlo en un momento.' });
+  coach = coach.slice(-30); save(COACH, coach.filter((m) => !m.err)); renderCoach();
+}
+$('#coachForm').onsubmit = (e) => { e.preventDefault(); const v = $('#coachIn').value; $('#coachIn').value = ''; $('#coachIn').blur(); coachAsk(v); };
+$$('#aiQs [data-q]').forEach((b) => b.onclick = () => coachAsk(b.dataset.q));
+$('#coachNew').onclick = () => { if (coachBusy) return; coach = []; save(COACH, coach); renderCoach(); };
 function renderPlan() {
   if (!plan) return go('home');
   const weeks = planStatus(plan), wi = Math.min(plan.weeks - 1, Math.max(0, curWeek(plan))), g = GOALS[plan.goal];
@@ -1300,18 +1396,7 @@ function renderPlan() {
     <div class="track"><i style="width:${Math.min(100, km ? done / km * 100 : 0)}%"></i></div>`;
   $('#planWeeks').innerHTML = weeks.map((x, i) => `<button class="${i === w ? 'on' : ''} ${i < wi ? 'past' : ''}" data-w="${i}"><b>${i + 1}</b>${Math.round(x.reduce((a, s) => a + s.m, 0) / 1000)} km</button>`).join('');
   $$('#planWeeks [data-w]').forEach((b) => b.onclick = () => { planView = Number(b.dataset.w); renderPlan(); });
-  const aiText = () => {
-    const g = GOALS[plan.goal], wi = curWeek(plan), st = planStatus(plan), last = runs.slice(0, 6).map((r) => `- ${new Date(r.start).toLocaleDateString('es-ES')}: ${fmtKm(r.dist)} km en ${fmtTime(r.dur)} (${fmtPace(r.dur / (r.dist / 1000))}/km)${r.session ? ' · sesión: ' + r.session.title : ''}`).join('\n');
-    const week = (st[wi] || []).map((x) => `${x.title} ${fmtKmS(x.m)} km (${x.state === 'done' ? 'hecha' : x.state === 'miss' ? 'no hecha' : 'pendiente'})`).join('; ');
-    const text = `Actúa como mi entrenador de running. Soy ${profile.name || 'corredor/a'}, nivel ${({ inicio: 'principiante', medio: 'intermedio', avanzado: 'avanzado' })[plan.level] || plan.level}. Objetivo: ${g.name} en ${plan.weeks} semanas (voy por la semana ${wi + 1}), corro ${plan.days.length} días por semana. Mi ritmo habitual es ${fmtPace(userPace())}/km.\nEsta semana: ${week || 'sin sesiones'}.\nÚltimas carreras:\n${last || '- ninguna todavía'}\n${plan.lastReview ? 'Última revisión del plan: ' + plan.lastReview.text + '\n' : ''}`;
-    const recs = personalRecords().filter((x) => x.r).map((x) => `${x.label}: ${x.val}`).join(', ');
-    return text + (recs ? `\nMis récords: ${recs}.` : '') + (aiQ ? `\n\nMi pregunta: ${aiQ}` : '\n\nMi pregunta: ');
-  };
-  $$('#aiQs [data-q]').forEach((b) => { b.classList.toggle('on', b.dataset.q === aiQ); b.onclick = () => { aiQ = b.dataset.q; $$('#aiQs [data-q]').forEach((x) => x.classList.toggle('on', x === b)); }; });
-  $('#askAiBtn').onclick = async () => { const text = aiText(); try { await navigator.clipboard.writeText(text); toast(aiQ ? 'Copiado con tu pregunta. Pégalo en tu IA.' : 'Contexto copiado. Pégalo en tu IA y añade la pregunta.', 3500); } catch (e) {} if (navigator.share) { try { await navigator.share({ text }); } catch (e) {} } };
-  $('#aiChatGpt').onclick = () => openAi('https://chatgpt.com/?q=');
-  $('#aiClaude').onclick = () => openAi('https://claude.ai/new?q=');
-  async function openAi(base) { const text = aiText(); try { await navigator.clipboard.writeText(text); } catch (e) {} const url = base + encodeURIComponent(text); if (url.length > 7000) { toast('El texto es largo: lo he copiado, pégalo al abrir.', 3500); } window.open(url, '_blank', 'noopener'); }
+  renderCoach();
   $('#planWeeks .on')?.scrollIntoView({ inline: 'center', block: 'nearest' });
   $('#planSessions').innerHTML = ss.map((s) => `<button class="sess" data-key="${s.key}"><span class="st ${s.state}">${sessIcon(s)}</span>
     <span style="flex:1;min-width:0"><b style="font-weight:600;display:block">${s.title}</b><span class="sub" style="font-size:12px">${new Date(s.date).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' })}${s.run ? ` · hecha${s.moved ? ' (otro día)' : ''}: ${fmtKm(s.run.dist)} km` : s.state === 'miss' ? ' · no hecha' : s.state === 'skip' ? ' · antes de crear el plan' : s.state === 'today' ? ' · hoy' : ''}</span></span>
@@ -1645,6 +1730,45 @@ $$('#routesSurf [data-surf]').forEach((b) => b.onclick = () => { rt.surf = b.dat
 $$('#routesKm [data-km]').forEach((b) => b.onclick = () => { rt.km = Number(b.dataset.km); renderRoutes(); });
 // Ficha de ruta
 function openRoute(r) { detailRoute = r; go('routeDetail'); }
+// Fotos del sitio: Wikimedia Commons (geosearch, sin clave, con CORS). Se buscan en la salida y en dos puntos del recorrido; caché 30 días.
+const PHOTO_KEY = 'zancada.photos.v1'; let photoCache = load(PHOTO_KEY, {}), rdPh = [], phIdx = 0;
+const stripHtml = (h) => String(h || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+async function loadPhotos(r) {
+  const c = r.id && photoCache[r.id]; if (c && Date.now() - c.t < 30 * 864e5) return c.p;
+  const n = r.ll.length, pts = [r.ll[0], r.ll[Math.floor(n / 3)], r.ll[Math.floor(n * 2 / 3)]], seen = new Set(), out = [];
+  for (const p of pts) {
+    const u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=geosearch&ggsnamespace=6&ggslimit=15&ggsradius=450&ggscoord=' + p[0].toFixed(5) + '%7C' + p[1].toFixed(5) + '&prop=imageinfo&iiprop=url%7Cmime%7Cextmetadata&iiurlwidth=640&iiextmetadatafilter=Artist%7CLicenseShortName';
+    try {
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 10000);
+      const res = await fetch(u, { signal: ctl.signal }); clearTimeout(tm); if (!res.ok) continue;
+      const j = await res.json();
+      Object.values(j.query?.pages || {}).sort((a, b) => (a.index || 0) - (b.index || 0)).forEach((pg) => {
+        const ii = pg.imageinfo?.[0]; if (!ii || !ii.thumburl || !/jpeg/.test(ii.mime || '') || seen.has(pg.title)) return;
+        if (/\b(map|mapa|plano|logo|escudo|diagram|placa|plaque|cartel|sign|se[ñn]al|bus|metro|interior|retrato|portrait)\b/i.test(pg.title)) return;
+        seen.add(pg.title); out.push({ src: ii.thumburl, big: ii.thumburl.replace(/\/640px-/, '/1280px-'), by: stripHtml(ii.extmetadata?.Artist?.value).slice(0, 60), lic: ii.extmetadata?.LicenseShortName?.value || '', page: ii.descriptionurl || '' });
+      });
+    } catch (e) {}
+    if (out.length >= 10) break;
+  }
+  const p = out.slice(0, 10); if (r.id && p.length) { photoCache[r.id] = { t: Date.now(), p }; save(PHOTO_KEY, photoCache); }
+  return p;
+}
+function showPhoto(i) {
+  if (!rdPh.length) return; phIdx = (i + rdPh.length) % rdPh.length; const x = rdPh[phIdx];
+  $('#pmImg').src = x.big; $('#pmImg').onerror = () => { $('#pmImg').onerror = null; $('#pmImg').src = x.src; };
+  $('#pmCredit').textContent = `${phIdx + 1} de ${rdPh.length} · ${x.by ? 'Foto: ' + x.by : 'Wikimedia Commons'}${x.lic ? ' · ' + x.lic : ''}`;
+  $('#photoModal').classList.add('on');
+}
+$('#pmClose').onclick = () => $('#photoModal').classList.remove('on');
+$('#pmPrev').onclick = () => showPhoto(phIdx - 1); $('#pmNext').onclick = () => showPhoto(phIdx + 1);
+$('#photoModal').onclick = (e) => { if (e.target.id === 'photoModal') $('#photoModal').classList.remove('on'); };
+function rdBig(on) {
+  rdBig.on = on; $('#rdMapWrap').style.height = on ? 'calc(100vh - 180px)' : '46vh'; $('#rdBig').textContent = on ? 'Reducir mapa' : 'Ampliar mapa';
+  const m = maps.rdMap; if (m) setTimeout(() => { m.invalidateSize(); if (detailRoute?.ll) m.fitBounds(detailRoute.ll, { padding: [36, 36] }); }, 280);
+}
+$('#rdBig').onclick = () => { rdBig(!rdBig.on); $('#routeDetail').scrollTop = 0; };
+let rdSat = false;
+$('#rdLayer').onclick = () => { const m = maps.rdMap; if (!m) return; rdSat = !rdSat; setLayer(m, rdSat ? 'sat' : 'calles'); $('#rdLayer').textContent = rdSat ? 'Mapa' : 'Satélite'; };
 let rdLayers = [];
 function renderRouteDetail() {
   const r = detailRoute; if (!r) return go('home', { pop: true });
@@ -1674,6 +1798,15 @@ function renderRouteDetail() {
   setTimeout(() => { map.invalidateSize(); map.fitBounds(r.ll, { padding: [36, 36] }); }, 80);
   $('#rdPois').style.display = 'none';
   $('#rdTransit').style.display = 'none';
+  rdBig(false); if (rdSat) { setLayer(map, 'calles'); rdSat = false; } $('#rdLayer').textContent = 'Satélite';
+  $('#rdPhotosCard').style.display = 'none';
+  if (r.ll && r.ll.length > 1) loadPhotos(r).then((ph) => {
+    if (!ph || !ph.length || rdTok !== renderRouteDetail.tok || detailRoute !== r) return;
+    rdPh = ph; $('#rdPhotosSub').textContent = `${ph.length} foto${ph.length === 1 ? '' : 's'}`;
+    $('#rdPhotos').innerHTML = ph.map((x, i) => `<button class="rphoto" data-ph="${i}" aria-label="Ver foto ${i + 1}"><img src="${x.src}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>`).join('');
+    $$('#rdPhotos [data-ph]').forEach((b) => b.onclick = () => showPhoto(Number(b.dataset.ph)));
+    $('#rdPhotosCard').style.display = '';
+  });
   loadPois(r).then((res) => {
     if (!res || rdTok !== renderRouteDetail.tok || detailRoute !== r) return;
     const ps = res.p || [];
@@ -2069,6 +2202,7 @@ function finishRun() {
   const newB = badges().filter((b) => b.when && !before.includes(b.id)); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
+  $('#cMedals').innerHTML = newB.slice(0, 3).map((b, i) => `<div class="medal-pop" style="animation-delay:${0.25 + i * 0.2}s">${medalSvg(b, newB.length > 1 ? 96 : 140, true)}</div>`).join(''); $('#cMedals').style.display = newB.length ? 'flex' : 'none';
   $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.route?.auto ? `Has corrido ${r.route.name}: la próxima vez te comparo con este tiempo.` : r.session && sessDone(r) ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
@@ -2306,10 +2440,12 @@ applyTheme(); reviewPlan();
 history.replaceState({ id: profile.done ? 'home' : 'welcome' }, '');
 if (profile.done) renderHome(); else openWelcome();
 // "Qué hay de nuevo": una vez por versión importante, solo a quien ya usaba la app (a quien empieza no le contamos el historial).
-const NEWS_VER = '0.55', NEWS = [
+const NEWS_VER = '0.56', NEWS = [
+  ['Entrenador IA de verdad', 'en Plan: chatea con él dentro de la app. Conoce tu plan, tus carreras y tus récords.'],
+  ['Fotos de cada ruta', 'mira cómo es el sitio antes de ir, y explora el mapa en grande o en satélite.'],
+  ['Medallas', 'las insignias ahora son medallas de bronce, plata y oro. Tócalas para verlas de cerca.'],
   ['Rutas arregladas', 'ya salen todas las rutas recomendadas en la app. Filtros más simples: zona y tiempo; suelo y orden en «Más filtros».'],
   ['Rutas', 'Para hoy según tu plan, filtro por tiempo, ordenar, fuentes y aseos en el mapa, metro cercano, tu historial en cada ruta e importar GPX.'],
-  ['Entrenador IA', 'eliges una pregunta en el plan y se abre ChatGPT o Claude con tu contexto ya escrito.'],
   ['Correr', 'objetivo en carrera libre, avisos de ritmo, ánimos por voz, calentamiento guiado, modo cinta sin GPS y avisar a alguien antes de salir.'],
   ['Al terminar', 'estiramientos guiados, récords y comparación, ritmo en el mapa y cómo repartiste el esfuerzo.'],
   ['Actividad', 'calendario, retos del mes, evolución del ritmo, tus ritmos, récords, buscador y compartir tu semana.'],
