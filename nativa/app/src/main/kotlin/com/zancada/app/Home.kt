@@ -134,6 +134,7 @@ fun HomeScreen() {
             }
         }
         PlanCardUi(app)
+        WidgetCard(home = true)
         app.nearRoute(here)?.let { n -> NearCard(n) }
         // Salir a correr
         ZCard(Modifier, pad = PaddingValues(start = 22.dp, top = 18.dp, end = 18.dp, bottom = 18.dp), onClick = { Nav.go(PREP) }) {
