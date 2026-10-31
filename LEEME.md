@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.5
+- **Rutas recomendadas**: la pestaña Rutas abre ahora en "Recomendadas", 17 sitios investigados para correr tranquilo sin semáforos ni gente: 12 en Madrid (Dehesa de la Villa, Rodríguez Sahagún, anillo del Canal en el Parque de Santander, Ciudad Universitaria, Parque del Oeste, Madrid Río, Casa de Campo, Retiro, El Pardo, Juan Carlos I, Valdebebas) y 5 en San Fernando (Camposoto–Punta del Boquerón, Carrascón, Tres Amigos, vía a Chiclana, Salina Dolores). Cada tarjeta dice la zona, a cuántos km estás, el suelo, por qué ir y tiene "Cómo llegar" (abre Google Maps en transporte público). Se ordenan por cercanía.
+- El trazado real de cada ruta lo calcula el enrutador peatonal de OpenStreetMap a partir de puntos de paso fijados a mano y se guarda en el móvil; mientras llega se muestra un trazado orientativo. La investigación está en `01_Investigacion/2026-10-31_rutas-correr-madrid-san-fernando_v01.md`.
+- Los bucles generados desde tu posición siguen disponibles en "Bucle desde aquí".
+
 ## Novedades 0.4
 - **Plan de entrenamiento** (tarjeta en Inicio): objetivo (5K, 10K, media o hábito), días de la semana, nivel y 6–12 semanas. Genera cada semana rodajes suaves, series, tempo y rodaje largo, con semana de descarga cada cuatro y afinado antes de la carrera.
 - **Revisión semanal automática**: cada lunes compara lo corrido con lo previsto y sube (+5 %) o baja (−10 % / −15 %) la carga de las semanas siguientes. El motivo se ve en Inicio y en el plan.
