@@ -156,6 +156,31 @@ console.log('3. Copia de seguridad en el APK');
   console.log(`  ${failures === before ? '✓' : '✗'} Exportar copia escribe ${w ? Math.round(w.data.length / 1024) + ' KB' : 'nada'} y abre el menú de compartir`);
 }
 
+// ---------- 4. seguridad: un GPX o una copia con HTML en los nombres no puede ejecutar código ----------
+console.log('4. Seguridad: nombres con código');
+{
+  const before = failures, EVIL = '<img src=x onerror="window.__pwned=1">';
+  const gpx = (tag) => `<?xml version="1.0"?><gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1"><${tag === 'trk' ? 'trk' : 'rte'}><name>${EVIL.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</name>${tag === 'trk' ? '<trkseg>' : ''}` +
+    Array.from({ length: 40 }, (_, i) => `<${tag === 'trk' ? 'trkpt' : 'rtept'} lat="${40.41 + i * 0.0003}" lon="-3.68"><ele>650</ele>${tag === 'trk' ? `<time>${new Date(T0 - 864e5 + i * 10000).toISOString()}</time>` : ''}</${tag === 'trk' ? 'trkpt' : 'rtept'}>`).join('') + `${tag === 'trk' ? '</trkseg></trk>' : '</rte>'}</gpx>`;
+  const evilRun = { ...(savedRuns[0] || { points: [], splits: [], dist: 0, dur: 0 }), id: 'evil', start: T0 - 2 * 864e5, name: EVIL, route: { id: 'x', name: EVIL } };
+  const { ctx, page, errors } = await newPage({ ...BASE, 'zancada.runs.v1': [evilRun], 'zancada.shoes.v1': [{ id: 's1', name: EVIL, km0: 0, created: T0 }], 'zancada.routes.v1': [], 'zancada.profile.v1': { name: EVIL, goal: 3, done: true } });
+  await page.setInputFiles('#gpxFiles', { name: 'a.gpx', mimeType: 'application/gpx+xml', buffer: Buffer.from(gpx('trk')) });
+  await page.clock.runFor(500);
+  await page.evaluate(() => { window.__z.go('routes'); document.querySelector('[data-mode="mine"]')?.click(); });
+  await page.setInputFiles('#routeGpx', { name: 'b.gpx', mimeType: 'application/gpx+xml', buffer: Buffer.from(gpx('rte')) });
+  await page.clock.runFor(500);
+  for (const sc of ['home', 'history', 'routes', 'profile', 'plan']) { await page.evaluate((sc) => window.__z.go(sc), sc); await page.clock.runFor(300); }
+  await page.evaluate(() => { document.querySelector('[data-mode="mine"]')?.click(); window.__z.go('profile'); });
+  for (const r of await page.evaluate(() => window.__z.runs.map((x) => x.id))) { await page.evaluate((id) => window.__z.openSummary(id), r); await page.clock.runFor(300); }
+  const pwned = await page.evaluate(() => !!window.__pwned || !!document.querySelector('img[src="x"]'));
+  const imported = await page.evaluate(() => ({ runs: window.__z.runs.length, routes: JSON.parse(localStorage.getItem('zancada.routes.v1') || '[]').length }));
+  if (imported.runs < 2 || imported.routes < 1) fail(`la prueba no llegó a importar los GPX (${JSON.stringify(imported)})`);
+  if (pwned) fail('un nombre con código HTML (GPX importado o copia restaurada) se ejecuta en la app');
+  errors.forEach((e) => fail(`seguridad: error de JavaScript: ${e}`));
+  await ctx.close();
+  console.log(`  ${failures === before ? '✓' : '✗'} GPX de carrera, GPX de ruta, zapatillas y nombre con código: no se ejecuta`);
+}
+
 await browser.close(); srv.close();
 if (UPDATE) console.log('\nReferencias actualizadas en tests/golden/.');
 console.log(failures ? `\n${failures} fallo(s).` : '\nTodo en orden.');

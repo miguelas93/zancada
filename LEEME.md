@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.60 (31 oct 2026)
+
+- **Fallo de seguridad arreglado.** Un GPX importado (de un amigo, Wikiloc…) o una copia restaurada con código HTML escondido en el nombre (por ejemplo `<img onerror=…>`) se ejecutaba dentro de la app. Ahora todos los nombres (carreras, rutas, zapatillas y tu nombre) se limpian al entrar y al cargar lo ya guardado. Hay una prueba automática nueva que lo vigila.
+- **GitHub más cerrado.** Las automatizaciones solo tienen permiso de lectura salvo el paso que publica el APK, y Dependabot avisa y propone arreglos cuando una dependencia tiene un fallo conocido (`.github/dependabot.yml`). Política en `SECURITY.md`.
+
 ## Novedades 0.59 (31 oct 2026)
 
 - **Pruebas automáticas (fase 0 del paso a app nativa).** Nueva carpeta `tests/`: ocho carreras simuladas (parque, árboles, pausas, semáforo, pantalla bloqueada, cuestas, carrera muy corta y media maratón) que se corren en la app con un GPS y un reloj falsos, más una revisión de todas las pantallas. Se ejecutan solas en GitHub en cada cambio y, si algo cambia sin querer, el APK no se publica. Son también la referencia que tendrá que igualar la app nativa en Kotlin. Detalles en `tests/README.md`.
