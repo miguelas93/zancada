@@ -33,7 +33,11 @@ jobs:
       - name: Copiar la web a www/
         run: |
           mkdir -p www
-          cp -r index.html manifest.json sw.js icon-192.png icon-512.png vendor www/
+          cp -r index.html manifest.json sw.js icon-192.png icon-512.png routes-data.js vendor www/
+          # Comprobar que cada script o estilo local que pide index.html está dentro de la APK
+          for f in $(grep -oE '(src|href)="[^":#?]+\.(js|css)"' index.html | sed -E 's/.*="([^"]+)"/\1/'); do
+            [ -f "www/$f" ] || { echo "Falta $f en www/"; exit 1; }
+          done
 
       - name: Instalar Capacitor y crear el proyecto Android
         run: |
@@ -49,7 +53,7 @@ jobs:
           mkdir -p android/app/src/main/res/drawable && cp android-ci/ic_stat_zancada.png android/app/src/main/res/drawable/ic_stat_zancada.png
           G=android/app/build.gradle
           sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" "$G"
-          sed -i "s/versionName \"1.0\"/versionName \"0.54.${{ github.run_number }}\"/" "$G"
+          sed -i "s/versionName \"1.0\"/versionName \"0.55.${{ github.run_number }}\"/" "$G"
           R=android/app/src/main/res
           rm -rf "$R/mipmap-anydpi-v26"
           for d in "$R"/mipmap-*; do
