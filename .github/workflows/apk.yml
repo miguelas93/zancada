@@ -64,9 +64,15 @@ jobs:
           cat "$M"
 
       - name: Compilar APK
+        env:
+          ZANCADA_KEYSTORE_B64: ${{ secrets.ZANCADA_KEYSTORE_B64 }}
         run: |
-          # Clave de depuración fija para que cada APK nuevo se instale encima del anterior.
-          mkdir -p ~/.android && cp android-ci/debug.keystore ~/.android/debug.keystore
+          # Clave de firma fija para que cada APK nuevo se instale encima del anterior.
+          # Vive en el Secret ZANCADA_KEYSTORE_B64 (base64), nunca en el repo.
+          if [ -z "$ZANCADA_KEYSTORE_B64" ]; then
+            echo "::error::Falta el Secret ZANCADA_KEYSTORE_B64 (Settings > Secrets and variables > Actions)"; exit 1
+          fi
+          mkdir -p ~/.android && echo "$ZANCADA_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
           cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
           cp app/build/outputs/apk/debug/app-debug.apk ../zancada-beta.apk
 
