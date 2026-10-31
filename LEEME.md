@@ -13,6 +13,12 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.30 (31 oct 2026)
+- Arreglos tras una revisión a fondo:
+  - Los tramos por tiempo (corre/anda, fartlek) se daban por "a medias" si no llegabas a unos km estimados; ahora cuentan por minutos ("12 de 29 min").
+  - Un entreno por tramos ya no concede la insignia de "Sesión del plan cumplida".
+  - Con "Tiempo" como dato grande, a partir de una hora el número se reduce para que no se salga de la pantalla.
+
 ## Novedades 0.29 (31 oct 2026)
 - Perfil › "Zancada beta": "Invitar a un amigo" (comparte web y APK) y "Avisar de un fallo" (abre un aviso en GitHub con la versión y el móvil ya rellenados), más el enlace a las novedades.
 

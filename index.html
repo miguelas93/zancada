@@ -324,7 +324,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.29 · invitar y avisar · 31 oct 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.30 · revisión de fallos · 31 oct 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -933,7 +933,7 @@ const BADGE_DEFS = [
   ['sem10', '10 sem', '10 semanas seguidas', (R) => streakWhen(R, 10)],
   ['alba', '< 7 h', 'Madrugador', (R) => firstWhen(R, (r) => new Date(r.start).getHours() < 7)],
   ['noche', '> 21 h', 'Nocturno', (R) => firstWhen(R, (r) => new Date(r.start).getHours() >= 21)],
-  ['plan', 'Plan', 'Sesión del plan cumplida', (R) => firstWhen(R, (r) => r.session && r.dist >= r.session.m * 0.9)],
+  ['plan', 'Plan', 'Sesión del plan cumplida', (R) => firstWhen(R, (r) => r.session && !r.session.custom && r.dist >= r.session.m * 0.9)],
   ['ruta', 'Ruta', 'Una ruta recomendada', (R) => firstWhen(R, (r) => r.route && !String(r.route.id).startsWith('run-'))],
   ['rutas5', '5 rutas', '5 rutas distintas', (R) => { const seen = new Set(); for (let i = R.length - 1; i >= 0; i--) { if (R[i].route && !String(R[i].route.id).startsWith('run-')) seen.add(R[i].route.id); if (seen.size >= 5) return R[i].start; } return 0; }],
 ];
@@ -1740,7 +1740,7 @@ function currentPace() {
 // Toca el dato grande para alternar Distancia → Tiempo → Ritmo medio (NRC/Garmin). El dato desplazado ocupa el hueco de abajo.
 const BIGM = { dist: ['Distancia', 'km'], time: ['Tiempo', ''], pace: ['Ritmo medio', '/km'] };
 function swapBig(el) {
-  const m = settings.bigm || 'dist'; if (m === 'dist') return;
+  const m = settings.bigm || 'dist'; $('#rDist').style.fontSize = m === 'time' && el >= 3600 ? '76px' : '100px'; if (m === 'dist') return;
   const dist = fmtKm(run.dist), time = fmtTime(el), avg = run.dist > 20 ? fmtPace(el / (run.dist / 1000)) : '–:––';
   if (m === 'time') { $('#rDist').textContent = time; $('#rTime').textContent = dist + ' km'; }
   else { $('#rDist').textContent = avg; $('#rTime').textContent = dist + ' km'; }
@@ -1803,7 +1803,7 @@ function finishRun() {
   run.forceSave = false;
   const r = finalizeRun({ id: 'r' + run.start, start: run.start, points: run.points, pausedMs: run.pausedMs });
   if (run.session?.goal) r.goal = run.session.min ? `${run.session.min} min` : `${fmtKmS(run.session.m)} km`;
-  if (run.session && !run.session.goal) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom };
+  if (run.session && !run.session.goal) r.session = { key: run.session.key, week: run.session.week, title: run.session.title, m: run.session.m, type: run.session.type, light: !!run.session.light, custom: !!run.session.custom, ...(run.session.timed ? { min: run.session.min } : {}) };
   if (run.route) { r.route = { id: run.route.id, name: run.route.name }; if (run.ghostRef) r.ghost = { ref: run.ghostRef.id, refDur: run.ghostRef.dur }; }
   else { const det = detectRoute(r); if (det) r.route = { id: det.id, name: det.name, auto: true }; }
   if (settings.shoe && shoes.some((x) => x.id === settings.shoe)) r.shoe = settings.shoe;
@@ -1813,7 +1813,7 @@ function finishRun() {
   const newB = badges().filter((b) => b.when && !before.includes(b.id)); pickedRoute = null; reviewPlan(); syncReminders();
   const w = weekStats(), best = runs.slice(1).reduce((a, x) => Math.max(a, x.dist), 0);
   $('#cDist').textContent = fmtKm(r.dist);
-  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.route?.auto ? `Has corrido ${r.route.name}: la próxima vez te comparo con este tiempo.` : r.session && r.dist >= r.session.m * 0.9 ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
+  $('#cText').textContent = newB.length ? `Nueva insignia: ${listEs(newB.map((b) => b.name))}.` : r.route?.auto ? `Has corrido ${r.route.name}: la próxima vez te comparo con este tiempo.` : r.session && sessDone(r) ? (r.session.custom ? 'Entreno por tramos completado.' : 'Sesión del plan cumplida.') : runs.length === 1 ? 'Tu primera carrera con Zancada.' : r.dist > best ? 'Tu carrera más larga hasta ahora.' : w.count === GOAL_OF() ? 'Objetivo de la semana cumplido.' : 'Carrera guardada.';
   $('#cTime').textContent = fmtTime(r.dur); $('#cPace').textContent = fmtPace(r.dur / (r.dist / 1000)); $('#cWeek').textContent = `${w.count} de ${GOAL_OF()}`;
   $('#toSummary').onclick = () => openSummary(r.id);
   const okS = r.splits.filter((x) => !x.partial), bestS = okS.length ? okS.reduce((a, x) => (x.split < a.split ? x : a)) : null;
@@ -1842,6 +1842,8 @@ function speak(text) { buzz(); try { if (settings.voice === '0' || !('speechSynt
 
 // ---------- resumen ----------
 let current = null, sumLayers = [];
+// Sesión cumplida: por tiempo en los tramos por minutos (corre/anda, fartlek), por distancia en el resto.
+const sessDone = (r) => r.session?.min ? r.dur >= r.session.min * 60 * 0.9 : r.dist >= r.session.m * 0.9;
 function compareRun(r) {
   if (!r.dist || r.dist < 500) return null;
   const prev = runs.filter((x) => x.id !== r.id && x.start < r.start && x.dist > 500 && ((r.route && x.route?.id === r.route.id) || Math.abs(x.dist - r.dist) / r.dist <= 0.15)).sort((a, b) => b.start - a.start)[0];
@@ -1900,7 +1902,7 @@ function runInsights(r) {
   const longest = prev.length ? Math.max(...prev.map((x) => x.dist)) : 0; if (prev.length >= 2 && r.dist > longest) out.push('Es tu carrera más larga hasta ahora.');
   const wk = runs.filter((x) => x.start >= weekStart(r.start) && x.start < weekStart(r.start) + 7 * 864e5 && x.start <= r.start).length; if (wk >= 3) out.push(`Van ${wk} carreras esta semana.`);
   { const ws1 = weekStart(r.start), wkm = runs.filter((x) => x.start >= ws1 && x.start < ws1 + 7 * 864e5 && x.start <= r.start).reduce((a, x) => a + x.dist, 0), p4 = runs.filter((x) => x.start >= ws1 - 28 * 864e5 && x.start < ws1).reduce((a, x) => a + x.dist, 0) / 4; if (p4 > 3000 && wkm > p4 * 1.35) out.push(`Esta semana llevas ${fmtKmS(wkm)} km, un ${Math.round((wkm / p4 - 1) * 100)} % más que tu media: subir más del 10 % por semana es la forma más fácil de lesionarse.`); }
-  if (r.session?.custom) out.push(r.dist >= r.session.m * 0.9 ? 'Entreno por tramos completado.' : `Entreno por tramos a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km.`);
+  if (r.session?.custom) out.push(sessDone(r) ? 'Entreno por tramos completado.' : r.session.min ? `Entreno por tramos a medias: ${Math.round(r.dur / 60)} de ${r.session.min} min.` : `Entreno por tramos a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km.`);
   else if (r.session) out.push(r.dist >= r.session.m * 0.9 ? 'Sesión del plan cumplida.' : `Sesión del plan a medias: ${fmtKm(r.dist)} de ${fmtKmS(r.session.m)} km; el lunes lo tengo en cuenta.`);
   return out.slice(0, 3).join(' ');
 }
