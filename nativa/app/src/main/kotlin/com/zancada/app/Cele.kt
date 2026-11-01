@@ -49,7 +49,7 @@ fun CeleScreen() {
     val cele by RunBus.cele.collectAsState()
     val ce = cele ?: run { LaunchedEffect(Unit) { Nav.reset(Scr(HOME)) }; return }
     val r = ce.run; val app = remember { Repo.app() }
-    val name = Repo.data.value.profile.name
+    val name = Repo.data.collectAsState().value.profile.name
     val w = remember { app.homeWeek() }
     val plan = remember { app.planCard() }
     val draw = remember { Animatable(0f) }
