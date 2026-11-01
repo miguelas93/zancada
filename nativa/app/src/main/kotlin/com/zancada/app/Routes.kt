@@ -297,6 +297,8 @@ fun RouteDetailScreen(r: Route) {
                 }
                 Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = ins.calculateTopPadding() + 14.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     IconBtn(Ico.back2, { Nav.back() })
+                    Spacer(Modifier.weight(1f))
+                    ChipB("Vista 3D", false, { Nav.go(V3D, route = r) }, Modifier.padding(end = 10.dp, top = 3.dp), bg = c.bar, fg = c.onBar)
                     IconBtn(if (saved) Ico.saved else Ico.save, {
                         if (saved) { Repo.update { d -> d.copy(savedRoutes = d.savedRoutes.filter { it.id != r.id }) }; toast("Quitada de tus recorridos") }
                         else { Repo.update { d -> d.copy(savedRoutes = listOf(Route(r.id, r.name, r.ll, r.km, r.gain, created = System.currentTimeMillis())) + d.savedRoutes) }; toast("Guardada en Mis recorridos") }
