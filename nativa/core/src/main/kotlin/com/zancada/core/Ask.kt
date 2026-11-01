@@ -15,6 +15,8 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
+import kotlin.math.PI
 
 /**
  * «Pídesela a Zeta»: describes la ruta con palabras («8 km llanos, con sombra, pasando por el río»)
@@ -190,4 +192,157 @@ fun scoreAsk(ll: List<List<Double>>, km: Double, gain: Int?, spec: AskSpec, feat
     }
     if (why.isEmpty()) why.add(if (spec.want.isEmpty()) "${fmtKmS(km * 1000)} km desde donde estás" else "la que más se acerca a lo que pides")
     return AskResult(score, why.joinToString(" · ").replaceFirstChar { it.uppercase() })
+}
+
+// ---------- planes de ruta que pasan POR el sitio pedido y comprobación final ----------
+
+/** Un plan: puntos de paso según un factor [f] (1 = tamaño estimado); se ajusta para clavar los km. */
+class AskPlan(val label: String, val via: String?, val build: (Double) -> List<LatLon>)
+
+private fun lerp(a: LatLon, b: LatLon, t: Double) = LatLon(a.lat + (b.lat - a.lat) * t, a.lon + (b.lon - a.lon) * t)
+
+/** Puntos repartidos por dentro del borde de un anillo (a [inset] del centro hacia el borde), empezando por el más cercano a [from]. */
+fun ringWaypoints(ring: List<LatLon>, center: LatLon, from: LatLon, n: Int, inset: Double): List<LatLon> {
+    if (ring.isEmpty()) return emptyList()
+    val i0 = ring.indices.minByOrNull { hav(ring[it], from) }!!
+    return (0 until n).map { k -> lerp(center, ring[(i0 + k * ring.size / n) % ring.size], inset) }
+}
+
+/** Puntos a lo largo de una línea desde el más cercano a [from], hasta recorrer [m] metros. */
+fun alongLine(line: List<LatLon>, from: LatLon, m: Double): List<LatLon> {
+    if (line.size < 2) return line
+    val i0 = line.indices.minByOrNull { hav(line[it], from) }!!
+    // hacia el lado con más recorrido
+    val fwd = line.subList(i0, line.size); val back = line.subList(0, i0 + 1).reversed()
+    val dirPts = if (fwd.zipWithNext().sumOf { (a, b) -> hav(a, b) } >= back.zipWithNext().sumOf { (a, b) -> hav(a, b) }) fwd else back
+    val out = mutableListOf(dirPts[0]); var d = 0.0; var lastKeep = 0.0
+    for (i in 1 until dirPts.size) {
+        d += hav(dirPts[i - 1], dirPts[i])
+        if (d - lastKeep >= 400 || d >= m) { out.add(dirPts[i]); lastKeep = d }
+        if (d >= m) break
+    }
+    return out
+}
+
+/**
+ * Planes para lo pedido: por dentro de parques/bosques, a lo largo de riberas y ríos, o bucles normales.
+ * Con «fuente», mete de paso la fuente más cercana al sitio elegido.
+ */
+fun askPlans(here: LatLon, spec: AskSpec, spots: List<Spot>, feats: List<AskFeat>, seed: Int = 0, place: Spot? = null): List<AskPlan> {
+    val plans = mutableListOf<AskPlan>()
+    val budget = spec.km * 1000
+    val fountains = feats.filter { it.kind == "fuente" }.map { it.pts[0] }
+    fun withFountain(pts: List<LatLon>): List<LatLon> {
+        if ("fuente" !in spec.want || fountains.isEmpty() || pts.size < 2) return pts
+        val f = fountains.minByOrNull { q -> pts.drop(1).minOf { hav(it, q) } }!!
+        if (pts.drop(1).minOf { hav(it, f) } > 600) return pts
+        val i = (1 until pts.size).minByOrNull { hav(pts[it], f) }!!
+        return pts.take(i) + f + pts.drop(i)
+    }
+    val reach = budget * 0.42
+    if (place != null) {
+        val d = max(0.0, hav(here, place.center) - sqrt(place.areaM2 / PI))
+        if (place.kind == "rio" || place.elongated) {
+            val axis = longAxis(place.rings.flatten()).first.let { a -> place.rings.flatten().sortedBy { hav(a, it) } }
+            plans += AskPlan("Por ${place.name}", place.name) { f -> val along = alongLine(axis, here, max(400.0, (budget - 2 * d) / 2 * f)); withFountain(listOf(here) + along + along.reversed().drop(1) + here) }
+        } else {
+            val ring = place.rings.maxByOrNull { ringArea(it) }!!
+            plans += AskPlan("Por ${place.name}", place.name) { f ->
+                val inner = max(600.0, budget - 2 * d) * f
+                val laps = max(1, (inner / max(400.0, place.perimM * 0.7)).toInt()).coerceAtMost(4)
+                val one = ringWaypoints(ring, place.center, here, 6, (inner / laps / max(400.0, place.perimM * 0.7)).coerceIn(0.35, 0.85))
+                withFountain(listOf(here) + (1..laps).flatMap { one } + one.first() + here)
+            }
+        }
+    }
+    if ("verde" in spec.want) {
+        spots.filter { it.kind == "parque" || it.kind == "bosque" || it.kind == "rio" }
+            .map { it to max(0.0, hav(here, it.center) - sqrt(it.areaM2 / PI)) }
+            .filter { (_, d) -> d < reach }
+            .sortedByDescending { (s, d) -> min(s.perimM, budget - 2 * d) / budget - d / budget }
+            .take(3).forEach { (s, _) ->
+                val ring = s.rings.maxByOrNull { ringArea(it) }!!
+                plans += AskPlan("Por ${s.name}", s.name) { f ->
+                    val d = hav(here, s.center)
+                    val inner = max(600.0, budget - 2 * d) * f
+                    val laps = max(1, (inner / max(400.0, s.perimM * 0.7)).toInt()).coerceAtMost(4)
+                    val inset = (inner / laps / max(400.0, s.perimM * 0.7)).coerceIn(0.35, 0.85)
+                    val one = ringWaypoints(ring, s.center, here, 6, inset)
+                    withFountain(listOf(here) + (1..laps).flatMap { one } + one.first() + here)
+                }
+            }
+    }
+    if ("agua" in spec.want) {
+        val lines = feats.filter { it.kind == "agua" && it.box == null && it.pts.size >= 2 }.map { it.pts } +
+            spots.filter { it.kind == "rio" }.map { s -> longAxis(s.rings.flatten()).let { (a, b) -> s.rings.flatten().sortedBy { p -> hav(a, p) } } }
+        lines.map { l -> l to l.minOf { hav(here, it) } }.filter { (_, d) -> d < reach }.sortedBy { it.second }.take(2).forEachIndexed { k, (l, d) ->
+            plans += AskPlan("Junto al agua", null) { f ->
+                val along = alongLine(l, here, max(400.0, (budget - 2 * d) / 2 * f))
+                withFountain(listOf(here) + along + along.reversed().drop(1) + here)
+            }
+        }
+    }
+    // Bucles normales (siempre, para comparar y por si lo anterior no sale).
+    askBearings(here, spec, feats, if (plans.isEmpty()) 4 else 2, seed).forEach { brg ->
+        plans += AskPlan("Bucle hacia el ${compass(brg)}", null) { f ->
+            val r = budget * f / (2 * PI) / 1.25; val c = dest(here, brg, r)
+            withFountain(listOf(here, dest(c, brg + 90, r), dest(c, brg, r), dest(c, brg - 90, r), here))
+        }
+    }
+    return plans.take(6)
+}
+
+/** Ruta calculada para un plan, ajustando el tamaño hasta quedar a ±8 % de los km pedidos (como mucho 3 intentos). */
+fun routePlan(p: AskPlan, km: Double, route: (List<LatLon>) -> Routed): Routed {
+    var f = 1.0; var best: Routed? = null
+    for (i in 0 until 3) {
+        val r = route(p.build(f))
+        if (best == null || abs(r.km - km) < abs(best.km - km)) best = r
+        if (abs(r.km - km) / km <= 0.08) break
+        f *= (km / max(0.3, r.km)).coerceIn(0.4, 2.5)
+    }
+    return best!!
+}
+
+data class AskCheck(val ok: Boolean, val miss: List<String>, val why: String, val score: Double)
+
+/** Comprueba cada cosa pedida con datos reales; [miss] dice lo que no cumple. */
+fun checkAsk(ll: List<List<Double>>, km: Double, gain: Int?, spec: AskSpec, feats: List<AskFeat>, spots: List<Spot>): AskCheck {
+    val miss = mutableListOf<String>(); val why = mutableListOf<String>()
+    val err = abs(km - spec.km) / spec.km
+    if (err > 0.12) miss += "sale de ${fmtKmS(km * 1000)} km en vez de ${fmtKmS(spec.km * 1000)}"
+    val gpk = (gain ?: 0) / max(0.5, km)
+    if (spec.flat && gain != null) { if (gpk > 9) miss += "tiene +$gain m de desnivel" else why += "llana (+$gain m)" }
+    if (spec.hills && gain != null) { if (gpk < 10) miss += "apenas tiene cuestas (+$gain m)" else why += "con cuestas (+$gain m)" }
+    val pts = ll.map { LatLon(it[0], it[1]) }
+    val step = max(1, pts.size / 400); val sample = pts.filterIndexed { i, _ -> i % step == 0 }
+    val segKm = km / max(1, sample.size)
+    if ("verde" in spec.want) {
+        val boxes = feats.filter { it.kind == "verde" && it.box != null }.map { it.box!! }
+        val green = spots.filter { it.kind != "pista" }
+        val n = sample.count { p -> green.any { it.contains(p) } || boxes.any { b -> p.lat >= b[0] && p.lat <= b[2] && p.lon >= b[1] && p.lon <= b[3] } }
+        val frac = n.toDouble() / max(1, sample.size)
+        if (frac < 0.35) miss += "solo ${fmtKmS(n * segKm * 1000)} km por zonas verdes" else why += "${fmtKmS(n * segKm * 1000)} km por zonas verdes"
+        spots.filter { s -> s.kind != "pista" && sample.count { s.contains(it) } * segKm >= 0.5 }.maxByOrNull { s -> sample.count { s.contains(it) } }?.let { why.add(0, "por ${it.name}") }
+    }
+    if ("agua" in spec.want) {
+        val lines = feats.filter { it.kind == "agua" && it.box == null }.flatMap { it.pts }
+        val riv = spots.filter { it.kind == "rio" }
+        val n = sample.count { p -> riv.any { it.contains(p) } || lines.any { q -> abs(q.lat - p.lat) < 0.0012 && abs(q.lon - p.lon) < 0.0016 && hav(p, q) < 110 } }
+        if (n.toDouble() / max(1, sample.size) < 0.3) miss += "solo ${fmtKmS(n * segKm * 1000)} km junto al agua" else why += "${fmtKmS(n * segKm * 1000)} km junto al agua"
+    }
+    if ("fuente" in spec.want) {
+        val fs = feats.filter { it.kind == "fuente" }.map { it.pts[0] }
+        val at = sample.indexOfFirst { p -> fs.any { q -> abs(q.lat - p.lat) < 0.0006 && hav(p, q) < 45 } }
+        if (at < 0) miss += "no pasa por ninguna fuente" else why += "fuente en el km ${fmtKmS(at * segKm * 1000)}"
+    }
+    val s = scoreAsk(ll, km, gain, spec, feats).score - miss.size * 5
+    return AskCheck(miss.isEmpty(), miss, why.ifEmpty { listOf("${fmtKmS(km * 1000)} km desde donde estás") }.joinToString(" · ").replaceFirstChar { it.uppercase() }, s)
+}
+
+/** Si la frase nombra un sitio de la lista («por Madrid Río», «en el Retiro»), ese sitio. */
+fun matchPlace(text: String, spots: List<Spot>): Spot? {
+    fun n(t: String) = t.lowercase().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+    val t = n(text)
+    return spots.filter { s -> val k = n(s.name).replace(Regex("^(parque|jardines?|jardin|paseo|pinar|bosque|monte)\\s+(de\\s+la\\s+|del\\s+|de\\s+los\\s+|de\\s+las\\s+|de\\s+)?"), ""); k.length >= 4 && t.contains(k) }.maxByOrNull { it.name.length }
 }

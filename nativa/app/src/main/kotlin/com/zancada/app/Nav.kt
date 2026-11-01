@@ -41,7 +41,7 @@ data class Scr(val id: String, val run: String? = null, val route: Route? = null
 
 const val HOME = "home"; const val HISTORY = "history"; const val ROUTES = "routes"; const val PROFILE = "profile"; const val CLUBS = "clubs"
 const val WELCOME = "welcome"; const val ROUTE = "routeDetail"; const val PLAN = "plan"; const val PLANSETUP = "planSetup"; const val PREP = "prep"
-const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val V3D = "view3d"
+const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val V3D = "view3d"; const val SPOT = "spot"
 val TABS = listOf(HOME, HISTORY, ROUTES, PROFILE)
 private val TRANSIENT = setOf(WELCOME, COUNT, RUN, CELE)
 /** Pantallas oscuras (para el color de los iconos de la barra de estado). */
@@ -84,12 +84,15 @@ object St {
     // Actividad
     var histFilter by mutableStateOf("all"); var histQ by mutableStateOf(""); var calOff by mutableStateOf(0)
     // Rutas
-    var rMode by mutableStateOf("rec"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
+    var rMode by mutableStateOf("spots"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
     var rDist by mutableStateOf("all"); var rSurf by mutableStateOf("all"); var rSort by mutableStateOf("near"); var rMore by mutableStateOf(false)
     var rKm by mutableStateOf(5); var rSug by mutableStateOf<List<Route>>(emptyList()); var rSugBusy by mutableStateOf(false); var rSugErr by mutableStateOf<String?>(null)
     // «Pídesela a Zeta»
     var askQ by mutableStateOf(""); var askList by mutableStateOf<List<Route>>(emptyList()); var askBusy by mutableStateOf<String?>(null); var askErr by mutableStateOf<String?>(null)
-    var askSpec by mutableStateOf<AskSpec?>(null)
+    var askSpec by mutableStateOf<AskSpec?>(null); var askAuto by mutableStateOf(false); var askNote by mutableStateOf<String?>(null)
+    // Sitios
+    var spots by mutableStateOf<List<Spot>>(emptyList()); var spotsKey by mutableStateOf<String?>(null); var spotsBusy by mutableStateOf(false)
+    var spot by mutableStateOf<Spot?>(null)
     // Preparar
     var prepMode by mutableStateOf<String?>(null)
     var pickedRoute by mutableStateOf<Route?>(null)
@@ -156,6 +159,7 @@ fun ZRoot() {
                     HEAT -> HeatScreen()
                     REPLAY -> ReplayScreen(scr.run)
                     V3D -> Map3dScreen(scr.route, scr.run)
+                    SPOT -> SpotScreen()
                 }
             }
             if (scr.id in TABS || scr.id == CLUBS) Tabs(scr.id, Modifier.align(Alignment.BottomCenter))
