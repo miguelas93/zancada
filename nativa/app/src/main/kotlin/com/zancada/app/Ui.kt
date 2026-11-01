@@ -38,6 +38,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -536,4 +538,45 @@ fun wxIcon(code: Int?): ImageVector = when (code ?: 0) {
     0, 1 -> Ico.sun
     in 51..67, in 80..82, in 95..99 -> Ico.rain
     else -> Ico.cloud
+}
+
+/**
+ * Ilustración de estado vacío con la marca: una ruta discontinua que se dibuja sola, de la salida A
+ * (píldora hueca) a la meta B (píldora llena), como en el logo B5.
+ */
+@Composable
+fun EmptyArt(modifier: Modifier = Modifier.size(150.dp, 96.dp), bg: Color = Z.c.bg) {
+    val ink = Z.text; val volt = Z.c.volt; val bgC = bg
+    val draw = animatedOnce(1f, 1100, 150)
+    Canvas(modifier) {
+        val w = size.width; val h = size.height; val s = 4.dp.toPx()
+        val p = Path().apply {
+            moveTo(w * 0.12f, h * 0.30f)
+            cubicTo(w * 0.45f, h * 0.05f, w * 0.30f, h * 0.85f, w * 0.58f, h * 0.70f)
+            cubicTo(w * 0.80f, h * 0.58f, w * 0.70f, h * 0.30f, w * 0.88f, h * 0.72f)
+        }
+        val pm = android.graphics.PathMeasure(p.asAndroidPath(), false); val len = pm.length
+        val part = android.graphics.Path(); pm.getSegment(0f, len * draw, part, true)
+        drawPath(part.asComposePath(), ink, style = Stroke(s, cap = StrokeCap.Round, join = StrokeJoin.Round, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(s * 0.1f, s * 2.4f))))
+        // A: píldora hueca; B: píldora llena (lima con borde tinta).
+        val pa = Offset(w * 0.12f, h * 0.30f); val pb = Offset(w * 0.88f, h * 0.72f)
+        val pw = 22.dp.toPx(); val ph = 11.dp.toPx(); val cr = androidx.compose.ui.geometry.CornerRadius(ph / 2)
+        drawRoundRect(bgC, Offset(pa.x - pw / 2, pa.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr)
+        drawRoundRect(ink, Offset(pa.x - pw / 2, pa.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr, style = Stroke(2.5.dp.toPx()))
+        if (draw > 0.95f) {
+            drawRoundRect(volt, Offset(pb.x - pw / 2, pb.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr)
+            drawRoundRect(ink, Offset(pb.x - pw / 2, pb.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr, style = Stroke(2.5.dp.toPx()))
+        }
+    }
+}
+
+/** Estado vacío: ilustración + título corto + una línea + acción opcional. */
+@Composable
+fun EmptyState(title: String, sub: String? = null, action: String? = null, onAction: (() -> Unit)? = null, modifier: Modifier = Modifier, bg: Color = Z.c.bg) {
+    Column(modifier.fillMaxWidth().padding(vertical = 28.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        EmptyArt(bg = bg)
+        Txt(title, size = 17.sp, weight = FontWeight.SemiBold, align = TextAlign.Center)
+        sub?.let { Sub(it, align = TextAlign.Center, modifier = Modifier.padding(horizontal = 24.dp)) }
+        if (action != null && onAction != null) Btn(action, onAction, Modifier.padding(top = 6.dp), BtnKind.Inv, 46.dp, 14.sp, fill = false)
+    }
 }

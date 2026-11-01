@@ -228,7 +228,7 @@ private fun RoutePick(ui: RunUi, onPick: (Route) -> Unit) {
         val all = app.myRoutes() + app.zr.filter { here == null || hav(here, it.startLL()) < 15000 }
         all.distinctBy { it.id }.sortedBy { r -> here?.let { hav(it, r.startLL()) } ?: 0.0 }.take(15)
     }
-    if (list.isEmpty()) Sub("No hay rutas guardadas ni recomendadas cerca. Guarda una en Rutas para poder cargarla.")
+    if (list.isEmpty()) Sub("No hay rutas cerca. Guarda una en Rutas.")
     list.forEach { r ->
         val away = here?.let { hav(it, r.startLL()) }
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Z.c.surface2).clickable { onPick(r) }.padding(horizontal = 16.dp, vertical = 12.dp),

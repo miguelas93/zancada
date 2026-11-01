@@ -59,10 +59,12 @@ fun HistoryScreen() {
         TopTabs(listOf("prog" to "Progreso", "runs" to "Carreras", "retos" to "Retos"), St.histTab, { St.histTab = it }, Modifier.padding(horizontal = 8.dp))
         Box(Modifier.weight(1f)) {
             val pad = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = ins.calculateBottomPadding() + 110.dp)
-            when (St.histTab) {
-                "runs" -> ScreenCol(pad = pad, gap = 12.dp, scroll = rememberScrollState()) { RunsTab(app, data) }
-                "retos" -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { RetosTab(app) }
-                else -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { ProgressTab(app) }
+            TabBody(St.histTab, listOf("prog", "runs", "retos")) { t ->
+                when (t) {
+                    "runs" -> ScreenCol(pad = pad, gap = 12.dp, scroll = rememberScrollState()) { RunsTab(app, data) }
+                    "retos" -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { RetosTab(app) }
+                    else -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { ProgressTab(app) }
+                }
             }
         }
     }
@@ -164,9 +166,9 @@ private fun RunsTab(app: App, data: AppData) {
         listOf("all" to "Todas", "plan" to "Del plan", "route" to "Con ruta", "long" to "Largas", "note" to "Con notas").forEach { (k, l) -> ChipB(l, St.histFilter == k, { St.histFilter = k }) }
     }
     val shown = app.historyList(St.histFilter, St.histQ)
-    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().padding(vertical = 40.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        ZMark(40.dp, if (c.night) c.volt else c.ink)
-        Sub(if (data.runs.isNotEmpty()) "Ninguna carrera con ese filtro" else "Aún no hay carreras", align = TextAlign.Center)
+    if (shown.isEmpty()) {
+        if (data.runs.isNotEmpty()) EmptyState("Nada con ese filtro", action = "Ver todas", onAction = { St.histFilter = "all"; St.histQ = "" })
+        else EmptyState("Tu primera carrera te espera", "Aquí verás cada salida con su mapa.", "Salir a correr", { Nav.go(PREP) })
     } else Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(c.surface).padding(horizontal = 14.dp, vertical = 2.dp)) {
         shown.forEachIndexed { i, r -> if (i > 0) Divider(); HistRow(r, app) }
     }
@@ -323,7 +325,7 @@ fun ClubsScreen() {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { H1("Clubs"); IconBtn(Ico.close, { Nav.go(PROFILE) }) }
         ZCard(dark = true, pad = PaddingValues(24.dp), gap = 12.dp) {
             Chip("Muy pronto"); Num("Corre con tu gente", 30.sp)
-            Sub("Clubs, clasificación semanal y quedadas llegarán cuando Zancada tenga cuentas. En esta beta todo vive en tu móvil, así que todavía no hay nada que compartir con otros.", size = 14.sp)
+            Sub("Clubs y quedadas llegarán con las cuentas.", size = 14.sp)
         }
         ZCard(gap = 4.dp) {
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) { H2("Clasificación semanal"); Sub("km", size = 12.sp) }
@@ -365,7 +367,7 @@ fun HeatScreen() {
             Lbl("Todas tus carreras")
             val first = rs.minOfOrNull { it.start } ?: app.now()
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Stat("Carreras", rs.size.toString(), 26.sp); Stat("Km", jsRound(rs.sumOf { it.dist } / 1000).toString(), 26.sp); Stat("Desde", app.es.monShortYY(first), 26.sp) }
-            Sub("Cuanto más repites un camino, más intenso se ve. Pellizca para acercarte.", size = 12.sp)
+            Sub("Más intenso = más veces. Pellizca para acercar.", size = 12.sp)
         }
     }
 }
