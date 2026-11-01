@@ -146,7 +146,7 @@ fun ProfileScreen() {
             SelRow("Avisos de voz", listOf("1" to "Cada km", "half" to "Cada 500 m", "min5" to "Cada 5 min", "0" to "Sin voz"), s.voice) { v -> Repo.settings { it.copy(voice = v) } }
             SelRow("Texto más grande", listOf("0" to "Normal", "1" to "Grande"), s.bigtext) { v -> Repo.settings { it.copy(bigtext = v) } }
             SelRow("Modo noche", listOf("auto" to "Automático", "on" to "Siempre", "off" to "Nunca"), s.night) { v -> Repo.settings { it.copy(night = v) } }
-            SelRow("Mapa del resumen", listOf("calles" to "Calles", "sat" to "Satélite"), s.map) { v -> Repo.settings { it.copy(map = v) } }
+            SelRow("Mapa del resumen", MAP_TYPES, s.map) { v -> Repo.settings { it.copy(map = v) } }
             SelRow("Autopausa al pararte", listOf("1" to "Sí", "0" to "No"), s.autopause) { v -> Repo.settings { it.copy(autopause = v) } }
         }
         ShoesCard(app)
@@ -193,7 +193,7 @@ fun ProfileScreen() {
 
 /** Pulsómetro Bluetooth: banda de pecho o reloj que emita el pulso. */
 @Composable
-private fun HrCard() {
+fun HrCard(onPick: (() -> Unit)? = null) {
     val ctx = LocalContext.current
     val st = Repo.data.collectAsState().value.settings
     val found = remember { mutableStateListOf<HrFound>() }
@@ -221,7 +221,7 @@ private fun HrCard() {
             if (searching) Sub("Buscando…", size = 12.sp)
             found.forEach { f ->
                 Btn(f.name, {
-                    scan?.stop(); Repo.settings { it.copy(hrAddr = f.addr, hrName = safeText(f.name, 30)) }; toast("${f.name} guardado")
+                    scan?.stop(); Repo.settings { it.copy(hrAddr = f.addr, hrName = safeText(f.name, 30)) }; toast("${f.name} guardado"); onPick?.invoke()
                 }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
             }
             if (!searching && found.isEmpty() && scan != null) Sub("No he encontrado ninguno. Comprueba que está encendido y emitiendo (en relojes, el modo «emitir pulso»).", size = 12.sp)

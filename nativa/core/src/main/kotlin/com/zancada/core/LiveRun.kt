@@ -19,8 +19,10 @@ class LiveRun(
     startPos: LatLon?,
     private val speak: (String) -> Unit,
     private val toast: (String) -> Unit = {},
+    /** Ajustes en vivo (se pueden cambiar en mitad de la carrera); por defecto, los del inicio. */
+    private val settingsOf: (() -> Settings)? = null,
 ) {
-    private val settings get() = app.settings
+    private val settings get() = settingsOf?.invoke() ?: app.settings
     val guide: List<Seg>? = if (sess?.goal == true && sess.min != null) null else buildGuide(sess)
     val nav: Nav? = route?.let { buildNav(it.ll) }?.also { n -> if (startPos != null && hav(startPos, n.pts[0]) > 50) n.phase = "start" }
 
