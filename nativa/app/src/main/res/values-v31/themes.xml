@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+: pantalla de arranque del sistema en tinta y sin icono; enseguida la app anima la Z (Logo.kt). -->
+    <style name="Theme.Zancada" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#0B0C0B</item>
+        <item name="android:statusBarColor">#0B0C0B</item>
+        <item name="android:navigationBarColor">#0B0C0B</item>
+        <item name="android:windowSplashScreenBackground">@color/zancada_tinta</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_vacio</item>
+    </style>
+</resources>

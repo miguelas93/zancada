@@ -14,6 +14,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -43,6 +46,8 @@ object Perm {
 }
 
 class MainActivity : ComponentActivity() {
+    /** Animación del logo al abrir la app (no al volver a una carrera en marcha). */
+    private var intro by mutableStateOf(false)
     private var pending: ((Boolean) -> Unit)? = null
     private val askPerms = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { res ->
         val cb = pending; pending = null
@@ -77,6 +82,7 @@ class MainActivity : ComponentActivity() {
         else if (RunBus.state.value.phase == Phase.RUNNING && Nav.cur.id != RUN) Nav.reset(Scr(HOME), Scr(RUN))
         Reminders.sync(this)
         handle(intent)
+        intro = savedInstanceState == null && Nav.cur.id != RUN
         setContent {
             val data by Repo.data.collectAsState()
             val minute by Repo.minute.collectAsState()
@@ -86,7 +92,7 @@ class MainActivity : ComponentActivity() {
                 WindowCompat.getInsetsController(window, window.decorView).apply { isAppearanceLightStatusBars = !darkBars; isAppearanceLightNavigationBars = !darkBars }
             }
             LaunchedEffect(Unit) {
-                delay(700)
+                delay(if (intro) INTRO_MS + 700L else 700L)
                 val s = Repo.data.value
                 if (s.profile.done && s.settings.newsSeen != NEWS_VER && St.modal == null && Nav.cur.id == HOME) St.modal = "news"
             }
@@ -97,7 +103,10 @@ class MainActivity : ComponentActivity() {
                     else -> closeModal()
                 }
             }
-            ZRoot()
+            Box {
+                ZRoot()
+                if (intro) IntroSplash { intro = false }
+            }
         }
     }
 

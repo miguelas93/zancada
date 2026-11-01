@@ -86,7 +86,7 @@ object Images {
             fp.color = 0xFFFFFFFF.toInt(); x.drawCircle(a[0], a[1], 14f, fp); fp.color = INK; x.drawCircle(a[0], a[1], 7f, fp)
             fp.color = VOLT; x.drawCircle(b[0], b[1], 14f, fp); fp.color = INK; x.drawCircle(b[0], b[1], 7f, fp)
         }
-        x.drawText("Zancada", 90f, 130f, paint(f.disp, 44f, FG))
+        lockup(ctx, x, 90f, 92f, 42f)
         x.drawText(app.es.fmtDate(r.start) + (r.route?.let { "  ·  " + it.name } ?: r.session?.let { "  ·  " + it.title.ifEmpty { "sesión del plan" } } ?: ""), 90f, 185f, paint(f.b500, 30f, mut(.6)))
         val big = paint(f.disp, 190f, FG); x.drawText(fmtKm(r.dist), 80f, 1095f, big)
         x.drawText("km", 90f + big.measureText(fmtKm(r.dist)) + 16f, 1095f, paint(f.b600, 56f, mut(.6)))
@@ -103,6 +103,14 @@ object Images {
         return png(bmp)
     }
 
+    /** Logo (símbolo volt + «zancada») arriba a la izquierda de las imágenes para compartir. */
+    private fun lockup(ctx: Context, x: Canvas, left: Float, top: Float, h: Float) {
+        val mw = h * MARK_W / MARK_H
+        ContextCompat.getDrawable(ctx, R.drawable.zancada_marca)?.mutate()?.apply { setBounds(left.toInt(), top.toInt(), (left + mw).toInt(), (top + h).toInt()); setTint(VOLT); draw(x) }
+        val wh = h * 0.62f; val ww = wh * 5512f / 786f; val wx = left + mw + h * 0.42f; val wy = top + (h - wh) / 2
+        ContextCompat.getDrawable(ctx, R.drawable.zancada_logotipo)?.mutate()?.apply { setBounds(wx.toInt(), wy.toInt(), (wx + ww).toInt(), (wy + wh).toInt()); setTint(FG); draw(x) }
+    }
+
     fun week(ctx: Context, app: App): ByteArray? {
         val ws = app.weekStart(app.now()); val wr = app.runs.filter { it.start >= ws }
         if (wr.isEmpty()) return null
@@ -110,7 +118,7 @@ object Images {
         val dist = wr.sumOf { it.dist }; val dur = wr.sumOf { it.dur }; val gain = wr.sumOf { (it.gain ?: 0).toDouble() }
         val day = DoubleArray(7); wr.forEach { day[app.es.dow(it.start)] += it.dist / 1000 }
         x.drawColor(INK)
-        x.drawText("Zancada", 90f, 130f, paint(f.disp, 44f, FG))
+        lockup(ctx, x, 90f, 92f, 42f)
         x.drawText("Mi semana · ${app.es.dayMon(ws)} – ${app.es.dayMon(ws + 6 * DAY)}", 90f, 180f, paint(f.b500, 30f, mut(.6)))
         val big = paint(f.disp, 230f, FG); x.drawText(fmtKm(dist), 80f, 480f, big)
         x.drawText("km", 96f + big.measureText(fmtKm(dist)) + 12f, 480f, paint(f.b600, 64f, mut(.6)))

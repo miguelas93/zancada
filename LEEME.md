@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.61 (1 nov 2026)
+
+- **Logo nuevo (B5).** La Z es una ruta: la pastilla hueca es la salida (A) y la maciza la meta (B). Está en el icono de la app, el favicon, la bienvenida y arriba a la derecha en Inicio.
+- **Arranque animado.** Al abrir la app aparece la A, se dibuja la Z y aterriza la B (1,5 s; un toque lo salta, y no sale si el móvil tiene las animaciones reducidas).
+
 ## Novedades 0.60 (31 oct 2026)
 
 - **Fallo de seguridad arreglado.** Un GPX importado (de un amigo, Wikiloc…) o una copia restaurada con código HTML escondido en el nombre (por ejemplo `<img onerror=…>`) se ejecutaba dentro de la app. Ahora todos los nombres (carreras, rutas, zapatillas y tu nombre) se limpian al entrar y al cargar lo ya guardado. Hay una prueba automática nueva que lo vigila.
