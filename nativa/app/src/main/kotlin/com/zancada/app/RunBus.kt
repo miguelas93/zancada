@@ -41,8 +41,6 @@ data class RunUi(
     /** Parciales cerrados (segundos por km) y ritmo del km en curso. */
     val splits: List<Double> = emptyList(),
     val kmPace: Double = Double.NaN,
-    /** Modo seguridad activo en esta carrera. */
-    val sos: Boolean = false,
 )
 
 /** Lo que se enseña al terminar (pantalla «Carrera terminada»). */

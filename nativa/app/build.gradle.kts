@@ -16,7 +16,6 @@ android {
         targetSdk = 35
         versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
         versionName = "1.0." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
-        // Mapa 3D (MapLibre) trae código nativo: solo para móviles ARM, así el APK no engorda con x86.
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
     // Firma fija (la misma clave que la beta, Secret ZANCADA_KEYSTORE_B64) para que cada APK nuevo
@@ -63,8 +62,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     // Mapas: OpenStreetMap (calles) y Esri (satélite), sin clave ni cuenta.
     implementation("org.osmdroid:osmdroid-android:6.1.20")
-    // Vista 3D (mapa inclinado con edificios): MapLibre, código abierto (BSD), sin clave ni cuenta.
-    implementation("org.maplibre.gl:android-sdk:12.3.1")
     // Health Connect: guardar las carreras como ejercicio (solo escritura).
     implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
 }

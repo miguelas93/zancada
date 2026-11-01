@@ -103,6 +103,9 @@ fun CeleScreen() {
                     }, Modifier.weight(1f), BtnKind.Ghost, color = c.onBar)
                     Btn("Estirar 5 min", { St.stretchWarm = false; St.modal = "stretch" }, Modifier.weight(1f), BtnKind.Ghost, color = c.onBar)
                 }
+                Repo.data.collectAsState().value.settings.takeIf { !it.sosPhone.isNullOrEmpty() }?.let { st ->
+                    Btn("Avisar a ${st.sosName?.ifEmpty { null } ?: "mi contacto"}: he llegado", { Share.toContact(ctx, st.sosPhone!!, Sos.end(r.dist, r.dur)) }, kind = BtnKind.Ghost, color = c.onBar, height = 44.dp, size = 14.sp)
+                }
             }
         }
     }

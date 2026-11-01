@@ -5,7 +5,7 @@
     <!-- Permisos mínimos (ver SECURITY.md): ubicación mientras corres, el servicio que la mantiene
          con la pantalla apagada, la notificación que lo hace visible, la vibración de cada km,
          internet (mapas, tiempo, rutas, Zeta), los avisos del plan (que se reprograman al reiniciar),
-         el contador de pasos (cadencia) y, solo si activas el modo seguridad, enviar SMS a tu contacto.
+         el contador de pasos (cadencia).
          Sin ubicación "todo el tiempo", sin contactos, cámara ni acceso a tus archivos. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -14,14 +14,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- La Vista 3D (MapLibre) mira si hay red para pedir el mapa; el estado del wifi que trae no hace falta. -->
+    <!-- El mapa mira si hay red antes de pedir teselas; el estado del wifi no hace falta. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" tools:node="remove" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Cadencia con el contador de pasos del móvil (se pide al empezar a correr; si se niega, no hay cadencia). -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- Modo seguridad: SMS a tu contacto durante la carrera. Solo se pide si lo activas en Perfil. -->
-    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
     <!-- Health Connect: solo ESCRIBIR ejercicios y distancia (nunca leer). Se pide al activarlo en Perfil. -->
     <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />

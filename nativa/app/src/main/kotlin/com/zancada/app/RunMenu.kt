@@ -184,9 +184,11 @@ fun RunMenu(ui: RunUi, start: String = "main", onClose: () -> Unit) {
         }
         when (page) {
             "main" -> {
-                MenuRow(Ico.pin, "Compartir mi ubicación", if (ui.sos) "Modo seguridad activo: tu contacto ya recibe SMS" else "Manda dónde estás por WhatsApp, SMS…") {
+                val sosTo = st.sosPhone?.takeIf { it.isNotEmpty() }
+                MenuRow(Ico.pin, "Compartir mi ubicación", sosTo?.let { "Directo a ${st.sosName?.ifEmpty { null } ?: it}" } ?: "Manda dónde estás por WhatsApp, SMS…") {
                     val f = ui.fix
-                    if (f == null) toast("Aún no tengo tu posición") else Share.text(ctx, "Estoy corriendo con Zancada: llevo ${fmtKm(ui.dist)} km en ${fmtTime(ui.elapsed)}. Estoy aquí: ${Sos.mapUrl(f.lat, f.lon)}", "Mi ubicación")
+                    if (f == null) toast("Aún no tengo tu posición")
+                    else { val t = Sos.here(ui.dist, ui.elapsed, f.lat, f.lon); if (sosTo != null) Share.toContact(ctx, sosTo, t) else Share.text(ctx, t, "Mi ubicación") }
                 }
                 if (!ui.live.guideOn) MenuRow(Ico.routes, "Cargar ruta", RunBus.config.route?.name ?: "Sigue una ruta guardada o recomendada") { page = "route" }
                 MenuRow(Ico.heart, "Añadir sensor", st.hrName?.let { "Pulsómetro: $it" } ?: "Pulsómetro por Bluetooth") { page = "sensor" }

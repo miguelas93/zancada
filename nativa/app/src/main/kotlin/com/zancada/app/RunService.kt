@@ -57,7 +57,6 @@ class RunService : LifecycleService() {
     private var ticks = 0
     private var foreground = false
     private val steps by lazy { StepMeter(this) }
-    private val sos by lazy { SosSender(this) }
     private val hr by lazy { HrMonitor(this) }
     /** Pulso cada 5 s de carrera, [segundo, ppm], para la gráfica del resumen. */
     private val hrSamples = mutableListOf<List<Int>>()
@@ -104,7 +103,7 @@ class RunService : LifecycleService() {
             SETTINGS -> { session.autopause = Repo.data.value.settings.autopause == "1"; if (!session.autopause && session.autoPaused) session.resume(System.currentTimeMillis()); publish() }
             HR_ON -> if (session.active) hr.start(Repo.data.value.settings.hrAddr)
             null -> if (!session.active) stopSelf()
-            DISCARD, STOP -> { if (!session.active || intent.action == DISCARD) { if (intent.action == DISCARD) sos.end(session.dist, session.elapsed(System.currentTimeMillis())); clearLive(); RunBus.state.value = RunUi(); shutdown() } }
+            DISCARD, STOP -> { if (!session.active || intent.action == DISCARD) { clearLive(); RunBus.state.value = RunUi(); shutdown() } }
         }
         // Con carrera en marcha, si Android mata el servicio le pedimos que lo vuelva a arrancar.
         return if (session.active) START_STICKY else START_NOT_STICKY
@@ -136,7 +135,6 @@ class RunService : LifecycleService() {
         wire(cfg, prevFix?.let { LatLon(it.lat, it.lon) })
         session.begin(System.currentTimeMillis())
         stepsFromSec = 0.0; steps.start(); hr.start(Repo.data.value.settings.hrAddr); hrSamples.clear()
-        sos.begin(System.currentTimeMillis(), prevFix?.lat, prevFix?.lon)
         startTicker(); persist(); publish()
     }
 
@@ -147,7 +145,6 @@ class RunService : LifecycleService() {
                 val now = System.currentTimeMillis()
                 session.tick(now); live?.tick(session, now)
                 steps.paused = session.paused; hr.paused = session.paused
-                sos.tick(now, session.dist, session.elapsed(now), session.lastFix?.lat, session.lastFix?.lon, manualPause = session.paused && !session.autoPaused)
                 publish()
                 if (++ticks % 10 == 0) {   // cada 5 s
                     persist()
@@ -177,7 +174,6 @@ class RunService : LifecycleService() {
         RunBus.track.value = session.points.map { LatLon(it.lat, it.lon) }
         startLocation(); startTicker()
         stepsFromSec = session.elapsed(System.currentTimeMillis()); steps.start(); hr.start(Repo.data.value.settings.hrAddr)
-        sos.begin(System.currentTimeMillis(), session.lastFix?.lat, session.lastFix?.lon, resumed = true)
         Voice.say("Carrera recuperada")
         publish()
     }
@@ -187,7 +183,7 @@ class RunService : LifecycleService() {
         val res = session.finish(now, forceShort = force)
         ticker?.cancel()
         when (res) {
-            is RunSession.Result.Empty -> { sos.cancel(); clearLive(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
+            is RunSession.Result.Empty -> { clearLive(); RunBus.state.value = RunUi(gpsError = "Sin recorrido: no hay nada que guardar"); shutdown() }
             is RunSession.Result.TooShort -> RunBus.state.value = RunBus.state.value.copy(tooShort = res.meters)   // la pantalla pregunta
             is RunSession.Result.Saved -> {
                 val cfg = RunBus.config
@@ -201,7 +197,7 @@ class RunService : LifecycleService() {
                     Cele(r, nb, celeText(r, nb, prevBest), "${wk.count} de ${goalOf()}")
                 }
                 Repo.saveNow()
-                steps.stop(); hr.stop(); sos.end(cele.run.dist, cele.run.dur)
+                steps.stop(); hr.stop()
                 clearLive()   // solo después de guardarla de verdad
                 Reminders.sync(this)
                 Hc.push(this)
@@ -226,7 +222,7 @@ class RunService : LifecycleService() {
             avg = if (session.dist > 50) el / (session.dist / 1000) else Double.NaN,
             bestKm = session.bestKm, paused = session.paused, autoPaused = session.autoPaused,
             live = lv?.state ?: cur.live, lockLine = lv?.lockLine() ?: "",
-            cad = if (session.active) steps.live(now) else null, hr = hr.now(now), sos = sos.active,
+            cad = if (session.active) steps.live(now) else null, hr = hr.now(now),
             splits = session.liveSplits.map { it.split },
             kmPace = session.liveSplits.sumOf { it.split }.let { t0 -> val d = session.dist - session.lastKm * 1000.0; if (session.active && d > 30) (el - t0) / (d / 1000) else Double.NaN },
         )

@@ -80,8 +80,8 @@ private fun HeadIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, labe
 @Composable
 private fun ProgressTab(app: App) {
     val c = Z.c; val mo = app.month(); val g = app.monthGoal()
-    // Mes: km, anillo del objetivo y barras por día.
-    ZCard(pad = PaddingValues(18.dp), gap = 12.dp) {
+    // Mes: km, anillo del objetivo y barras por día. Al tocar: «Tu mes en Zancada» en historias.
+    ZCard(pad = PaddingValues(18.dp), gap = 12.dp, onClick = { val m0 = app.monthStart(app.now()); val from = if (app.monthWrap(m0) != null) m0 else app.monthStart(app.now(), 1); DiscSt.wrapFrom = from; Nav.go(MONTH) }) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Lbl(mo.name)
@@ -322,37 +322,6 @@ private fun TrendCard(t: Trend, app: App) {
             Sub(app.pace(t.hi), size = 10.sp, modifier = Modifier.align(Alignment.BottomStart))
         }
         Sub(t.note, size = 12.sp)
-    }
-}
-
-// ---------- Clubs ----------
-
-@Composable
-fun ClubsScreen() {
-    val c = Z.c
-    val data by Repo.data.collectAsState()
-    val app = remember(data) { Repo.app() }
-    val w = app.weekStats(); val ws = app.weekStart(app.now()); val km = data.runs.filter { it.start >= ws }.sumOf { it.dist }
-    ScreenCol {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { H1("Clubs"); IconBtn(Ico.close, { Nav.go(PROFILE) }) }
-        ZCard(dark = true, pad = PaddingValues(24.dp), gap = 12.dp) {
-            Chip("Muy pronto"); Num("Corre con tu gente", 30.sp)
-            Sub("Clubs y quedadas llegarán con las cuentas.", size = 14.sp)
-        }
-        ZCard(gap = 4.dp) {
-            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) { H2("Clasificación semanal"); Sub("km", size = 12.sp) }
-            CompositionLocalProvider(LocalDark provides true) {
-                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(c.bar).padding(horizontal = 14.dp, vertical = 12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Num("1", 16.sp, color = c.onBarMuted)
-                        Box(Modifier.size(34.dp).clip(CircleShape).background(c.volt), contentAlignment = Alignment.Center) { Txt(data.profile.name.ifEmpty { "Tú" }.take(2).uppercase(), size = 13.sp, weight = FontWeight.SemiBold, color = c.onVolt) }
-                        Txt("Tú", weight = FontWeight.SemiBold)
-                    }
-                    Num(toFixed(km / 1000, 1).replace('.', ','), 20.sp, color = c.volt)
-                }
-            }
-            Sub("Así se verá tu fila cuando haya más gente en tu club. ${w.count} ${pl(w.count, "carrera")} esta semana.", size = 12.sp, modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 10.dp))
-        }
     }
 }
 

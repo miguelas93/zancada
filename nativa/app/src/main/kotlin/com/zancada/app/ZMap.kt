@@ -71,7 +71,7 @@ val EsriPlaces = EsriRef("EsriPlaces", "World_Boundaries_and_Places")
 val OpenTopo = XYTileSource("OpenTopo", 0, 17, 256, ".png", arrayOf("https://a.tile.opentopomap.org/", "https://b.tile.opentopomap.org/", "https://c.tile.opentopomap.org/"), "© OpenStreetMap · SRTM · OpenTopoMap (CC-BY-SA)")
 
 /** Tipos de mapa: clave, nombre. "calles" es el gris de siempre. */
-val MAP_TYPES = listOf("calles" to "Claro", "color" to "Estándar", "sat" to "Satélite", "hibrido" to "Híbrido", "relieve" to "Relieve")
+val MAP_TYPES = listOf("calles" to "Claro", "sat" to "Satélite", "relieve" to "Relieve")
 fun mapAttribution(layer: String) = when (layer) { "sat" -> "© Esri, Maxar"; "hibrido" -> "© Esri, Maxar, HERE"; "relieve" -> "© OpenStreetMap · OpenTopoMap"; else -> "© OpenStreetMap" }
 
 fun mapsInit(ctx: Context) {

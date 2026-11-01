@@ -41,11 +41,11 @@ fun cadenceOf(steps: Int, movingSec: Double): Int? = if (steps < 60 || movingSec
 /** Modo seguridad: textos de los SMS. */
 object Sos {
     fun mapUrl(lat: Double, lon: Double) = "https://maps.google.com/?q=${"%.5f".format(java.util.Locale.ROOT, lat)},${"%.5f".format(java.util.Locale.ROOT, lon)}"
-    fun start(name: String, every: Int, lat: Double?, lon: Double?) =
-        "${name.ifEmpty { "Hola" }}: salgo a correr con Zancada. Te mando mi ubicación cada $every min." + (if (lat != null && lon != null) " Ahora: ${mapUrl(lat, lon)}" else "")
-    fun update(dist: Double, el: Double, lat: Double, lon: Double) = "Zancada: voy por ${fmtKm(dist)} km (${fmtTime(el)}). Estoy aquí: ${mapUrl(lat, lon)}"
-    fun stopped(min: Int, lat: Double, lon: Double) = "Zancada: llevo $min min sin moverme durante la carrera. Si no te escribo pronto, llámame. Estoy aquí: ${mapUrl(lat, lon)}"
-    fun end(dist: Double, el: Double) = "Zancada: he terminado la carrera, ${fmtKm(dist)} km en ${fmtTime(el)}. Todo bien."
+    /** Mensaje al salir: el corredor lo envía con un toque (WhatsApp, SMS…). */
+    fun start(lat: Double?, lon: Double?) =
+        "Salgo a correr con Zancada. Si en un buen rato no te escribo, llámame." + (if (lat != null && lon != null) " Salgo de aquí: ${mapUrl(lat, lon)}" else "")
+    fun here(dist: Double, el: Double, lat: Double, lon: Double) = "Estoy corriendo con Zancada: llevo ${fmtKm(dist)} km en ${fmtTime(el)}. Estoy aquí: ${mapUrl(lat, lon)}"
+    fun end(dist: Double, el: Double) = "He terminado: ${fmtKm(dist)} km en ${fmtTime(el)}. Todo bien 👍"
     /** Solo números de teléfono: dígitos, espacios y un + inicial. */
     fun cleanPhone(s: String): String = s.trim().let { t -> (if (t.startsWith("+")) "+" else "") + t.filter { it.isDigit() } }.take(16)
     fun validPhone(s: String) = cleanPhone(s).count { it.isDigit() } in 6..15

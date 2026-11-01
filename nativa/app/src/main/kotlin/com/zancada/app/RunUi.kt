@@ -133,8 +133,8 @@ fun PrepScreen() {
                 RunBus.config = RunConfig(ss, route)
                 Perm.runExtras { Nav.go(COUNT) }
             }, enabled = fix != null && perm)
-            Repo.data.collectAsState().value.settings.takeIf { it.sosOn == "1" && !it.sosPhone.isNullOrEmpty() }?.let { st ->
-                Sub("Modo seguridad: avisaré por SMS a ${st.sosName?.ifEmpty { null } ?: st.sosPhone} cada ${st.sosEvery ?: 10} min y si me quedo parado.", size = 12.sp)
+            Repo.data.collectAsState().value.settings.takeIf { !it.sosPhone.isNullOrEmpty() }?.let { st ->
+                Btn("Avisar a ${st.sosName?.ifEmpty { null } ?: "mi contacto"} de que salgo", { Share.toContact(ctx, st.sosPhone!!, Sos.start(fix?.lat, fix?.lon)) }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
             }
             Sub(when {
                 !perm || denied -> "Necesito tu ubicación. Actívala en Ajustes del móvil › Zancada."

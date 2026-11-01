@@ -303,27 +303,17 @@ private fun SosCard() {
     var phone by remember { mutableStateOf(st.sosPhone ?: "") }
     var name by remember { mutableStateOf(st.sosName ?: "") }
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { IcoBox(Ico.shield, 34.dp); H2("Modo seguridad") }
-        Sub("Tu contacto recibe tu ubicación por SMS mientras corres.", size = 12.sp)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { IcoBox(Ico.shield, 34.dp); H2("Contacto de seguridad") }
+        Sub("Con un toque le avisas al salir, le mandas dónde estás y le dices que has llegado. Por WhatsApp o SMS.", size = 12.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Field(name, { name = it }, "Nombre (Ana)", Modifier.weight(1f), maxLen = 20)
             Field(phone, { phone = it.filter { ch -> ch.isDigit() || ch == '+' || ch == ' ' } }, "Teléfono", Modifier.weight(1.3f), numeric = true, maxLen = 18)
         }
-        SelRow("Avisar cada", listOf("5" to "5 min", "10" to "10 min", "15" to "15 min", "30" to "30 min"), "${st.sosEvery ?: 10}") { v -> Repo.settings { it.copy(sosEvery = v.toInt()) } }
-        if (st.sosOn == "1") {
-            Btn("Guardar contacto", {
-                if (!Sos.validPhone(phone)) { toast("Revisa el número de teléfono"); return@Btn }
-                Repo.settings { it.copy(sosPhone = Sos.cleanPhone(phone), sosName = safeText(name, 20)) }; toast("Contacto guardado")
-            }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
-            Btn("Desactivar modo seguridad", { Repo.settings { it.copy(sosOn = "0") }; toast("Modo seguridad desactivado") }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
-        } else Btn("Activar modo seguridad", {
-            if (!Sos.validPhone(phone)) { toast("Escribe el teléfono de tu contacto"); return@Btn }
-            Perm.sms { ok ->
-                if (!ok) { toast("Sin permiso para enviar SMS: actívalo en Ajustes del móvil", 3500); return@sms }
-                Repo.settings { it.copy(sosOn = "1", sosPhone = Sos.cleanPhone(phone), sosName = safeText(name, 20)) }
-                toast("Modo seguridad activado")
-            }
-        }, height = 46.dp, size = 15.sp)
+        Btn("Guardar contacto", {
+            if (!Sos.validPhone(phone)) { toast("Revisa el número de teléfono"); return@Btn }
+            Repo.settings { it.copy(sosPhone = Sos.cleanPhone(phone), sosName = safeText(name, 20), sosOn = null, sosEvery = null) }; toast("Contacto guardado")
+        }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
+        if (!st.sosPhone.isNullOrEmpty()) Btn("Quitar contacto", { phone = ""; name = ""; Repo.settings { it.copy(sosPhone = null, sosName = null, sosOn = null, sosEvery = null) }; toast("Contacto quitado") }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
     }
 }
 
