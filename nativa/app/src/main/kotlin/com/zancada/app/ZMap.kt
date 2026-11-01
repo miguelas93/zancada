@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.zancada.core.LatLon
+import com.zancada.core.pointInRing
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
@@ -86,6 +87,9 @@ data class MLine(val ll: List<LatLon>, val color: Color, val width: Float, val a
 /** Un punto: círculo con borde, y opcionalmente un halo o una etiqueta tipo píldora ("5,2 km"). */
 data class MDot(val p: LatLon, val fill: Color, val border: Color, val size: Float = 18f, val borderW: Float = 3f, val halo: Color? = null, val haloW: Float = 0f, val label: String? = null, val tap: Int? = null)
 
+/** Un área (parque, ribera…): uno o varios anillos rellenos con borde. */
+data class MArea(val rings: List<List<LatLon>>, val fill: Color, val stroke: Color, val tap: Int? = null)
+
 private val INK = 0xFF0B0C0B.toInt()
 
 /** Para mover el mapa desde fuera (encuadrar un trazado, seguir al corredor…). */
@@ -129,6 +133,7 @@ class MapCtl {
 private class ZOverlay(ctx: Context) : Overlay() {
     var lines: List<MLine> = emptyList()
     var dots: List<MDot> = emptyList()
+    var areas: List<MArea> = emptyList()
     var onTap: ((Int) -> Unit)? = null
     var onTouch: (() -> Unit)? = null
     private val dn = ctx.resources.displayMetrics.density
@@ -141,6 +146,12 @@ private class ZOverlay(ctx: Context) : Overlay() {
     override fun draw(c: Canvas, map: MapView, shadow: Boolean) {
         if (shadow) return
         val pr = map.projection
+        for (a in areas) {
+            path.reset()
+            for (r in a.rings) { if (r.size < 3) continue; r.forEachIndexed { i, p -> pr.toPixels(GeoPoint(p.lat, p.lon), pt); if (i == 0) path.moveTo(pt.x.toFloat(), pt.y.toFloat()) else path.lineTo(pt.x.toFloat(), pt.y.toFloat()) }; path.close() }
+            fillP.color = a.fill.toArgb(); c.drawPath(path, fillP)
+            paint.color = a.stroke.toArgb(); paint.alpha = a.stroke.alpha.times(255).toInt(); paint.strokeWidth = 2f * dn; paint.pathEffect = null; c.drawPath(path, paint)
+        }
         for (l in lines) {
             if (l.ll.size < 2) continue
             path.reset()
@@ -175,6 +186,10 @@ private class ZOverlay(ctx: Context) : Overlay() {
         var best = Double.MAX_VALUE; var id: Int? = null
         for (d in dots) { val t = d.tap ?: continue; pr.toPixels(GeoPoint(d.p.lat, d.p.lon), pt); val dd = hypot(pt.x - e.x.toDouble(), pt.y - e.y.toDouble()); if (dd < best && dd < 30 * dn) { best = dd; id = t } }
         if (id == null) for (l in lines) { val t = l.tap ?: continue; for (p in l.ll) { pr.toPixels(GeoPoint(p.lat, p.lon), pt); val dd = hypot(pt.x - e.x.toDouble(), pt.y - e.y.toDouble()); if (dd < best && dd < 16 * dn) { best = dd; id = t } } }
+        if (id == null) {
+            val g = pr.fromPixels(e.x.toInt(), e.y.toInt()); val q = LatLon(g.latitude, g.longitude)
+            id = areas.lastOrNull { a -> a.tap != null && a.rings.any { pointInRing(q, it) } }?.tap
+        }
         return id?.let { cb(it); true } ?: false
     }
 }
@@ -194,6 +209,7 @@ private fun streetsFilter(night: Boolean): ColorMatrixColorFilter {
 @Composable
 fun ZMap(
     modifier: Modifier, layer: String = "calles", lines: List<MLine> = emptyList(), dots: List<MDot> = emptyList(), ctl: MapCtl? = null,
+    areas: List<MArea> = emptyList(),
     interactive: Boolean = true, onTap: ((Int) -> Unit)? = null, onTouch: (() -> Unit)? = null, attribution: Boolean = true,
     attrBottom: androidx.compose.ui.unit.Dp = 0.dp,
 ) {
@@ -228,7 +244,7 @@ fun ZMap(
                 v.overlayManager.tilesOverlay.loadingBackgroundColor = c.mapLand.toArgb()
             }
             if (interactive) v.setOnTouchListener(null) else v.setOnTouchListener { _, _ -> true }
-            holder[0]?.let { o -> o.lines = lines; o.dots = dots; o.onTap = onTap; o.onTouch = onTouch }
+            holder[0]?.let { o -> o.lines = lines; o.dots = dots; o.areas = areas; o.onTap = onTap; o.onTouch = onTouch }
             v.invalidate()
         }, onRelease = { it.onDetach() })
         if (attribution) Text(mapAttribution(layer), Modifier.align(Alignment.BottomEnd).padding(bottom = attrBottom).clip(RoundedCornerShape(topStart = 6.dp)).background(Color(0xAAFFFFFF)).padding(horizontal = 4.dp, vertical = 1.dp),

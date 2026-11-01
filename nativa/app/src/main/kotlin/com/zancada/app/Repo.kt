@@ -143,32 +143,70 @@ object Repo {
         Route("", "Bucle hacia el ${compass(brg)}", res.ll, jsRound(res.km * 10) / 10.0, gain, created = System.currentTimeMillis(), start = LatLon(res.ll[0][0], res.ll[0][1]), src = "sug")
     }
 
+    // ---------- sitios para correr (OpenStreetMap): 7 días de caché por zona de ~2 km ----------
+    private var spotsMem: Pair<String, List<Spot>>? = null
+    suspend fun spots(here: LatLon): List<Spot> {
+        val key = "${toFixed(here.lat, 2)}_${toFixed(here.lon, 2)}"
+        spotsMem?.takeIf { it.first == key }?.let { return it.second }
+        val f = File(appCtx.cacheDir, "spots-v1-$key.json")
+        val txt = withContext(Dispatchers.IO) { f.takeIf { it.exists() && System.currentTimeMillis() - it.lastModified() < 7 * DAY }?.readText() }
+            ?: Net.get(spotsUrl(here), 30_000)?.also { t -> if (t.contains("\"elements\"")) withContext(Dispatchers.IO) { runCatching { f.writeText(t) } } }
+            ?: return emptyList()
+        val out = withContext(Dispatchers.Default) { parseSpots(txt, here) }
+        if (out.isNotEmpty()) spotsMem = key to out
+        return out
+    }
+
+    private fun routeWith(pts: List<LatLon>, spec: AskSpec): Routed {
+        val opts = buildString {
+            append("\"costing_options\":{\"pedestrian\":{\"walkway_factor\":0.8")
+            if (spec.flat) append(",\"use_hills\":0.0"); if (spec.hills) append(",\"use_hills\":1.0")
+            if ("verde" in spec.want) append(",\"sidewalk_factor\":1.4")
+            append("}},")
+        }
+        val body = routeBody(pts).replace("\"costing\":\"pedestrian\",", "\"costing\":\"pedestrian\",$opts")
+        val (code, txt) = Net.postBlocking("$ROUTER/route", body); if (code != 200 || txt == null) error("router $code")
+        return parseRouted(txt)
+    }
+
+    data class AskOut(val routes: List<Route>, val allOk: Boolean, val miss: List<String>)
+
     /**
-     * «Pídesela a Zeta»: la IA traduce la frase (si no contesta, reglas), se miran parques, agua y fuentes
-     * alrededor (Overpass) y se prueban 5 bucles; salen los 3 que mejor encajan, según van llegando.
+     * «Pídesela a Zeta»: la IA traduce la frase (si no contesta, reglas); se buscan los sitios y fuentes de alrededor;
+     * cada plan pasa POR el sitio (dentro del parque, a lo largo del río) y se ajusta a los km; al final se comprueba
+     * todo lo pedido y solo se enseñan las que cumplen (si ninguna, las más cercanas diciendo qué falla).
      */
-    suspend fun askRoutes(here: LatLon, text: String, paceSec: Double, seed: Int, step: (String) -> Unit, onSpec: (AskSpec) -> Unit, emit: (List<Route>) -> Unit): List<Route> {
+    suspend fun askRoutes(here: LatLon, text: String, paceSec: Double, seed: Int, step: (String) -> Unit, onSpec: (AskSpec) -> Unit, emit: (List<Route>) -> Unit): AskOut = withContext(Dispatchers.IO) {
         step("Entendiendo lo que pides…")
         val rules = askRules(text, paceSec)
         val ai = runCatching { withTimeoutOrNull(14_000) { Net.post(COACH_URL, askBody(text, paceSec), 14_000) } }.getOrNull()
-        val spec = ai?.takeIf { it.code == 200 }?.body?.let { coachAnswer(it) }?.let { parseAskSpec(it, rules) } ?: rules
+        var spec = ai?.takeIf { it.code == 200 }?.body?.let { coachAnswer(it) }?.let { parseAskSpec(it, rules) } ?: rules
+        step("Mirando los sitios de alrededor…")
+        val spots = runCatching { spots(here) }.getOrDefault(emptyList())
+        val place = matchPlace(text, spots)
+        if (place != null && place.kind != "pista") spec = spec.copy(want = spec.want + if (place.kind == "rio") "agua" else "verde")
         onSpec(spec)
-        val feats = askOverpassUrl(here, spec.km, spec.want)?.let { u -> step("Buscando ${listOfNotNull("parques".takeIf { "verde" in spec.want }, "agua".takeIf { "agua" in spec.want }, "fuentes".takeIf { "fuente" in spec.want }).joinToString(", ")} cerca…"); Net.get(u, 25_000)?.let { parseAskFeats(it) } } ?: emptyList()
-        val brgs = askBearings(here, spec, feats, 5, seed)
-        val scored = mutableListOf<Pair<Double, Route>>()
-        brgs.forEachIndexed { i, brg ->
-            step("Probando recorridos (${i + 1} de ${brgs.size})…")
-            val r = runCatching { loop(here, spec.km, brg) }.getOrNull() ?: return@forEachIndexed
-            val res = scoreAsk(r.ll, r.km, r.gain, spec, feats)
-            val name = when {
-                res.why.contains("agua") -> "Bucle junto al agua"; res.why.contains("verdes") -> "Bucle por zonas verdes"
-                res.why.contains("fuente") -> "Bucle con fuente"; spec.hills -> "Bucle con cuestas"; spec.flat -> "Bucle llano"
-                else -> "Bucle hacia el ${compass(brg)}"
+        val feats = askOverpassUrl(here, spec.km, spec.want)?.let { u -> Net.get(u, 25_000)?.let { parseAskFeats(it) } } ?: emptyList()
+        val plans = askPlans(here, spec, spots, feats, seed, place)
+        val done = mutableListOf<Pair<AskCheck, Route>>()
+        plans.forEachIndexed { i, p ->
+            step("Probando recorridos (${i + 1} de ${plans.size})…")
+            val r = runCatching { routePlan(p, spec.km, { pts -> routeWith(pts, spec) }) }.getOrNull() ?: return@forEachIndexed
+            val gain = runCatching { Net.postBlocking("$ROUTER/height", heightBody(r.ll)).let { (c, b) -> if (c == 200 && b != null) parseGain(b) else null } }.getOrNull()
+            val chk = checkAsk(r.ll, r.km, gain, spec, feats, spots)
+            val name = p.via?.let { "Por $it" } ?: when {
+                chk.why.contains("agua") -> "Junto al agua"; chk.why.contains("verdes") -> "Por zonas verdes"
+                spec.hills -> "Bucle con cuestas"; spec.flat -> "Bucle llano"; else -> p.label
             }
-            scored.add(res.score to r.copy(id = "ask-${System.currentTimeMillis()}-$i", name = name, src = "ask", sub = "Pedida a Zeta", why = res.why))
-            emit(scored.sortedByDescending { it.first }.take(3).map { it.second })
+            val route = Route("ask-${System.currentTimeMillis()}-$i", name, r.ll, jsRound(r.km * 10) / 10.0, gain, created = System.currentTimeMillis(),
+                start = LatLon(r.ll[0][0], r.ll[0][1]), src = "ask", sub = if (chk.ok) "Cumple lo que pediste" else "No cumple: " + chk.miss.joinToString(", "), why = chk.why)
+            done += chk to route
+            val ok = done.filter { it.first.ok }
+            emit((if (ok.isNotEmpty()) ok else done).sortedByDescending { it.first.score }.take(3).map { it.second })
         }
-        return scored.sortedByDescending { it.first }.take(3).map { it.second }
+        val ok = done.filter { it.first.ok }
+        AskOut((if (ok.isNotEmpty()) ok else done).sortedByDescending { it.first.score }.take(3).map { it.second }, ok.isNotEmpty(),
+            if (ok.isEmpty()) done.maxByOrNull { it.first.score }?.first?.miss ?: emptyList() else emptyList())
     }
 }
 
