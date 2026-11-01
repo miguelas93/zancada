@@ -1,6 +1,12 @@
 package com.zancada.app
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -105,24 +111,28 @@ fun HomeScreen() {
     LaunchedEffect(here) { here?.let { p -> Repo.weather(p)?.let { wx = it } } }
     val w = app.homeWeek()
     ScreenCol {
-        Row(verticalAlignment = Alignment.Top) { Column(Modifier.weight(1f)) {
+        // Cabecera de marca: logo siempre a la izquierda y accesos rápidos a la derecha.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            ZLockup(24.dp, if (c.night) c.volt else c.ink, c.ink, Modifier.weight(1f))
+            HeadBtn(Ico.plus, "Añadir una carrera a mano") { St.manualPrefill = null; St.modal = "manual" }
+            HeadBtn(Ico.chat, "Hablar con Zeta", ::openCoach)
+            HeadBtn(Ico.search, "Buscar rutas") { St.rSearch = true; Nav.go(ROUTES) }
+            HeadBtn(Ico.bell, "Novedades") { St.modal = "news" }
+        }
+        Column {
             Sub(cap(app.es.wdLongDayMonLong(app.now())))
             H1(if (data.profile.name.isNotEmpty()) "Hola, ${data.profile.name}" else "Hola")
             wx?.let { Sub(wxText(it).removeSuffix(".") + (it.best?.let { b -> " · Mejor hora hoy: ${b.h}:00 (${b.t}°, ${b.rain} % de lluvia)" } ?: ""), size = 12.sp, modifier = Modifier.padding(top = 4.dp)) }
-        }; ZMark(28.dp, if (c.night) c.volt else c.ink, Modifier.padding(top = 4.dp)) }
+        }
         if (app.showStartCard()) StartCard()
-        // Esta semana
-        ZCard(dark = true, gap = 18.dp) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl("Esta semana"); Sub("Objetivo ${w.goal} carreras") }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-                Num(w.km, 72.sp, unit = "km", unitSize = 20.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
-                WeekBarsDay(w.perDay, w.maxDay, w.today)
+        // Tu serie · Esta semana (se pasan de lado)
+        val pager = rememberPagerState { 2 }
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            HorizontalPager(pager, Modifier.fillMaxWidth().noSwipeNav("homePager"), pageSpacing = 12.dp, verticalAlignment = Alignment.Top) { pg ->
+                if (pg == 0) StreakCard(app, w) else WeekCard(w)
             }
-            Track(min(1.0, w.count.toDouble() / w.goal))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Stat("Carreras", w.count.toString(), 22.sp, unit = "de ${w.goal}")
-                Stat("Tiempo", fmtTime(w.dur), 22.sp)
-                Stat("Seguidas", w.streak.toString(), 22.sp, unit = "sem")
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)) {
+                repeat(2) { i -> Box(Modifier.height(6.dp).width(if (pager.currentPage == i) 18.dp else 6.dp).clip(RoundedCornerShape(3.dp)).background(if (pager.currentPage == i) c.ink else c.line)) }
             }
         }
         app.recap()?.let { r -> RecapCard(r) }
@@ -144,6 +154,75 @@ fun HomeScreen() {
         }
         data.runs.firstOrNull()?.let { LastRunCard(it, app) }
         Sub("Beta · los datos se guardan solo en este móvil", size = 12.sp, align = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+private fun HeadBtn(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+    Box(Modifier.size(42.dp).clip(CircleShape).clickable(onClickLabel = label, onClick = onClick), contentAlignment = Alignment.Center) { Icon(icon, label, Modifier.size(23.dp), tint = Z.c.ink) }
+}
+
+@Composable
+private fun WeekCard(w: HomeWeek) {
+    ZCard(dark = true, gap = 18.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl("Esta semana"); Sub("Objetivo ${w.goal} carreras") }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+            Num(w.km, 72.sp, unit = "km", unitSize = 20.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
+            WeekBarsDay(w.perDay, w.maxDay, w.today)
+        }
+        Track(min(1.0, w.count.toDouble() / w.goal))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Stat("Carreras", w.count.toString(), 22.sp, unit = "de ${w.goal}")
+            Stat("Tiempo", fmtTime(w.dur), 22.sp)
+            Stat("Seguidas", w.streak.toString(), 22.sp, unit = "sem")
+        }
+    }
+}
+
+/** «Tu serie»: semanas seguidas cumpliendo el objetivo y los días de esta semana, con el sello de Zancada en cada día corrido. */
+@Composable
+private fun StreakCard(app: App, w: HomeWeek) {
+    val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope()
+    val ws = app.weekStart(app.now()); val ran = app.runs.filter { it.start >= ws }.map { app.es.dow(it.start) }.toSet()
+    val mark = if (c.night) c.volt else c.ink
+    ZCard(gap = 16.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Txt("Tu serie", size = 17.sp, weight = FontWeight.SemiBold)
+            Row(Modifier.clip(RoundedCornerShape(50)).border(1.5.dp, c.ink, RoundedCornerShape(50)).clickable {
+                scope.launch {
+                    val a = Repo.app(); val png = withContext(Dispatchers.Default) { Images.week(ctx, a) }
+                    if (png == null) { toast("Cuando corras esta semana, podrás compartirla"); return@launch }
+                    val wr = a.runs.filter { it.start >= ws }
+                    Share.file(ctx, "zancada-semana-${isoMs(ws).take(10)}.png", "image/png", png, "Mi semana con Zancada: ${fmtKm(wr.sumOf { it.dist })} km en ${wr.size} ${pl(wr.size, "salida")} 🏃")
+                }
+            }.padding(horizontal = 14.dp, vertical = 7.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Ico.share, null, Modifier.size(16.dp), tint = c.ink); Txt("Compartir", size = 13.sp, weight = FontWeight.SemiBold)
+            }
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Box(Modifier.size(58.dp).clip(CircleShape).background(c.volt), contentAlignment = Alignment.Center) { Num(w.streak.toString(), 28.sp, color = c.onVolt) }
+                Txt(if (w.streak == 1) "semana" else "semanas", size = 12.sp, weight = FontWeight.SemiBold)
+            }
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween) {
+                "LMXJVSD".forEachIndexed { i, l ->
+                    val day = java.util.Calendar.getInstance().apply { timeInMillis = ws + i * DAY + 12 * 3_600_000L }.get(java.util.Calendar.DAY_OF_MONTH)
+                    val done = i in ran; val today = i == w.today; val future = i > w.today
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Txt(l.toString(), size = 13.sp, color = c.muted)
+                        Box(Modifier.size(32.dp).clip(CircleShape).background(if (done) c.bar else Color.Transparent).then(if (today && !done) Modifier.border(1.5.dp, c.ink, CircleShape) else Modifier), contentAlignment = Alignment.Center) {
+                            if (done) ZMark(12.dp, c.volt) else Txt(day.toString(), size = 13.sp, weight = if (today) FontWeight.SemiBold else FontWeight.Normal, color = if (future || !today) c.muted else c.ink)
+                        }
+                    }
+                }
+            }
+        }
+        val left = max(0, w.goal - w.count)
+        Sub(when {
+            left == 0 -> "Semana cumplida. Tu serie sigue viva: ${w.streak} ${pl(w.streak, "semana")} seguidas."
+            w.streak > 0 -> "Te falta${if (left == 1) "" else "n"} $left ${pl(left, "carrera")} antes del domingo para sumar la semana ${w.streak + 1}."
+            else -> "Corre $left ${pl(left, "vez", "veces")} esta semana y empieza tu serie."
+        }, size = 13.sp)
     }
 }
 

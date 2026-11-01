@@ -12,6 +12,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -124,48 +129,175 @@ fun RoutesScreen() {
         if (out.isEmpty()) { St.rSugErr = "x"; return@LaunchedEffect }
         Repo.update { d -> val m = LinkedHashMap(d.routeCache); m[sugKey] = out; while (m.size > 12) m.remove(m.keys.first()); d.copy(routeCache = m) }
     }
-    val asMap = St.rView == "map" && St.rMode != "sug" && St.rMode != "ask"
-    ScreenCol(gap = 14.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            H1("Rutas")
-            if (St.rMode == "rec" || St.rMode == "mine") Seg(listOf("list" to "Lista", "map" to "Mapa"), if (asMap) "map" else "list", { St.rView = it }, h = 32.dp, pad = 3.dp, fill = false)
-        }
-        Chips {
-            listOf("rec" to "Recomendadas", "ask" to "Pídesela a Zeta", "mine" to "Mis recorridos", "sug" to "Bucle").forEach { (k, l) -> ChipB(l, St.rMode == k, { St.rMode = k }) }
-        }
-        if (St.rMode == "rec") Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Chips {
-                (if (near != null) listOf("cerca" to "Cerca de ti") else emptyList()).plus(CITIES.map { it.key to it.value.name }).forEach { (k, n) -> ChipB(n, zone == k, { St.rZone = k }) }
-            }
-            Chips { listOf("all" to "Cualquier tiempo", "t20" to "20 min", "t30" to "30 min", "t45" to "45 min", "t60" to "Más de 45").forEach { (k, l) -> ChipB(l, St.rDist == k, { St.rDist = k }) } }
-            val extra = (if (St.rSurf != "all") 1 else 0) + (if (St.rSort != "near") 1 else 0)
-            Underline(if (St.rMore) "Menos filtros" else "Más filtros" + if (extra > 0) " ($extra)" else "", { St.rMore = !St.rMore })
-            if (St.rMore) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Chips(wrap = true) { listOf("all" to "Cualquier suelo", "tierra" to "Tierra", "asfalto" to "Asfalto", "pista" to "Pista").forEach { (k, l) -> ChipB(l, St.rSurf == k, { St.rSurf = k }) } }
-                SelRow("Ordenar", listOf("near" to "Más cerca primero", "short" to "Más corta", "long" to "Más larga", "flat" to "Más llana", "new" to "Sin estrenar"), St.rSort) { St.rSort = it }
+    // Búsqueda y dificultad se aplican sobre la lista del modo.
+    val q = St.rQ.trim().lowercase()
+    val shown = list.filter { r -> (q.isEmpty() || "${r.name} ${r.zone ?: ""} ${r.sub ?: ""}".lowercase().contains(q)) && (St.rDiff == "all" || app.routeMeta(r).diffCls == (if (St.rDiff == "easy") "" else St.rDiff)) }
+    val sel = shown.getOrNull(St.rSel.coerceIn(0, maxOf(0, shown.size - 1)))
+    LaunchedEffect(shown.map { it.id }) { if (St.rSel >= shown.size) St.rSel = 0 }
+    LaunchedEffect(St.rMode) { if (St.rMode == "ask" || St.rMode == "sug") St.rSheet = 2 }
+    RoutesMapScreen(shown, sel, here, app, near, zone) {
+        when (St.rMode) {
+            "mine" -> Btn("Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)", { importGpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
+            "ask", "sug" -> {
+                Seg(listOf("ask" to "Pídesela a Zeta", "sug" to "Bucle rápido"), St.rMode, { St.rMode = it }, h = 40.dp)
+                if (St.rMode == "ask") AskBox(here, app)
+                else Chips(wrap = true) { listOf(3, 5, 8, 10, 15).forEach { k -> ChipB("$k km", St.rKm == k, { St.rKm = k }) } }
             }
         }
-        if (St.rMode == "mine") Btn("Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)", { importGpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
-        if (St.rMode == "sug") Chips(wrap = true) { listOf(3, 5, 8, 10, 15).forEach { k -> ChipB("$k km", St.rKm == k, { St.rKm = k }) } }
-        if (St.rMode == "ask") AskBox(here, app)
-        if (asMap) RoutesMap(list, here)
-        else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (St.rMode == "rec" && St.rDist == "all" && St.rSurf == "all") app.pickToday(list)?.let { TodayCard(it) }
-            list.forEach { RouteCard(it, app) }
-            if (list.isEmpty()) when (St.rMode) {
-                "rec" -> if (app.zr.isEmpty()) InfoCard("No se han podido cargar las rutas", "Cierra la app y vuelve a abrirla. Si sigue igual, avísame desde Perfil › Avisar de un fallo.")
-                    else InfoCard("Ninguna ruta con esos filtros", "Hay ${app.zoneRoutes(zone, here).size} rutas en esta zona con otro tiempo o suelo.") { Btn("Quitar filtros", { St.rDist = "all"; St.rSurf = "all"; St.rSort = "near" }, height = 44.dp, size = 14.sp) }
-                "mine" -> InfoCard("Aún no tienes recorridos", "Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.")
-                "ask" -> if (here == null) InfoCard("Buscando tu posición…", "Las rutas se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
-                    else if (St.askErr != null && St.askBusy == null) InfoCard("No he podido calcular rutas ahora", St.askErr!!)
-                else -> if (here == null) InfoCard("Buscando tu posición…", "Los bucles se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
-                    else if (St.rSugErr != null && !St.rSugBusy) InfoCard("No he podido calcular bucles ahora", "Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Las rutas recomendadas sí funcionan sin él.") {
-                        Btn("Reintentar", { RtSt.seed = (RtSt.seed + 37) % 360 }, kind = BtnKind.Sec, height = 46.dp)
-                    }
+        if (St.rMode == "rec" && St.rDist == "all" && St.rSurf == "all" && q.isEmpty()) app.pickToday(shown)?.let { TodayCard(it) }
+        shown.forEach { RouteCard(it, app) }
+        if (shown.isEmpty()) when (St.rMode) {
+            "rec" -> if (app.zr.isEmpty()) InfoCard("No se han podido cargar las rutas", "Cierra la app y vuelve a abrirla. Si sigue igual, avísame desde Perfil › Avisar de un fallo.")
+                else InfoCard("Ninguna ruta con esos filtros", "Hay ${app.zoneRoutes(zone, here).size} rutas en esta zona con otro tiempo, suelo o nombre.") { Btn("Quitar filtros", { St.rDist = "all"; St.rSurf = "all"; St.rSort = "near"; St.rDiff = "all"; St.rQ = "" }, height = 44.dp, size = 14.sp) }
+            "mine" -> InfoCard("Aún no tienes recorridos", "Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.")
+            "ask" -> if (here == null) InfoCard("Buscando tu posición…", "Las rutas se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
+                else if (St.askErr != null && St.askBusy == null) InfoCard("No he podido calcular rutas ahora", St.askErr!!)
+            else -> if (here == null) InfoCard("Buscando tu posición…", "Los bucles se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
+                else if (St.rSugErr != null && !St.rSugBusy) InfoCard("No he podido calcular bucles ahora", "Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Las rutas recomendadas sí funcionan sin él.") {
+                    Btn("Reintentar", { RtSt.seed = (RtSt.seed + 37) % 360 }, kind = BtnKind.Sec, height = 46.dp)
+                }
+        }
+        if (St.rMode == "ask" && St.askBusy != null) repeat(maxOf(0, 3 - St.askList.size)) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface2).alpha(0.6f)) }
+        if (St.rMode == "sug" && St.rSugBusy) repeat(3 - St.rSug.size) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface2).alpha(0.6f)) }
+        if (St.rMode == "sug" && !St.rSugBusy && St.rSug.isNotEmpty()) Btn("Generar otros tres bucles", { RtSt.seed = (RtSt.seed + 37) % 360 }, Modifier.padding(top = 4.dp), BtnKind.Sec, 48.dp)
+    }
+}
+
+/**
+ * Rutas como mapa: el mapa ocupa toda la pantalla y no se mueve; arriba el buscador y los filtros en una línea;
+ * abajo una hoja que se arrastra: tarjetas que se pasan de lado (la ruta elegida se resalta en el mapa) o la lista entera.
+ */
+@Composable
+private fun RoutesMapScreen(shown: List<Route>, sel: Route?, here: LatLon?, app: App, near: String?, zone: String, listContent: @Composable ColumnScope.() -> Unit) {
+    val c = Z.c
+    val ins = WindowInsets.systemBars.asPaddingValues()
+    val ctl = remember { MapCtl() }
+    val screenH = LocalConfiguration.current.screenHeightDp.dp
+    val tabsH = ins.calculateBottomPadding() + 92.dp
+    val topH = ins.calculateTopPadding() + 128.dp
+    val peekH = 196.dp
+    val sheetH by animateDpAsState(when (St.rSheet) { 0 -> 54.dp; 1 -> peekH; else -> screenH + ins.calculateTopPadding() - topH - tabsH + 20.dp }, label = "sheet")
+    val pager = androidx.compose.foundation.pager.rememberPagerState { shown.size }
+    // Mapa: todas las rutas finas; la elegida, con el trazo de la marca (tinta + volt) y sus pastillas de salida y meta.
+    val lines = shown.mapIndexedNotNull { i, r -> if (r.ll.size < 2 || r === sel) null else MLine(r.ll.toLL(), Ink, 3f, 0.45f, tap = i) } +
+        (sel?.takeIf { it.ll.size >= 2 }?.let { r -> routeLines(r.ll.toLL()).map { it.copy(tap = shown.indexOf(r)) } } ?: emptyList())
+    val dots = shown.mapIndexedNotNull { i, r -> if (r.ll.size < 2 || r === sel) null else MDot(r.startLL(), Color.White, Ink, label = "${commaNum(r.km)} km", tap = i) } +
+        listOfNotNull(sel?.takeIf { it.ll.size >= 2 }?.let { r -> MDot(r.startLL(), Volt, Ink, size = 22f, label = "${commaNum(r.km)} km", tap = shown.indexOf(r)) }) +
+        listOfNotNull(here?.let { MDot(it, Color(0xFF2F6BFF), Color.White, size = 16f, halo = Color(0x332F6BFF), haloW = 14f) })
+    val sheetPadDp = (if (St.rSheet == 2) peekH else sheetH).value + tabsH.value + 16f
+    LaunchedEffect(shown.map { it.id }) { val all = shown.filter { it.ll.size >= 2 }.map { it.startLL() } + listOfNotNull(here); if (all.isNotEmpty() && sel == null) ctl.fit(all, 40f, topH.value + 10f, 40f, sheetPadDp, 14.0) }
+    LaunchedEffect(sel?.id) { sel?.takeIf { it.ll.size >= 2 }?.let { ctl.fit(it.ll.toLL(), 50f, topH.value + 20f, 70f, sheetPadDp, 16.0) } }
+    LaunchedEffect(pager) { androidx.compose.runtime.snapshotFlow { pager.currentPage }.collect { if (shown.isNotEmpty()) St.rSel = it } }
+    LaunchedEffect(St.rSel, shown.size) { if (St.rSel < shown.size && pager.currentPage != St.rSel) pager.animateScrollToPage(St.rSel) }
+    Box(Modifier.fillMaxSize().background(c.mapLand)) {
+        ZMap(Modifier.matchParentSize(), St.rLayer, lines, dots, ctl, onTap = { i -> St.rSel = i; if (St.rSheet == 0) St.rSheet = 1 }, attrBottom = sheetH + tabsH)
+        // Arriba: modo + buscador + Guardadas, y los filtros en una sola línea.
+        Column(Modifier.fillMaxWidth().padding(top = ins.calculateTopPadding() + 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(Modifier.padding(horizontal = 14.dp).fillMaxWidth().height(52.dp).shadow(10.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(c.surface).padding(start = 12.dp, end = 6.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ZMark(16.dp, if (c.night) c.volt else c.ink)
+                Box(Modifier.width(1.dp).height(26.dp).background(c.line))
+                Icon(Ico.search, null, Modifier.size(18.dp), tint = c.muted)
+                val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+                LaunchedEffect(St.rSearch) { if (St.rSearch) { St.rSearch = false; runCatching { focus.requestFocus() } } }
+                androidx.compose.foundation.text.BasicTextField(St.rQ, { St.rQ = it.take(60) }, Modifier.weight(1f).focusRequester(focus), singleLine = true,
+                    textStyle = bodyStyle(15.sp).copy(color = c.ink), cursorBrush = androidx.compose.ui.graphics.SolidColor(c.ink),
+                    decorationBox = { inner -> Box { if (St.rQ.isEmpty()) Txt(if (St.rMode == "mine") "Buscar en tus recorridos" else "Buscar ruta, parque, zona…", size = 15.sp, color = c.muted, maxLines = 1); inner() } })
+                if (St.rQ.isNotEmpty()) IconBtn(Ico.close, { St.rQ = "" }, size = 34.dp, bg = Color.Transparent, iconSize = 16.dp)
+                val mine = St.rMode == "mine"
+                Row(Modifier.clip(RoundedCornerShape(12.dp)).background(if (mine) c.bar else Color.Transparent).clickable { St.rMode = if (mine) "rec" else "mine"; St.rSel = 0; St.rSheet = 1 }.padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(if (mine) Ico.saved else Ico.save, null, Modifier.size(18.dp), tint = if (mine) c.volt else c.ink)
+                    Txt("Guardadas", size = 13.sp, weight = FontWeight.SemiBold, color = if (mine) c.onBar else c.ink)
+                }
             }
-            if (St.rMode == "ask" && St.askBusy != null) repeat(maxOf(0, 3 - St.askList.size)) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface).alpha(0.6f)) }
-            if (St.rMode == "sug" && St.rSugBusy) repeat(3 - St.rSug.size) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface).alpha(0.6f)) }
-            if (St.rMode == "sug" && !St.rSugBusy && St.rSug.isNotEmpty()) Btn("Generar otros tres bucles", { RtSt.seed = (RtSt.seed + 37) % 360 }, Modifier.padding(top = 4.dp), BtnKind.Sec, 48.dp)
+            if (St.rMode == "rec") Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterDrop("Zona", (if (near != null) listOf("cerca" to "Cerca de ti") else emptyList()) + CITIES.map { it.key to it.value.name }, zone, null) { St.rZone = it }
+                FilterDrop("Tiempo", listOf("all" to "Cualquiera", "t20" to "20 min", "t30" to "30 min", "t45" to "45 min", "t60" to "Más de 45"), St.rDist, "all") { St.rDist = it }
+                FilterDrop("Dificultad", listOf("all" to "Cualquiera", "easy" to "Fácil", "mid" to "Media", "hard" to "Exigente"), St.rDiff, "all") { St.rDiff = it }
+                FilterDrop("Superficie", listOf("all" to "Cualquiera", "tierra" to "Tierra", "asfalto" to "Asfalto", "pista" to "Pista"), St.rSurf, "all") { St.rSurf = it }
+                FilterDrop("Ordenar", listOf("near" to "Más cerca", "short" to "Más corta", "long" to "Más larga", "flat" to "Más llana", "new" to "Sin estrenar"), St.rSort, "near") { St.rSort = it }
+            }
+        }
+        // Botones del mapa y «Crear ruta», encima de la hoja.
+        if (St.rSheet < 2) Column(Modifier.align(Alignment.BottomEnd).padding(end = 14.dp, bottom = tabsH + sheetH + 12.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            var layersOpen by remember { mutableStateOf(false) }
+            Box {
+                MapFab(Ico.layers, "Tipo de mapa") { layersOpen = true }
+                androidx.compose.material3.DropdownMenu(layersOpen, { layersOpen = false }, containerColor = c.surface) {
+                    MAP_TYPES.forEach { (k, l) -> androidx.compose.material3.DropdownMenuItem({ Txt(l, weight = if (St.rLayer == k) FontWeight.SemiBold else FontWeight.Normal) }, { St.rLayer = k; layersOpen = false }) }
+                }
+            }
+            if (sel != null && sel.ll.size >= 2) Box(Modifier.size(48.dp).shadow(8.dp, CircleShape).clip(CircleShape).background(c.surface).clickable { Nav.go(V3D, route = sel) }, contentAlignment = Alignment.Center) { Txt("3D", size = 15.sp, weight = FontWeight.Bold) }
+            MapFab(Ico.locate, "Mi ubicación") { here?.let { ctl.center(it, 15.0, animate = true) } ?: toast("Buscando tu posición…") }
+            Row(Modifier.height(48.dp).shadow(8.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp)).background(c.volt).clickable { St.rMode = "ask"; St.rSheet = 2 }.padding(horizontal = 18.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Ico.plus, null, Modifier.size(18.dp), tint = c.onVolt); Txt("Crear ruta", size = 15.sp, weight = FontWeight.SemiBold, color = c.onVolt)
+            }
+        }
+        // Hoja de abajo: se arrastra entre mínima, tarjetas y lista completa.
+        Column(Modifier.align(Alignment.BottomCenter).padding(bottom = tabsH - 20.dp).fillMaxWidth().height(sheetH + 20.dp)
+            .shadow(16.dp, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)).clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)).background(c.bg)) {
+            var drag by remember { mutableStateOf(0f) }
+            Column(Modifier.fillMaxWidth().pointerInput(Unit) {
+                detectVerticalDragGestures(onDragStart = { drag = 0f }, onDragEnd = {
+                    if (drag < -40f) St.rSheet = minOf(2, St.rSheet + 1) else if (drag > 40f) St.rSheet = maxOf(0, St.rSheet - 1)
+                }) { ch, dy -> ch.consume(); drag += dy }
+            }.clickable { St.rSheet = if (St.rSheet == 2) 1 else St.rSheet + 1 }.padding(top = 10.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(Modifier.width(40.dp).height(5.dp).clip(RoundedCornerShape(3.dp)).background(c.line))
+                if (St.rSheet != 1) Txt(when (St.rMode) { "ask" -> "Crea tu ruta con Zeta"; "sug" -> "Bucles desde aquí"; "mine" -> "${shown.size} ${pl(shown.size, "recorrido guardado", "recorridos guardados")}"; else -> "${shown.size} ${pl(shown.size, "ruta")} · gratis, sin suscripción" },
+                    Modifier.padding(top = 8.dp), size = 14.sp, weight = FontWeight.SemiBold)
+            }
+            when (St.rSheet) {
+                1 -> if (shown.isEmpty()) Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) { InfoCard(if (St.rMode == "mine") "Aún no tienes recorridos" else "Ninguna ruta con esos filtros", "Desliza hacia arriba para ver más opciones.") }
+                    else androidx.compose.foundation.pager.HorizontalPager(pager, Modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp), pageSpacing = 10.dp) { i -> PeekCard(shown[i], app) }
+                2 -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = listContent)
+                else -> {}
+            }
+        }
+    }
+}
+
+@Composable
+private fun MapFab(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+    val c = Z.c
+    Box(Modifier.size(48.dp).shadow(8.dp, CircleShape).clip(CircleShape).background(c.surface).clickable(onClickLabel = label, onClick = onClick), contentAlignment = Alignment.Center) { Icon(icon, label, Modifier.size(22.dp), tint = c.ink) }
+}
+
+/** Filtro de la fila superior: píldora que se rellena de tinta cuando está activo y abre su lista. */
+@Composable
+private fun FilterDrop(label: String, opts: List<Pair<String, String>>, cur: String, def: String?, onSel: (String) -> Unit) {
+    val c = Z.c; var open by remember { mutableStateOf(false) }
+    val on = def != null && cur != def
+    val text = if (def == null) opts.firstOrNull { it.first == cur }?.second ?: label else if (on) opts.firstOrNull { it.first == cur }?.second ?: label else label
+    Box {
+        Row(Modifier.height(38.dp).shadow(6.dp, RoundedCornerShape(19.dp)).clip(RoundedCornerShape(19.dp)).background(if (on) c.bar else c.surface).clickable { open = true }.padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Txt(text, size = 14.sp, weight = FontWeight.SemiBold, color = if (on) c.onBar else c.ink, maxLines = 1)
+            Icon(Ico.chevron, null, Modifier.size(14.dp).graphicsLayer { rotationZ = 90f }, tint = if (on) c.volt else c.muted)
+        }
+        androidx.compose.material3.DropdownMenu(open, { open = false }, containerColor = c.surface) {
+            opts.forEach { (k, l) -> androidx.compose.material3.DropdownMenuItem({ Txt(l, weight = if (k == cur) FontWeight.SemiBold else FontWeight.Normal, color = c.ink) }, { onSel(k); St.rSel = 0; open = false }) }
+        }
+    }
+}
+
+/** Tarjeta de la hoja: foto a la izquierda, datos a la derecha (como las rutas de pago de otras apps, aquí gratis). */
+@Composable
+private fun PeekCard(r: Route, app: App) {
+    val c = Z.c; val m = app.routeMeta(r)
+    val sub = when (r.src) { "rec" -> "${r.zone ?: ""}${r.away?.let { " · " + fmtAway(it) } ?: ""}"; "sug" -> "Desde tu ubicación"; else -> r.sub ?: "" }
+    Row(Modifier.fillMaxWidth().height(132.dp).shadow(6.dp, RoundedCornerShape(20.dp)).clip(RoundedCornerShape(20.dp)).background(c.surface).clickable { Nav.go(ROUTE, route = r) }) {
+        RoutePhotoThumb(r, w = 112.dp, h = 132.dp)
+        Column(Modifier.weight(1f).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Txt(r.name, size = 16.sp, weight = FontWeight.SemiBold, maxLines = 1, lineHeight = 1.2)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Chip(m.diff, m.diffCls); Txt("${commaNum(r.km)} km · ${r.gain?.let { "$it m" } ?: "—"} · ${fmtDur(m.time)}", size = 13.sp, maxLines = 1)
+            }
+            if (sub.isNotEmpty()) Sub(sub, size = 13.sp, maxLines = 1)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                ZMark(12.dp, if (c.night) c.volt else c.ink); Txt(if (r.src == "sug" || r.src == "ask") "Diseñada para ti" else "Gratis en Zancada", size = 13.sp, weight = FontWeight.SemiBold)
+            }
         }
     }
 }
@@ -217,21 +349,6 @@ private fun AskBox(here: LatLon?, app: App) {
 @Composable
 fun InfoCard(title: String, sub: String, extra: (@Composable ColumnScope.() -> Unit)? = null) {
     ZCard(gap = if (extra != null) 10.dp else 6.dp) { Txt(title, weight = FontWeight.SemiBold); Sub(sub); extra?.invoke(this) }
-}
-
-@Composable
-private fun RoutesMap(list: List<Route>, here: LatLon?) {
-    val c = Z.c; val ctl = remember { MapCtl() }
-    val h = (LocalConfiguration.current.screenHeightDp * 0.58f).dp
-    val lines = list.mapIndexedNotNull { i, r -> if (r.ll.size < 2) null else MLine(r.ll.toLL(), Ink, 3f, 0.55f, tap = i) }
-    val dots = list.mapIndexedNotNull { i, r -> if (r.ll.size < 2) null else MDot(r.startLL(), Volt, Ink, label = "${commaNum(r.km)} km", tap = i) } + listOfNotNull(here?.let { MDot(it, Volt, Ink) })
-    LaunchedEffect(list.map { it.id }) { val all = list.filter { it.ll.size >= 2 }.map { it.startLL() }; if (all.isNotEmpty()) ctl.fit(all, 40f, 40f, 40f, 40f, 14.0) }
-    Box(Modifier.fillMaxWidth().height(h).clip(RoundedCornerShape(24.dp))) {
-        ZMap(Modifier.matchParentSize(), "calles", lines, dots, ctl, onTap = { i -> list.getOrNull(i)?.let { Nav.go(ROUTE, route = it) } }, attrBottom = 52.dp)
-        Sub(if (list.isNotEmpty()) "${list.size} ${pl(list.size, "ruta")} · toca un punto para ver la ficha" else "Ninguna ruta con esos filtros",
-            Modifier.align(Alignment.BottomCenter).padding(start = 12.dp, end = 12.dp, bottom = 10.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(c.surface).padding(horizontal = 12.dp, vertical = 8.dp),
-            size = 12.sp, align = androidx.compose.ui.text.style.TextAlign.Center)
-    }
 }
 
 @Composable

@@ -48,6 +48,8 @@ object Perm {
 class MainActivity : ComponentActivity() {
     /** Animación del logo al abrir la app (no al volver a una carrera en marcha). */
     private var intro by mutableStateOf(false)
+    /** Cuándo se fue la app a segundo plano: si vuelves tras más de 10 s, sale otra vez la cortinilla. */
+    private var leftAt = 0L
     private var pending: ((Boolean) -> Unit)? = null
     private val askPerms = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { res ->
         val cb = pending; pending = null
@@ -108,6 +110,14 @@ class MainActivity : ComponentActivity() {
                 if (intro) IntroSplash { intro = false }
             }
         }
+    }
+
+    override fun onStop() { super.onStop(); leftAt = System.currentTimeMillis() }
+
+    override fun onStart() {
+        super.onStart()
+        if (leftAt > 0 && System.currentTimeMillis() - leftAt > 10_000 && Nav.cur.id != RUN && Nav.cur.id != COUNT && RunBus.state.value.phase != Phase.RUNNING) intro = true
+        leftAt = 0
     }
 
     override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); handle(intent) }

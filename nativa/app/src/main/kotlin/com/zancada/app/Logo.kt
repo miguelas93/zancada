@@ -98,17 +98,18 @@ fun ZLockup(height: Dp, mark: Color, text: Color, modifier: Modifier = Modifier)
 
 private fun backOut(x: Float): Float { val c1 = 1.70158f; val c3 = c1 + 1; val u = x - 1; return 1 + c3 * u * u * u + c1 * u * u }
 
-const val INTRO_MS = 1500
+/** 0,9 s: lo justo para reconocer la marca sin hacer esperar (las apps de Google piden ≤ 1 s de arranque). */
+const val INTRO_MS = 900
 
-/** Pantalla de arranque: aparece la A, se dibuja la ruta, aterriza la B y sale «zancada». Un toque la salta. */
+/** Cortinilla de arranque (0,9 s): aparece la A, se dibuja la ruta, aterriza la B y sale «zancada». Un toque la salta. */
 @Composable
 fun IntroSplash(onDone: () -> Unit) {
     val t = remember { Animatable(0f) }
     LaunchedEffect(Unit) { t.animateTo(1f, tween(INTRO_MS, easing = LinearEasing)); onDone() }
     val ms = t.value * INTRO_MS
     fun seg(from: Float, to: Float, e: Easing = FastOutSlowInEasing) = e.transform(((ms - from) / (to - from)).coerceIn(0f, 1f))
-    val a = backOut(seg(0f, 260f, LinearEasing)); val z = seg(160f, 800f); val b = backOut(seg(760f, 1020f, LinearEasing))
-    val wm = seg(880f, 1150f); val out = seg(1280f, 1500f)
+    val a = backOut(seg(0f, 170f, LinearEasing)); val z = seg(100f, 480f); val b = backOut(seg(450f, 630f, LinearEasing))
+    val wm = seg(420f, 620f); val out = seg(720f, 900f)
     Box(
         Modifier.fillMaxSize().graphicsLayer { alpha = 1f - out }.background(INK).pointerInput(Unit) { detectTapGestures { onDone() } },
         contentAlignment = Alignment.Center
@@ -121,3 +122,8 @@ fun IntroSplash(onDone: () -> Unit) {
         )
     }
 }
+
+/** Símbolo dentro de un círculo (avatar de Zeta, sellos): tinta sobre volt por defecto. */
+@Composable
+fun ZBadge(size: Dp, bg: Color = VOLT, fg: Color = INK, modifier: Modifier = Modifier) =
+    Box(modifier.size(size).background(bg, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) { ZMark(size * 0.42f, fg) }

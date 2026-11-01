@@ -25,6 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.composed
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -86,6 +89,7 @@ object St {
     // Rutas
     var rMode by mutableStateOf("rec"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
     var rDist by mutableStateOf("all"); var rSurf by mutableStateOf("all"); var rSort by mutableStateOf("near"); var rMore by mutableStateOf(false)
+    var rSearch by mutableStateOf(false); var rQ by mutableStateOf(""); var rSel by mutableStateOf(0); var rSheet by mutableStateOf(1); var rLayer by mutableStateOf("calles"); var rDiff by mutableStateOf("all")
     var rKm by mutableStateOf(5); var rSug by mutableStateOf<List<Route>>(emptyList()); var rSugBusy by mutableStateOf(false); var rSugErr by mutableStateOf<String?>(null)
     // «Pídesela a Zeta»
     var askQ by mutableStateOf(""); var askList by mutableStateOf<List<Route>>(emptyList()); var askBusy by mutableStateOf<String?>(null); var askErr by mutableStateOf<String?>(null)
@@ -163,7 +167,7 @@ fun ZRoot() {
                 }
             }
             if (scr.id in TABS || scr.id == CLUBS) Tabs(scr.id, Modifier.align(Alignment.BottomCenter))
-            val showZeta = data.profile.done && scr.id in setOf(HOME, HISTORY, PROFILE, ROUTES, PLAN, CLUBS)
+            val showZeta = data.profile.done && scr.id in setOf(HISTORY, PROFILE, PLAN, CLUBS)
             if (showZeta) ZetaFab(scr.id == PLAN, data.settings.zetaSeen == null, Modifier.align(Alignment.BottomEnd))
             Modals()
             ToastHost(Modifier.align(Alignment.TopCenter))
@@ -171,9 +175,16 @@ fun ZRoot() {
     }
 }
 
+/** Zonas que se deslizan de lado por sí mismas (carruseles): ahí el gesto no cambia de pestaña. */
+object SwipeBlock { val rects = mutableMapOf<String, androidx.compose.ui.geometry.Rect>() }
+fun Modifier.noSwipeNav(key: String): Modifier = composed {
+    DisposableEffect(key) { onDispose { SwipeBlock.rects.remove(key) } }
+    onGloballyPositioned { SwipeBlock.rects[key] = it.boundsInRoot() }
+}
+
 /** Deslizar entre pestañas (Inicio ↔ Actividad ↔ Rutas ↔ Perfil); hacia la derecha vuelve a Inicio desde Preparar y Resumen. */
 private fun Modifier.swipeNav(cur: String) = pointerInput(cur) {
-    if (cur !in TABS && cur != CLUBS && cur != PREP && cur != SUMMARY) return@pointerInput
+    if ((cur !in TABS && cur != CLUBS && cur != PREP && cur != SUMMARY) || cur == ROUTES) return@pointerInput
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
         val t0 = System.currentTimeMillis(); val start = down.position; var end = start; var multi = false
@@ -184,7 +195,7 @@ private fun Modifier.swipeNav(cur: String) = pointerInput(cur) {
             end = ch.position
             if (!ch.pressed) break
         }
-        if (multi || St.modal != null) return@awaitEachGesture
+        if (multi || St.modal != null || SwipeBlock.rects.values.any { it.contains(start) }) return@awaitEachGesture
         val dx = (end.x - start.x) / density; val dy = (end.y - start.y) / density; val dt = System.currentTimeMillis() - t0
         if (abs(dx) < 60 || abs(dx) < 1.6 * abs(dy) || dt > 700) return@awaitEachGesture
         // En Preparar y Resumen el mapa ocupa la parte de arriba: solo cuenta el gesto en la hoja de abajo.
@@ -222,8 +233,9 @@ private fun Tabs(cur: String, modifier: Modifier) {
 @Composable
 fun ZetaAv(size: Dp = 36.dp, font: Int = 20, ring: Boolean = false) {
     val c = Z.c
+    // El avatar de Zeta es el símbolo de Zancada: la misma Z en todas partes.
     Box(Modifier.size(size).clip(CircleShape).background(c.volt).then(if (ring) Modifier.border(3.dp, c.bar, CircleShape) else Modifier), contentAlignment = Alignment.Center) {
-        Text("Z", style = numStyle(font.sp, -0.04).copy(color = Ink))
+        ZMark(size * 0.40f, Ink)
     }
 }
 
