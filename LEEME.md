@@ -13,6 +13,11 @@ Versión muy beta para probar en el móvil desde el navegador. Sin cuenta: todo 
 - Diseño "Volt": tinta + un único acento lima, Space Grotesk para cifras e Inter para texto. Toda la app pasa a modo noche de 20:00 a 7:00 o con el móvil en oscuro (se puede forzar en Perfil).
 - Se puede "Añadir a pantalla de inicio" (PWA) o instalar el APK de Android (ver abajo).
 
+## Novedades 0.62 (1 nov 2026)
+
+- **Cortinilla más corta (0,9 s)** y vuelve a salir si la app estuvo más de 10 segundos en segundo plano.
+- **Logo arriba a la izquierda en Inicio.**
+
 ## Novedades 0.61 (1 nov 2026)
 
 - **Logo nuevo (B5).** La Z es una ruta: la pastilla hueca es la salida (A) y la maciza la meta (B). Está en el icono de la app, el favicon, la bienvenida y arriba a la derecha en Inicio.

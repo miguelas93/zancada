@@ -206,7 +206,11 @@ fun CountScreen() {
         RunService.send(ctx, RunService.START)
         Nav.reset(Scr(HOME), Scr(RUN))
     }
+    // La cuenta atrás dibuja el logo: sale la A (salida), se traza la ruta y en «¡Vamos!» aterriza la B.
+    val t = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { t.animateTo(1f, tween(3000, easing = androidx.compose.animation.core.LinearEasing)) }
     Column(Modifier.fillMaxSize().background(c.bar), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        androidx.compose.foundation.Canvas(Modifier.size(64.dp * (MARK_W / MARK_H), 64.dp)) { drawZMark(c.volt, z = (t.value * 1.15f).coerceAtMost(1f), a = (t.value * 8).coerceAtMost(1f), b = ((t.value - 0.88f) / 0.12f).coerceIn(0f, 1f)) }
         Text("$n", style = numStyle(180.sp).copy(color = c.volt))
         Sub("Prepárate…", size = 16.sp, color = c.onBarMuted)
     }
@@ -403,31 +407,3 @@ private fun LockOverlay(ui: RunUi, paceTxt: String, unlock: () -> Unit) {
 
 // ---------- Carrera terminada ----------
 
-@Composable
-fun CeleScreen() {
-    val c = Z.c
-    val cele by RunBus.cele.collectAsState()
-    val ce = cele ?: run { LaunchedEffect(Unit) { Nav.reset(Scr(HOME)) }; return }
-    val r = ce.run; val app = remember { Repo.app() }
-    ScreenFix(c.bar, gap = 20.dp, dark = true) {
-        Lbl("Carrera terminada")
-        if (ce.badges.isNotEmpty()) Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
-            ce.badges.take(3).forEachIndexed { i, b ->
-                var show by remember { mutableStateOf(false) }
-                LaunchedEffect(Unit) { delay(250L + i * 200L); show = true }
-                Box(Modifier.size(if (ce.badges.size > 1) 96.dp else 140.dp, (if (ce.badges.size > 1) 96 else 140).dp * 1.2f)) { if (show) Medal(b, if (ce.badges.size > 1) 96.dp else 140.dp, pop = true, shine = true) }
-            }
-        }
-        Spacer(Modifier.weight(1f))
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Num(fmtKm(r.dist), 112.sp, unit = "km", unitSize = 26.sp, unitWeight = FontWeight.SemiBold, color = c.volt, spacing = -0.05)
-            Txt(ce.text, size = 17.sp, weight = FontWeight.Medium)
-        }
-        Column { Divider(); Spacer(Modifier.height(18.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Stat("Tiempo", fmtTime(r.dur), 26.sp); Stat("Ritmo", app.pace(r.paceSec()), 26.sp); Stat("Semana", ce.week, 26.sp) }
-        }
-        Spacer(Modifier.weight(1f))
-        Btn("Ver mi carrera", { Nav.replace(SUMMARY, run = r.id) })
-        Btn("Estirar 5 min, guiado", { St.stretchWarm = false; St.modal = "stretch" }, Modifier.alpha(0.8f), BtnKind.Ghost, color = c.onBar)
-    }
-}

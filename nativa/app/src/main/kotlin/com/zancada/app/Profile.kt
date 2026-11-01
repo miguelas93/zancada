@@ -171,7 +171,7 @@ fun ProfileScreen() {
         Btn("Cambiar mi nombre u objetivo", { Nav.go(WELCOME) }, kind = BtnKind.Sec)
         Btn("Cargar una carrera de ejemplo", { Repo.mutate { addRun(demoRun()) }; toast("Carrera de ejemplo añadida"); Nav.go(HOME) }, kind = BtnKind.Ghost)
         ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Zancada"); Sub(APP_VER, size = 12.sp) }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { ZLockup(20.dp, if (Z.c.night) Z.c.volt else Z.c.ink, Z.c.ink); Sub(APP_VER, size = 12.sp) }
             Sub("Estás probando la app nativa. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Btn("Invitar a un amigo", { Share.text(ctx, INVITE_TEXT, "Zancada") }, Modifier.weight(1f), BtnKind.Sec, 44.dp, 14.sp)

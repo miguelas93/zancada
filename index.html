@@ -161,14 +161,14 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .rcard.on{outline:2px solid var(--ink)}
 .skel{height:96px;border-radius:24px;background:var(--surface);opacity:.6;animation:pulse 1.2s infinite alternate}
 @keyframes pulse{from{opacity:.4}to{opacity:.8}}
-.hmark{color:var(--ink)} :root[data-theme="noche"] .hmark{color:var(--volt)}
+.hlock svg:first-child{color:var(--ink)} :root[data-theme="noche"] .hlock svg:first-child{color:var(--volt)}
 /* Arranque: aparece la A, se dibuja la ruta, aterriza la B y sale «zancada» (logo B5). Un toque lo salta. */
-#intro{position:fixed;inset:0;z-index:999;background:#0B0C0B;display:flex;align-items:center;justify-content:center;animation:zIntroOut .25s ease-in 1.3s forwards}
+#intro{position:fixed;inset:0;z-index:999;background:#0B0C0B;display:flex;align-items:center;justify-content:center;animation:zIntroOut .18s ease-in .72s forwards}
 #intro svg.m{width:110px;height:96px;color:#D4FF3A;overflow:visible}
-#intro .a{transform-box:fill-box;transform-origin:center;animation:zPop .26s cubic-bezier(.34,1.56,.64,1) both}
-#intro .z{stroke-dasharray:1346;stroke-dashoffset:1346;animation:zDraw .64s cubic-bezier(.4,0,.2,1) .16s forwards}
-#intro .b{transform-box:fill-box;transform-origin:center;animation:zPop .26s cubic-bezier(.34,1.56,.64,1) .76s both}
-#intro .w{position:absolute;bottom:calc(var(--sab) + 64px);opacity:0;animation:zFade .27s ease .88s forwards}
+#intro .a{transform-box:fill-box;transform-origin:center;animation:zPop .17s cubic-bezier(.34,1.56,.64,1) both}
+#intro .z{stroke-dasharray:1346;stroke-dashoffset:1346;animation:zDraw .38s cubic-bezier(.4,0,.2,1) .1s forwards}
+#intro .b{transform-box:fill-box;transform-origin:center;animation:zPop .18s cubic-bezier(.34,1.56,.64,1) .45s both}
+#intro .w{position:absolute;bottom:calc(var(--sab) + 64px);opacity:0;animation:zFade .2s ease .42s forwards}
 @keyframes zPop{from{transform:scale(0)}to{transform:scale(1)}} @keyframes zDraw{to{stroke-dashoffset:0}}
 @keyframes zFade{to{opacity:1}} @keyframes zIntroOut{to{opacity:0;visibility:hidden}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -240,8 +240,9 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 <!-- INICIO -->
 <section class="screen scroll withtabs on" id="home">
   <div class="col" style="gap:20px">
+    <div class="between"><span class="zlock hlock" style="display:inline-flex;align-items:center;gap:11px" role="img" aria-label="Zancada"><svg viewBox="0 0 765 670" width="29.7" height="26" aria-hidden="true"><rect x="21" y="21" width="258" height="108" rx="54" fill="none" stroke="currentColor" stroke-width="42"/><polyline points="420,75 690,75 75,595 345,595" fill="none" stroke="currentColor" stroke-width="150" stroke-linecap="round" stroke-linejoin="round"/><rect x="465" y="520" width="300" height="150" rx="75" fill="currentColor"/></svg><svg viewBox="0 0 5512 786" width="113.0" height="16.1" aria-hidden="true"><path fill="var(--ink)" d="M4469 770 4453.74 649.03Q4413.16 712.68 4352.5 748.5Q4289 786 4208 786Q4124 786 4060.5 748.5Q3997 711 3961 642.5Q3925 574 3925 485Q3925 394 3961 326Q3997 258 4060.5 220Q4124 182 4208 182Q4289 182 4352.5 219.5Q4412.16 254.73 4452.84 316.44L4491 0H4703L4644 469L4680 770ZM1226 770 1211.38 654.19Q1171.67 714.15 1113.5 748.5Q1050 786 969 786Q885 786 821.5 748.5Q758 711 722 642.5Q686 574 686 485Q686 394 722 326Q758 258 821.5 220Q885 182 969 182Q1050 182 1113.5 219.5Q1171.57 253.79 1211.66 313.17L1226 199H1438L1402 484L1438 770ZM3633 770 3618.38 654.19Q3578.67 714.15 3520.5 748.5Q3457 786 3376 786Q3292 786 3228.5 748.5Q3165 711 3129 642.5Q3093 574 3093 485Q3093 394 3129 326Q3165 258 3228.5 220Q3292 182 3376 182Q3457 182 3520.5 219.5Q3578.57 253.79 3618.66 313.17L3633 199H3845L3809 484L3845 770ZM5300 770 5285.38 654.19Q5245.67 714.15 5187.5 748.5Q5124 786 5043 786Q4959 786 4895.5 748.5Q4832 711 4796 642.5Q4760 574 4760 485Q4760 394 4796 326Q4832 258 4895.5 220Q4959 182 5043 182Q5124 182 5187.5 219.5Q5245.57 253.79 5285.66 313.17L5300 199H5512L5476 484L5512 770ZM1519 199H1724L1743.31 318.01Q1746.08 313.18 1749 308.5Q1788 246 1845 214Q1902 182 1971 182Q2053 182 2111 215Q2169 248 2199.5 308Q2230 368 2230 450V770H2026V480Q2026 416 1993.5 382Q1961 348 1900 348Q1858 348 1826.5 366Q1795 384 1778 417Q1761 450 1761 495V770H1557V396ZM3026 529Q3018 606 2970 664Q2922 722 2845.5 754Q2769 786 2674 786Q2569 786 2489 748Q2409 710 2364 642Q2319 574 2319 485Q2319 395 2364 327Q2409 259 2489 220.5Q2569 182 2674 182Q2769 182 2845.5 214.5Q2922 247 2970 304.5Q3018 362 3026 440H2823Q2812 389 2772 361.5Q2732 334 2674 334Q2629 334 2595.5 351.5Q2562 369 2543.5 402.5Q2525 436 2525 485Q2525 533 2543.5 566.5Q2562 600 2595.5 617.5Q2629 635 2674 635Q2732 635 2772.5 606Q2813 577 2823 529ZM0 770V628L359.68 345H3V199H615V341L256.34 623H617V770ZM893 485Q893 527 910.5 560Q928 593 959 611.5Q990 630 1030 630Q1072 630 1109 611.5Q1146 593 1174 560Q1202 527 1216 485Q1202 442 1174 409Q1146 376 1109 357Q1072 338 1030 338Q990 338 959 357Q928 376 910.5 409Q893 442 893 485ZM3300 485Q3300 527 3317.5 560Q3335 593 3366 611.5Q3397 630 3437 630Q3479 630 3516 611.5Q3553 593 3581 560Q3609 527 3623 485Q3609 442 3581 409Q3553 376 3516 357Q3479 338 3437 338Q3397 338 3366 357Q3335 376 3317.5 409Q3300 442 3300 485ZM4132 485Q4132 527 4149.5 560Q4167 593 4198 611.5Q4229 630 4269 630Q4311 630 4348 611.5Q4385 593 4413 560Q4441 527 4455 485Q4441 442 4413 409Q4385 376 4348 357Q4311 338 4269 338Q4229 338 4198 357Q4167 376 4149.5 409Q4132 442 4132 485ZM4967 485Q4967 527 4984.5 560Q5002 593 5033 611.5Q5064 630 5104 630Q5146 630 5183 611.5Q5220 593 5248 560Q5276 527 5290 485Q5276 442 5248 409Q5220 376 5183 357Q5146 338 5104 338Q5064 338 5033 357Q5002 376 4984.5 409Q4967 442 4967 485Z"/></svg></span></div>
     <div class="between">
-      <div><div class="sub" id="homeDate"></div><h1 id="homeHello">Hola</h1><div class="sub" id="homeWx" style="display:none;font-size:12px;margin-top:4px;white-space:pre-line;line-height:1.4"></div></div><svg class="hmark" viewBox="0 0 765 670" width="32" height="28" aria-label="Zancada" role="img" style="flex:none;align-self:flex-start;margin-top:4px"><rect x="21" y="21" width="258" height="108" rx="54" fill="none" stroke="currentColor" stroke-width="42"/><polyline points="420,75 690,75 75,595 345,595" fill="none" stroke="currentColor" stroke-width="150" stroke-linecap="round" stroke-linejoin="round"/><rect x="465" y="520" width="300" height="150" rx="75" fill="currentColor"/></svg>
+      <div><div class="sub" id="homeDate"></div><h1 id="homeHello">Hola</h1><div class="sub" id="homeWx" style="display:none;font-size:12px;margin-top:4px;white-space:pre-line;line-height:1.4"></div></div>
     </div>
     <div id="startCard"></div>
     <div class="card dark col" style="gap:18px" id="weekCard">
@@ -347,7 +348,7 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
     <button class="btn ghost" id="demoBtn">Cargar una carrera de ejemplo</button>
     <div class="card col" style="gap:10px;padding:18px 20px"><div class="between"><h2>Zancada beta</h2><span class="sub" style="font-size:12px" id="betaVer"></span></div><p class="sub" style="margin:0;font-size:13px;line-height:1.45">Estás probando una beta. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.</p><div style="display:flex;gap:8px"><button class="btn sec" id="inviteBtn" style="height:44px;font-size:14px;flex:1">Invitar a un amigo</button><button class="btn sec" id="bugBtn" style="height:44px;font-size:14px;flex:1">Avisar de un fallo</button></div><a class="sub" id="newsLink" href="https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades" target="_blank" rel="noopener" style="font-size:12px;text-align:center;text-decoration:underline">Ver las novedades de cada versión</a></div>
     <button class="btn ghost" id="wipeBtn" style="color:var(--danger)">Borrar todos los datos de este móvil</button>
-    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.61 · logo nuevo · 1 nov 2026</p>
+    <p style="margin:0;font-size:12px;text-align:center" class="sub">Zancada beta 0.62 · marca · 1 nov 2026</p>
   </div>
   <nav class="tabs" data-tab="profile"></nav>
 </section>
@@ -594,8 +595,9 @@ html[data-big] body{font-size:17px}html[data-big] .sub{font-size:15px}html[data-
 (() => {
 'use strict';
 const $ = (s) => document.querySelector(s);
-// Arranque con el logo: se quita solo a los 1,6 s, con un toque, o al momento si el móvil pide menos animaciones (y en las pruebas automáticas).
-{ const i = document.getElementById('intro'); if (i) { const end = () => i.remove(); i.addEventListener('click', end); if (navigator.webdriver || matchMedia('(prefers-reduced-motion: reduce)').matches) end(); else setTimeout(end, 1600); } }
+// Arranque con el logo (0,9 s; vuelve a salir si la app estuvo más de 10 s en segundo plano): se quita solo, con un toque, o al momento si el móvil pide menos animaciones (y en las pruebas automáticas).
+{ const i0 = document.getElementById('intro'); const tpl = i0 && i0.cloneNode(true); let hid = 0; document.addEventListener('visibilitychange', () => { if (document.hidden) { hid = Date.now(); return; } if (tpl && hid && Date.now() - hid > 10000 && !document.getElementById('intro') && !matchMedia('(prefers-reduced-motion: reduce)').matches && !(() => { try { return run.active; } catch (e) { return false; } })()) { const n = tpl.cloneNode(true); document.body.prepend(n); n.addEventListener('click', () => n.remove()); setTimeout(() => n.remove(), 950); } hid = 0; }); }
+{ const i = document.getElementById('intro'); if (i) { const end = () => i.remove(); i.addEventListener('click', end); if (navigator.webdriver || matchMedia('(prefers-reduced-motion: reduce)').matches) end(); else setTimeout(end, 950); } }
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 // Seguridad: los textos que escribe la persona o que llegan de fuera (nombre de un GPX, copia restaurada) se pintan dentro del HTML.
 // Sin < ni > no pueden colar etiquetas ni código (un GPX con <img onerror=…> en el nombre ejecutaba JavaScript en la app).
