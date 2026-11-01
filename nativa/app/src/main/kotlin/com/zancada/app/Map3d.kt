@@ -169,7 +169,7 @@ fun Map3dScreen(route: Route?, runId: String?) {
         if (!flying) return@LaunchedEffect
         val pts = Map3d.sample(ll, 220); val step = 180L
         var brg = Map3d.bearing(pts.first(), pts[minOf(pts.size - 1, 10)])
-        m.easeCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.Builder().target(LatLng(pts[0].lat, pts[0].lon)).zoom(16.3).tilt(65.0).bearing(brg).build()), 1500)
+        m.easeCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.Builder().target(LatLng(pts[0].lat, pts[0].lon)).zoom(16.3).tilt(60.0).bearing(brg).build()), 1500)
         delay(1600)
         for (i in pts.indices) {
             if (!flying) break
@@ -180,7 +180,7 @@ fun Map3dScreen(route: Route?, runId: String?) {
                 brg = (brg + d * 0.25 + 360) % 360
             }
             runCatching { (s.getSource("z-dot") as? GeoJsonSource)?.setGeoJson(GPoint.fromLngLat(pts[i].lon, pts[i].lat)) }
-            m.easeCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.Builder().target(LatLng(pts[i].lat, pts[i].lon)).zoom(16.3).tilt(65.0).bearing(brg).build()), step.toInt(), false)
+            m.easeCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.Builder().target(LatLng(pts[i].lat, pts[i].lon)).zoom(16.3).tilt(60.0).bearing(brg).build()), step.toInt(), false)
             delay(step)
         }
         flying = false
