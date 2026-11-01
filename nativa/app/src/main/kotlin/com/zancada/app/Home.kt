@@ -119,41 +119,32 @@ fun HomeScreen() {
             HeadBtn(Ico.search, "Buscar rutas") { St.rSearch = true; Nav.go(ROUTES) }
             HeadBtn(Ico.bell, "Novedades") { St.modal = "news" }
         }
-        Column {
-            Sub(cap(app.es.wdLongDayMonLong(app.now())))
-            H1(if (data.profile.name.isNotEmpty()) "Hola, ${data.profile.name}" else "Hola")
-            wx?.let { Sub(wxText(it).removeSuffix(".") + (it.best?.let { b -> " · Mejor hora hoy: ${b.h}:00 (${b.t}°, ${b.rain} % de lluvia)" } ?: ""), size = 12.sp, modifier = Modifier.padding(top = 4.dp)) }
+        // Saludo en una línea y el tiempo como chip con icono.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(Modifier.weight(1f)) {
+                Sub(cap(app.es.wdLongDayMonLong(app.now())), size = 12.sp, maxLines = 1)
+                H1(if (data.profile.name.isNotEmpty()) "Hola, ${data.profile.name}" else "Hola", size = 26.sp)
+            }
+            wx?.let { WxChip(it) }
         }
         if (app.showStartCard()) StartCard()
-        // Tu serie · Esta semana (se pasan de lado)
-        val pager = rememberPagerState { 2 }
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            HorizontalPager(pager, Modifier.fillMaxWidth().noSwipeNav("homePager"), pageSpacing = 12.dp, verticalAlignment = Alignment.Top) { pg ->
-                if (pg == 0) StreakCard(app, w) else WeekCard(w)
-            }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)) {
-                repeat(2) { i -> Box(Modifier.height(6.dp).width(if (pager.currentPage == i) 18.dp else 6.dp).clip(RoundedCornerShape(3.dp)).background(if (pager.currentPage == i) c.ink else c.line)) }
-            }
+        StreakStrip(app, w)
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            GoalTile(w, Modifier.weight(1f).fillMaxHeight())
+            KmTile(w, Modifier.weight(1f).fillMaxHeight())
         }
-        app.recap()?.let { r -> RecapCard(r) }
         app.loadWarn()?.let { lw ->
-            ZCard(gap = 8.dp, onClick = ::openCoach) {
-                Chip("Cuidado con la carga", "hard")
-                Sub(lw.text, size = 14.sp, color = c.ink)
-                Underline("Pregúntale a Zeta cómo seguir", ::openCoach)
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(c.surface).clickable(onClick = ::openCoach).padding(horizontal = 14.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                IcoBox(Ico.gauge, 34.dp, bg = c.danger.copy(alpha = 0.14f), tint = c.danger)
+                Txt(lw.text, Modifier.weight(1f), size = 13.sp, maxLines = 2)
+                Icon(Ico.chevron, null, Modifier.size(20.dp), tint = Z.muted)
             }
         }
         PlanCardUi(app)
-        app.nearRoute(here)?.let { n -> NearCard(n) }
-        // Salir a correr
-        ZCard(Modifier, pad = PaddingValues(start = 22.dp, top = 18.dp, end = 18.dp, bottom = 18.dp), onClick = { Nav.go(PREP) }) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) { Chip("Carrera libre"); Num("Salir a correr", 26.sp); Sub(w.nudge) }
-                Box(Modifier.size(56.dp).clip(CircleShape).background(c.volt), contentAlignment = Alignment.Center) { Icon(Ico.play, null, Modifier.size(22.dp), tint = c.onVolt) }
-            }
-        }
+        app.recap()?.let { r -> RecapCard(r) }
         data.runs.firstOrNull()?.let { LastRunCard(it, app) }
-        Sub("Beta · los datos se guardan solo en este móvil", size = 12.sp, align = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        app.nearRoute(here)?.let { n -> NearCard(n) }
     }
 }
 
@@ -162,80 +153,74 @@ private fun HeadBtn(icon: androidx.compose.ui.graphics.vector.ImageVector, label
     Box(Modifier.size(42.dp).clip(CircleShape).clickable(onClickLabel = label, onClick = onClick), contentAlignment = Alignment.Center) { Icon(icon, label, Modifier.size(23.dp), tint = Z.c.ink) }
 }
 
+/** Chip del tiempo: icono, grados y la mejor hora para salir. */
 @Composable
-private fun WeekCard(w: HomeWeek) {
-    ZCard(dark = true, gap = 18.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl("Esta semana"); Sub("Objetivo ${w.goal} carreras") }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-            Num(w.km, 72.sp, unit = "km", unitSize = 20.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
-            WeekBarsDay(w.perDay, w.maxDay, w.today)
-        }
-        Track(min(1.0, w.count.toDouble() / w.goal))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Stat("Carreras", w.count.toString(), 22.sp, unit = "de ${w.goal}")
-            Stat("Tiempo", fmtTime(w.dur), 22.sp)
-            Stat("Seguidas", w.streak.toString(), 22.sp, unit = "sem")
-        }
+private fun WxChip(w: Wx) {
+    val c = Z.c
+    Row(Modifier.clip(RoundedCornerShape(50)).background(c.surface).padding(horizontal = 12.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(wxIcon(w.code), null, Modifier.size(18.dp), tint = c.ink)
+        Num("${w.t}°", 16.sp)
+        w.best?.let { b -> Sub("· ${b.h}:00", size = 12.sp, maxLines = 1) }
     }
 }
 
-/** «Tu serie»: semanas seguidas cumpliendo el objetivo y los días de esta semana, con el sello de Zancada en cada día corrido. */
+/** «En racha»: semanas seguidas cumpliendo el objetivo, en una sola fila, con el sello Z en cada día corrido. */
 @Composable
-private fun StreakCard(app: App, w: HomeWeek) {
+private fun StreakStrip(app: App, w: HomeWeek) {
     val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope()
     val ws = app.weekStart(app.now()); val ran = app.runs.filter { it.start >= ws }.map { app.es.dow(it.start) }.toSet()
-    val mark = if (c.night) c.volt else c.ink
-    ZCard(gap = 16.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Txt("Tu serie", size = 17.sp, weight = FontWeight.SemiBold)
-            Row(Modifier.clip(RoundedCornerShape(50)).border(1.5.dp, c.ink, RoundedCornerShape(50)).clickable {
-                scope.launch {
-                    val a = Repo.app(); val png = withContext(Dispatchers.Default) { Images.week(ctx, a) }
-                    if (png == null) { toast("Cuando corras esta semana, podrás compartirla"); return@launch }
-                    val wr = a.runs.filter { it.start >= ws }
-                    Share.file(ctx, "zancada-semana-${isoMs(ws).take(10)}.png", "image/png", png, "Mi semana con Zancada: ${fmtKm(wr.sumOf { it.dist })} km en ${wr.size} ${pl(wr.size, "salida")} 🏃")
-                }
-            }.padding(horizontal = 14.dp, vertical = 7.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Ico.share, null, Modifier.size(16.dp), tint = c.ink); Txt("Compartir", size = 13.sp, weight = FontWeight.SemiBold)
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(c.surface).clickable { Nav.go(HISTORY) }.padding(start = 14.dp, end = 6.dp, top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.width(64.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                Icon(Ico.flame, null, Modifier.size(18.dp), tint = if (w.streak > 0) c.ink else c.muted)
+                Num(w.streak.toString(), 22.sp)
             }
+            Sub("En racha", size = 11.sp, maxLines = 1)
         }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Box(Modifier.size(58.dp).clip(CircleShape).background(c.volt), contentAlignment = Alignment.Center) { Num(w.streak.toString(), 28.sp, color = c.onVolt) }
-                Txt(if (w.streak == 1) "semana" else "semanas", size = 12.sp, weight = FontWeight.SemiBold)
-            }
-            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween) {
-                "LMXJVSD".forEachIndexed { i, l ->
-                    val day = java.util.Calendar.getInstance().apply { timeInMillis = ws + i * DAY + 12 * 3_600_000L }.get(java.util.Calendar.DAY_OF_MONTH)
-                    val done = i in ran; val today = i == w.today; val future = i > w.today
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Txt(l.toString(), size = 13.sp, color = c.muted)
-                        Box(Modifier.size(32.dp).clip(CircleShape).background(if (done) c.bar else Color.Transparent).then(if (today && !done) Modifier.border(1.5.dp, c.ink, CircleShape) else Modifier), contentAlignment = Alignment.Center) {
-                            if (done) ZMark(12.dp, c.volt) else Txt(day.toString(), size = 13.sp, weight = if (today) FontWeight.SemiBold else FontWeight.Normal, color = if (future || !today) c.muted else c.ink)
-                        }
-                    }
+        Row(Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween) {
+            "LMXJVSD".forEachIndexed { i, l ->
+                val done = i in ran; val today = i == w.today
+                Box(Modifier.size(24.dp).clip(CircleShape).background(if (done) c.bar else Color.Transparent).then(if (today && !done) Modifier.border(1.5.dp, c.ink, CircleShape) else Modifier), contentAlignment = Alignment.Center) {
+                    if (done) ZMark(9.dp, c.volt) else Txt(l.toString(), size = 11.sp, weight = if (today) FontWeight.SemiBold else FontWeight.Normal, color = if (today) c.ink else c.muted)
                 }
             }
         }
-        val left = max(0, w.goal - w.count)
-        Sub(when {
-            left == 0 -> "Semana cumplida. Tu serie sigue viva: ${w.streak} ${pl(w.streak, "semana")} seguidas."
-            w.streak > 0 -> "Te falta${if (left == 1) "" else "n"} $left ${pl(left, "carrera")} antes del domingo para sumar la semana ${w.streak + 1}."
-            else -> "Corre $left ${pl(left, "vez", "veces")} esta semana y empieza tu serie."
-        }, size = 13.sp)
+        Box(Modifier.size(40.dp).clip(CircleShape).clickable(onClickLabel = "Compartir tu semana") {
+            scope.launch {
+                val a = Repo.app(); val png = withContext(Dispatchers.Default) { Images.week(ctx, a) }
+                if (png == null) { toast("Cuando corras esta semana, podrás compartirla"); return@launch }
+                val wr = a.runs.filter { it.start >= ws }
+                Share.file(ctx, "zancada-semana-${isoMs(ws).take(10)}.png", "image/png", png, "Mi semana con Zancada: ${fmtKm(wr.sumOf { it.dist })} km en ${wr.size} ${pl(wr.size, "salida")} 🏃")
+            }
+        }, contentAlignment = Alignment.Center) { Icon(Ico.share, "Compartir", Modifier.size(20.dp), tint = c.ink) }
     }
 }
 
+/** Mosaico oscuro: anillo del objetivo semanal en %. */
 @Composable
-private fun WeekBarsDay(perDay: List<Double>, maxDay: Double, today: Int) {
+private fun GoalTile(w: HomeWeek, modifier: Modifier) {
+    val c = Z.c; val f = if (w.goal > 0) w.count.toDouble() / w.goal else 0.0
+    ZCard(modifier, dark = true, pad = PaddingValues(16.dp), gap = 10.dp, radius = 24.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Ico.target, null, Modifier.size(16.dp), tint = c.onBarMuted); Lbl("Objetivo") }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Ring(f, 62.dp, 7.dp) { Num("${min(100, (f * 100).roundToInt())}%", 15.sp, color = c.onBar) }
+            Column { Num("${w.count}/${w.goal}", 22.sp, color = c.onBar); Sub("carreras", size = 11.sp, color = c.onBarMuted) }
+        }
+    }
+}
+
+/** Mosaico: km de la semana con mini barras por día. */
+@Composable
+private fun KmTile(w: HomeWeek, modifier: Modifier) {
     val c = Z.c
-    Row(Modifier.height(84.dp), horizontalArrangement = Arrangement.spacedBy(7.dp), verticalAlignment = Alignment.Bottom) {
-        "LMXJVSD".forEachIndexed { i, l ->
-            val t = i == today
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                val h = max(4, (perDay[i] / maxDay * 60).roundToInt())
-                Box(Modifier.width(10.dp).height(h.dp).clip(RoundedCornerShape(5.dp)).background(if (t) c.volt else c.onBar).alpha(if (t) 1f else if (perDay[i] > 0) 0.35f else 0.35f * 0.18f))
-                Txt(l.toString(), size = 11.sp, weight = if (t) FontWeight.SemiBold else FontWeight.Medium, color = if (t) c.onBar else c.onBarMuted)
+    ZCard(modifier, pad = PaddingValues(16.dp), gap = 8.dp, radius = 24.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Ico.history, null, Modifier.size(16.dp), tint = Z.muted); Lbl("Semana") }
+        Num(w.km, 26.sp, unit = "km", unitSize = 12.sp)
+        Row(Modifier.fillMaxWidth().height(30.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
+            w.perDay.forEachIndexed { i, m ->
+                Box(Modifier.weight(1f).height(max(3, (m / max(1.0, w.maxDay) * 30).roundToInt()).dp).clip(RoundedCornerShape(2.dp))
+                    .background(if (i == w.today) c.volt else c.ink).alpha(if (m == 0.0) 0.12f else 1f))
             }
         }
     }
@@ -258,9 +243,8 @@ private fun RecapCard(r: Recap) {
             Lbl("La semana pasada"); IconBtn(Ico.close, { Repo.settings { it.copy(recapSeen = r.ws) } }, size = 32.dp, bg = Z.c.surface2, iconSize = 16.dp)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Stat("Carreras", r.n.toString(), 24.sp); Stat("Km", toFixed(r.km, 1).replace('.', ','), 24.sp); Stat("Tiempo", fmtTime(r.dur), 24.sp)
+            IcoStat(Ico.flag, r.n.toString(), "carreras"); IcoStat(Ico.routes, toFixed(r.km, 1).replace('.', ','), "km"); IcoStat(Ico.clock, fmtTime(r.dur), "tiempo")
         }
-        Sub(r.text)
     }
 }
 
