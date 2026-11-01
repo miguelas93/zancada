@@ -41,11 +41,11 @@ data class Scr(val id: String, val run: String? = null, val route: Route? = null
 
 const val HOME = "home"; const val HISTORY = "history"; const val ROUTES = "routes"; const val PROFILE = "profile"; const val CLUBS = "clubs"
 const val WELCOME = "welcome"; const val ROUTE = "routeDetail"; const val PLAN = "plan"; const val PLANSETUP = "planSetup"; const val PREP = "prep"
-const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"
+const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val V3D = "view3d"
 val TABS = listOf(HOME, HISTORY, ROUTES, PROFILE)
 private val TRANSIENT = setOf(WELCOME, COUNT, RUN, CELE)
 /** Pantallas oscuras (para el color de los iconos de la barra de estado). */
-val DARK_SCREENS = setOf(WELCOME, PLANSETUP, COUNT, CELE, HEAT, REPLAY, RUN)
+val DARK_SCREENS = setOf(WELCOME, PLANSETUP, COUNT, CELE, HEAT, REPLAY, RUN, V3D)
 
 /** Navegación con el botón «atrás» de Android, como el historial de la web. */
 object Nav {
@@ -152,6 +152,7 @@ fun ZRoot() {
                     SUMMARY -> SummaryScreen(scr.run)
                     HEAT -> HeatScreen()
                     REPLAY -> ReplayScreen(scr.run)
+                    V3D -> Map3dScreen(scr.route, scr.run)
                 }
             }
             if (scr.id in TABS || scr.id == CLUBS) Tabs(scr.id, Modifier.align(Alignment.BottomCenter))

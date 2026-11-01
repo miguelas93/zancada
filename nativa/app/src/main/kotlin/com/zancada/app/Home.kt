@@ -188,13 +188,13 @@ private fun RecapCard(r: Recap) {
 @Composable
 fun PlanCardUi(app: App) {
     when (val p = app.planCard()) {
-        PlanCard.None -> ZCard(dark = true, gap = 10.dp, onClick = { PlanSetupSt.open() }) {
+        PlanCard.None -> PhotoCard(height = 250.dp, onClick = { PlanSetupSt.open() }) {
             Chip("Nuevo"); Num("Entrena con un plan", 26.sp); Sub("Objetivo, días y semanas. Se adapta cada semana a lo que corres.")
         }
         is PlanCard.Finished -> ZCard(dark = true, gap = 10.dp, onClick = { St.planView = null; Nav.go(PLAN) }) {
             Chip("Plan terminado"); Num("${p.done} de ${p.total} sesiones", 26.sp); Sub(p.text)
         }
-        is PlanCard.Week -> ZCard(dark = true, gap = 12.dp, onClick = { St.planView = null; Nav.go(PLAN) }) {
+        is PlanCard.Week -> PhotoCard(onClick = { St.planView = null; Nav.go(PLAN) }) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl(p.head, Modifier.weight(1f)); Sub(p.doneTxt) }
             if (p.title != null) Column {
                 Chip(p.chip ?: "", modifier = Modifier.padding(bottom = 8.dp)); Num(p.title ?: "", 26.sp); p.desc?.let { Sub(it, modifier = Modifier.padding(top = 4.dp)) }

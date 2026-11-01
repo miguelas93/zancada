@@ -78,6 +78,8 @@ fun SummaryScreen(id: String?) {
                     Txt(if (byPace) "Color único" else "Color por ritmo", size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar)
                 }
             }
+            if (hasPts) Box(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 108.dp).height(44.dp).clip(RoundedCornerShape(22.dp)).background(c.bar).clickable { Nav.go(V3D, run = r.id) }
+                .padding(horizontal = 16.dp), contentAlignment = Alignment.Center) { Txt("Vista 3D", size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar) }
             if (hasPts) Row(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 56.dp).height(44.dp).clip(RoundedCornerShape(22.dp)).background(c.bar).clickable { Nav.go(REPLAY, run = r.id) }
                 .padding(start = 12.dp, end = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Ico.play, null, Modifier.size(18.dp), tint = c.volt); Txt("Repetición", size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar)

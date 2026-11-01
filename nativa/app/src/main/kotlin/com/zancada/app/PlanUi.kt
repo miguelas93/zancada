@@ -53,7 +53,7 @@ fun PlanScreenUi() {
                 }, Modifier.padding(top = 8.dp), style = bodyStyle(14.sp, FontWeight.Medium).copy(color = Z.muted))
             }
         }
-        ZCard(dark = true) {
+        PhotoCard(height = 240.dp) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl(ps.weekTitle); ps.note?.let { Sub(it, size = 12.sp) } }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
                 Num(fmtKmS(ps.done), 56.sp, unit = "de ${fmtKmS(ps.km)} km", unitSize = 18.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
