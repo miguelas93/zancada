@@ -105,6 +105,7 @@ fun RoutesScreen() {
     val list: List<Route> = when (St.rMode) {
         "rec" -> app.recList(RouteFilter(here, zone, St.rDist, St.rSurf, St.rSort))
         "mine" -> withAway(app.myRoutes(), here)
+        "ask" -> St.askList
         else -> St.rSug
     }
     // Bucles desde aquí
@@ -123,14 +124,14 @@ fun RoutesScreen() {
         if (out.isEmpty()) { St.rSugErr = "x"; return@LaunchedEffect }
         Repo.update { d -> val m = LinkedHashMap(d.routeCache); m[sugKey] = out; while (m.size > 12) m.remove(m.keys.first()); d.copy(routeCache = m) }
     }
-    val asMap = St.rView == "map" && St.rMode != "sug"
+    val asMap = St.rView == "map" && St.rMode != "sug" && St.rMode != "ask"
     ScreenCol(gap = 14.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             H1("Rutas")
-            if (St.rMode != "sug") Seg(listOf("list" to "Lista", "map" to "Mapa"), if (asMap) "map" else "list", { St.rView = it }, h = 32.dp, pad = 3.dp, fill = false)
+            if (St.rMode != "sug" && St.rMode != "ask") Seg(listOf("list" to "Lista", "map" to "Mapa"), if (asMap) "map" else "list", { St.rView = it }, h = 32.dp, pad = 3.dp, fill = false)
         }
         Chips {
-            listOf("rec" to "Recomendadas", "mine" to "Mis recorridos", "sug" to "Bucle desde aquí").forEach { (k, l) -> ChipB(l, St.rMode == k, { St.rMode = k }) }
+            listOf("rec" to "Recomendadas", "ask" to "Pídesela a Zeta", "mine" to "Mis recorridos", "sug" to "Bucle desde aquí").forEach { (k, l) -> ChipB(l, St.rMode == k, { St.rMode = k }) }
         }
         if (St.rMode == "rec") Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Chips {
@@ -146,6 +147,7 @@ fun RoutesScreen() {
         }
         if (St.rMode == "mine") Btn("Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)", { importGpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
         if (St.rMode == "sug") Chips(wrap = true) { listOf(3, 5, 8, 10, 15).forEach { k -> ChipB("$k km", St.rKm == k, { St.rKm = k }) } }
+        if (St.rMode == "ask") AskBox(here, app)
         if (asMap) RoutesMap(list, here)
         else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (St.rMode == "rec" && St.rDist == "all" && St.rSurf == "all") app.pickToday(list)?.let { TodayCard(it) }
@@ -154,15 +156,59 @@ fun RoutesScreen() {
                 "rec" -> if (app.zr.isEmpty()) InfoCard("No se han podido cargar las rutas", "Cierra la app y vuelve a abrirla. Si sigue igual, avísame desde Perfil › Avisar de un fallo.")
                     else InfoCard("Ninguna ruta con esos filtros", "Hay ${app.zoneRoutes(zone, here).size} rutas en esta zona con otro tiempo o suelo.") { Btn("Quitar filtros", { St.rDist = "all"; St.rSurf = "all"; St.rSort = "near" }, height = 44.dp, size = 14.sp) }
                 "mine" -> InfoCard("Aún no tienes recorridos", "Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.")
+                "ask" -> if (here == null) InfoCard("Buscando tu posición…", "Las rutas se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
+                    else if (St.askErr != null && St.askBusy == null) InfoCard("No he podido calcular rutas ahora", St.askErr!!)
                 else -> if (here == null) InfoCard("Buscando tu posición…", "Los bucles se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
                     else if (St.rSugErr != null && !St.rSugBusy) InfoCard("No he podido calcular bucles ahora", "Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Las rutas recomendadas sí funcionan sin él.") {
                         Btn("Reintentar", { RtSt.seed = (RtSt.seed + 37) % 360 }, kind = BtnKind.Sec, height = 46.dp)
                     }
             }
+            if (St.rMode == "ask" && St.askBusy != null) repeat(maxOf(0, 3 - St.askList.size)) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface).alpha(0.6f)) }
             if (St.rMode == "sug" && St.rSugBusy) repeat(3 - St.rSug.size) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface).alpha(0.6f)) }
             if (St.rMode == "sug" && !St.rSugBusy && St.rSug.isNotEmpty()) Btn("Generar otros tres bucles", { RtSt.seed = (RtSt.seed + 37) % 360 }, Modifier.padding(top = 4.dp), BtnKind.Sec, 48.dp)
         }
     }
+}
+
+/** «Pídesela a Zeta»: escribes o dictas cómo quieres la ruta. */
+@Composable
+private fun AskBox(here: LatLon?, app: App) {
+    val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope()
+    var seed by remember { mutableStateOf(0) }
+    fun search() {
+        val q = St.askQ.trim(); val h = here
+        if (q.isEmpty() || St.askBusy != null) return
+        if (h == null) { toast("Aún no sé dónde estás"); return }
+        St.askList = emptyList(); St.askErr = null; St.askSpec = null; St.askBusy = "Entendiendo lo que pides…"
+        scope.launch {
+            val out = runCatching { Repo.askRoutes(h, q, app.userPace(), seed, { St.askBusy = it }, { St.askSpec = it }, { St.askList = it }) }.getOrNull()
+            St.askBusy = null
+            if (out.isNullOrEmpty()) St.askErr = "Hace falta conexión; el servicio de rutas de OpenStreetMap puede estar saturado. Prueba otra vez en un momento."
+        }
+    }
+    val voice = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
+        res.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.takeIf { it.isNotBlank() }?.let { St.askQ = it.take(300); search() }
+    }
+    ZCard(dark = true, gap = 12.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ZetaAv(34.dp, 18)
+            Column(Modifier.weight(1f)) { Txt("Dime cómo la quieres", size = 16.sp, weight = FontWeight.SemiBold); Sub("Distancia o tiempo, llana o con cuestas, parques, río, fuentes…", size = 12.sp) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Field(St.askQ, { St.askQ = it }, "Ej.: 8 km llanos pasando por el río", Modifier.weight(1f), h = 52.dp, maxLen = 300, onDone = { search() }, radius = 14.dp)
+            IconBtn(Ico.mic, {
+                val i = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    .putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, "es-ES")
+                    .putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "¿Cómo quieres la ruta?")
+                if (runCatching { voice.launch(i) }.isFailure) toast("Este móvil no tiene dictado por voz: escríbelo")
+            }, size = 52.dp, bg = c.volt, tint = c.onVolt)
+        }
+        if (St.askQ.isBlank()) Chips(wrap = true) { ASK_EXAMPLES.forEach { e -> ChipB(e, false, { St.askQ = e; search() }, shadow = false) } }
+        Btn(if (St.askBusy != null) St.askBusy!! else "Buscar ruta", { search() }, height = 50.dp, size = 15.sp, enabled = St.askBusy == null && St.askQ.isNotBlank())
+        St.askSpec?.let { Sub("Entendido: " + it.summary(), size = 12.sp) }
+    }
+    if (St.askBusy == null && St.askList.isNotEmpty()) Underline("Probar otros recorridos con lo mismo", { seed = (seed + 37) % 360; search() })
 }
 
 @Composable

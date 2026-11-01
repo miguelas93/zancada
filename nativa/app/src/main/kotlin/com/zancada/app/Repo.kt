@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.JsonObject
 import java.io.File
 import java.net.HttpURLConnection
@@ -140,6 +141,34 @@ object Repo {
         val res = makeLoop(start, km, brg) { pts -> val (code, body) = Net.postBlocking("$ROUTER/route", routeBody(pts)); if (code != 200 || body == null) error("router $code"); parseRouted(body) }
         val gain = runCatching { Net.postBlocking("$ROUTER/height", heightBody(res.ll)).let { (c, b) -> if (c == 200 && b != null) parseGain(b) else null } }.getOrNull()
         Route("", "Bucle hacia el ${compass(brg)}", res.ll, jsRound(res.km * 10) / 10.0, gain, created = System.currentTimeMillis(), start = LatLon(res.ll[0][0], res.ll[0][1]), src = "sug")
+    }
+
+    /**
+     * «Pídesela a Zeta»: la IA traduce la frase (si no contesta, reglas), se miran parques, agua y fuentes
+     * alrededor (Overpass) y se prueban 5 bucles; salen los 3 que mejor encajan, según van llegando.
+     */
+    suspend fun askRoutes(here: LatLon, text: String, paceSec: Double, seed: Int, step: (String) -> Unit, onSpec: (AskSpec) -> Unit, emit: (List<Route>) -> Unit): List<Route> {
+        step("Entendiendo lo que pides…")
+        val rules = askRules(text, paceSec)
+        val ai = runCatching { withTimeoutOrNull(14_000) { Net.post(COACH_URL, askBody(text, paceSec), 14_000) } }.getOrNull()
+        val spec = ai?.takeIf { it.code == 200 }?.body?.let { coachAnswer(it) }?.let { parseAskSpec(it, rules) } ?: rules
+        onSpec(spec)
+        val feats = askOverpassUrl(here, spec.km, spec.want)?.let { u -> step("Buscando ${listOfNotNull("parques".takeIf { "verde" in spec.want }, "agua".takeIf { "agua" in spec.want }, "fuentes".takeIf { "fuente" in spec.want }).joinToString(", ")} cerca…"); Net.get(u, 25_000)?.let { parseAskFeats(it) } } ?: emptyList()
+        val brgs = askBearings(here, spec, feats, 5, seed)
+        val scored = mutableListOf<Pair<Double, Route>>()
+        brgs.forEachIndexed { i, brg ->
+            step("Probando recorridos (${i + 1} de ${brgs.size})…")
+            val r = runCatching { loop(here, spec.km, brg) }.getOrNull() ?: return@forEachIndexed
+            val res = scoreAsk(r.ll, r.km, r.gain, spec, feats)
+            val name = when {
+                res.why.contains("agua") -> "Bucle junto al agua"; res.why.contains("verdes") -> "Bucle por zonas verdes"
+                res.why.contains("fuente") -> "Bucle con fuente"; spec.hills -> "Bucle con cuestas"; spec.flat -> "Bucle llano"
+                else -> "Bucle hacia el ${compass(brg)}"
+            }
+            scored.add(res.score to r.copy(id = "ask-${System.currentTimeMillis()}-$i", name = name, src = "ask", sub = "Pedida a Zeta", why = res.why))
+            emit(scored.sortedByDescending { it.first }.take(3).map { it.second })
+        }
+        return scored.sortedByDescending { it.first }.take(3).map { it.second }
     }
 }
 

@@ -180,8 +180,8 @@ private class ZOverlay(ctx: Context) : Overlay() {
 }
 
 private fun streetsFilter(night: Boolean): ColorMatrixColorFilter {
-    // grayscale(1) contrast(.92) brightness(1.04)  ·  de noche: grayscale(1) invert(1) brightness(.78) contrast(.95)
-    val (k, o) = if (night) -0.741f to 195.4f else 0.9568f to 10.65f
+    // grayscale(1) contrast(.92) brightness(1.04)  ·  de noche: invertido pero en grises (fondo ~#525252, letras claras), no casi negro
+    val (k, o) = if (night) -0.55f to 215f else 0.9568f to 10.65f
     val r = 0.2126f * k; val g = 0.7152f * k; val b = 0.0722f * k
     return ColorMatrixColorFilter(ColorMatrix(floatArrayOf(r, g, b, 0f, o, r, g, b, 0f, o, r, g, b, 0f, o, 0f, 0f, 0f, 1f, 0f)))
 }

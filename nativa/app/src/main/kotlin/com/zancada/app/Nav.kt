@@ -87,6 +87,9 @@ object St {
     var rMode by mutableStateOf("rec"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
     var rDist by mutableStateOf("all"); var rSurf by mutableStateOf("all"); var rSort by mutableStateOf("near"); var rMore by mutableStateOf(false)
     var rKm by mutableStateOf(5); var rSug by mutableStateOf<List<Route>>(emptyList()); var rSugBusy by mutableStateOf(false); var rSugErr by mutableStateOf<String?>(null)
+    // «Pídesela a Zeta»
+    var askQ by mutableStateOf(""); var askList by mutableStateOf<List<Route>>(emptyList()); var askBusy by mutableStateOf<String?>(null); var askErr by mutableStateOf<String?>(null)
+    var askSpec by mutableStateOf<AskSpec?>(null)
     // Preparar
     var prepMode by mutableStateOf<String?>(null)
     var pickedRoute by mutableStateOf<Route?>(null)
