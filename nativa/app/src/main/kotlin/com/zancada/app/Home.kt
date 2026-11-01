@@ -42,7 +42,7 @@ fun WelcomeScreen() {
     }
     ScreenFix(c.bar, dark = true) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Row { Num("zancada", 22.sp, spacing = -0.04); Num(".", 22.sp, color = c.volt, spacing = -0.04) }
+            ZLockup(26.dp, c.volt, c.onBar)
             Dots(4, step)
         }
         Spacer(Modifier.weight(1f))
@@ -105,11 +105,11 @@ fun HomeScreen() {
     LaunchedEffect(here) { here?.let { p -> Repo.weather(p)?.let { wx = it } } }
     val w = app.homeWeek()
     ScreenCol {
-        Column {
+        Row(verticalAlignment = Alignment.Top) { Column(Modifier.weight(1f)) {
             Sub(cap(app.es.wdLongDayMonLong(app.now())))
             H1(if (data.profile.name.isNotEmpty()) "Hola, ${data.profile.name}" else "Hola")
             wx?.let { Sub(wxText(it).removeSuffix(".") + (it.best?.let { b -> " · Mejor hora hoy: ${b.h}:00 (${b.t}°, ${b.rain} % de lluvia)" } ?: ""), size = 12.sp, modifier = Modifier.padding(top = 4.dp)) }
-        }
+        }; ZMark(28.dp, if (c.night) c.volt else c.ink, Modifier.padding(top = 4.dp)) }
         if (app.showStartCard()) StartCard()
         // Esta semana
         ZCard(dark = true, gap = 18.dp) {
