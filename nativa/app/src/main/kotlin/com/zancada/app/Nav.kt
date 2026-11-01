@@ -84,7 +84,7 @@ object St {
     // Actividad
     var histFilter by mutableStateOf("all"); var histQ by mutableStateOf(""); var calOff by mutableStateOf(0)
     // Rutas
-    var rMode by mutableStateOf("spots"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
+    var rMode by mutableStateOf("rec"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
     var rDist by mutableStateOf("all"); var rSurf by mutableStateOf("all"); var rSort by mutableStateOf("near"); var rMore by mutableStateOf(false)
     var rKm by mutableStateOf(5); var rSug by mutableStateOf<List<Route>>(emptyList()); var rSugBusy by mutableStateOf(false); var rSugErr by mutableStateOf<String?>(null)
     // «Pídesela a Zeta»

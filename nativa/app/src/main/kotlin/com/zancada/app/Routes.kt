@@ -106,7 +106,6 @@ fun RoutesScreen() {
         "rec" -> app.recList(RouteFilter(here, zone, St.rDist, St.rSurf, St.rSort))
         "mine" -> withAway(app.myRoutes(), here)
         "ask" -> St.askList
-        "spots" -> emptyList()
         else -> St.rSug
     }
     // Bucles desde aquí
@@ -125,14 +124,14 @@ fun RoutesScreen() {
         if (out.isEmpty()) { St.rSugErr = "x"; return@LaunchedEffect }
         Repo.update { d -> val m = LinkedHashMap(d.routeCache); m[sugKey] = out; while (m.size > 12) m.remove(m.keys.first()); d.copy(routeCache = m) }
     }
-    val asMap = St.rView == "map" && St.rMode != "sug" && St.rMode != "ask" && St.rMode != "spots"
+    val asMap = St.rView == "map" && St.rMode != "sug" && St.rMode != "ask"
     ScreenCol(gap = 14.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             H1("Rutas")
             if (St.rMode == "rec" || St.rMode == "mine") Seg(listOf("list" to "Lista", "map" to "Mapa"), if (asMap) "map" else "list", { St.rView = it }, h = 32.dp, pad = 3.dp, fill = false)
         }
         Chips {
-            listOf("spots" to "Sitios", "ask" to "Pídesela a Zeta", "mine" to "Mis recorridos").forEach { (k, l) -> ChipB(l, St.rMode == k, { St.rMode = k }) }
+            listOf("rec" to "Recomendadas", "ask" to "Pídesela a Zeta", "mine" to "Mis recorridos", "sug" to "Bucle").forEach { (k, l) -> ChipB(l, St.rMode == k, { St.rMode = k }) }
         }
         if (St.rMode == "rec") Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Chips {
@@ -149,12 +148,11 @@ fun RoutesScreen() {
         if (St.rMode == "mine") Btn("Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)", { importGpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
         if (St.rMode == "sug") Chips(wrap = true) { listOf(3, 5, 8, 10, 15).forEach { k -> ChipB("$k km", St.rKm == k, { St.rKm = k }) } }
         if (St.rMode == "ask") AskBox(here, app)
-        if (St.rMode == "spots") SpotsBlock(here)
         if (asMap) RoutesMap(list, here)
         else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (St.rMode == "rec" && St.rDist == "all" && St.rSurf == "all") app.pickToday(list)?.let { TodayCard(it) }
             list.forEach { RouteCard(it, app) }
-            if (list.isEmpty() && St.rMode != "spots") when (St.rMode) {
+            if (list.isEmpty()) when (St.rMode) {
                 "rec" -> if (app.zr.isEmpty()) InfoCard("No se han podido cargar las rutas", "Cierra la app y vuelve a abrirla. Si sigue igual, avísame desde Perfil › Avisar de un fallo.")
                     else InfoCard("Ninguna ruta con esos filtros", "Hay ${app.zoneRoutes(zone, here).size} rutas en esta zona con otro tiempo o suelo.") { Btn("Quitar filtros", { St.rDist = "all"; St.rSurf = "all"; St.rSort = "near" }, height = 44.dp, size = 14.sp) }
                 "mine" -> InfoCard("Aún no tienes recorridos", "Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.")
