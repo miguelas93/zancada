@@ -50,6 +50,18 @@ object Share {
         runCatching { ctx.startActivity(Intent.createChooser(i, title ?: "Compartir").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
     }
 
+    /**
+     * Mensaje directo al contacto de seguridad, sin permisos: WhatsApp si está instalado, si no la app de SMS
+     * con el texto ya escrito. El corredor solo pulsa «Enviar».
+     */
+    fun toContact(ctx: Context, phone: String, text: String) {
+        val digits = phone.filter { it.isDigit() }.let { if (phone.startsWith("+") || it.length > 9) it else "34$it" }
+        val wa = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$digits?text=" + Uri.encode(text))).setPackage("com.whatsapp").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (runCatching { ctx.startActivity(wa) }.isSuccess) return
+        val sms = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + Uri.encode(phone))).putExtra("sms_body", text).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (runCatching { ctx.startActivity(sms) }.isFailure) text(ctx, text, "Avisar")
+    }
+
     fun open(ctx: Context, url: String) { runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } }
 
     fun readText(ctx: Context, uri: Uri): String? = runCatching { ctx.contentResolver.openInputStream(uri)?.use { s -> s.readBytes().takeIf { it.size < 60 * 1024 * 1024 }?.toString(Charsets.UTF_8) } }.getOrNull()

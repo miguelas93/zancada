@@ -31,16 +31,14 @@ object Perm {
         if (Build.VERSION.SDK_INT < 33) { cb(true); return }
         act?.ask(arrayOf(Manifest.permission.POST_NOTIFICATIONS), cb) ?: cb(false)
     }
-    /** Antes de empezar: notificación, sensor de pasos (cadencia) y SMS si el modo seguridad está activo. Lo que se niegue, simplemente no se usa. */
+    /** Antes de empezar: notificación, sensor de pasos (cadencia). Lo que se niegue, simplemente no se usa. */
     fun runExtras(cb: () -> Unit) {
         val want = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= 33) want += Manifest.permission.POST_NOTIFICATIONS
         if (Build.VERSION.SDK_INT >= 29) want += Manifest.permission.ACTIVITY_RECOGNITION
-        if (Repo.data.value.settings.sosOn == "1") want += Manifest.permission.SEND_SMS
         val a = act ?: return cb()
         a.askMissing(want.toTypedArray()) { cb() }
     }
-    fun sms(cb: (Boolean) -> Unit) = act?.ask(arrayOf(Manifest.permission.SEND_SMS), cb) ?: cb(false)
     /** Buscar y conectar el pulsómetro Bluetooth. */
     fun bt(cb: (Boolean) -> Unit) { val a = act ?: return cb(false); a.askMissing(HrBle.perms()) { cb(HrBle.allowed(a)) } }
 }

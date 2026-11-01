@@ -100,7 +100,7 @@ data class Settings(
     val goal: String? = null,
     val bigm: String? = null,
     val pacemap: String? = null,
-    /** Modo seguridad (solo la nativa): avisar por SMS a un contacto durante la carrera. */
+    /** Contacto de seguridad (solo la nativa): se le avisa con un toque al salir y al llegar. sosOn/sosEvery ya no se usan. */
     val sosOn: String? = null,
     val sosPhone: String? = null,
     val sosName: String? = null,

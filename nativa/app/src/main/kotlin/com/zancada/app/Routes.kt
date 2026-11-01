@@ -143,9 +143,12 @@ fun RoutesScreen() {
         when (St.rMode) {
             "mine" -> Btn("Importar una ruta GPX (de un amigo, Wikiloc, Komoot…)", { importGpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
             "ask", "sug" -> {
-                Seg(listOf("ask" to "Pídesela a Zeta", "sug" to "Bucle rápido"), St.rMode, { St.rMode = it }, h = 40.dp)
-                if (St.rMode == "ask") AskBox(here, app)
-                else Chips(wrap = true) { listOf(3, 5, 8, 10, 15).forEach { k -> ChipB("$k km", St.rKm == k, { St.rKm = k }) } }
+                // Un solo sitio para crear rutas: con palabras (Zeta) o, de un toque, un bucle de X km.
+                AskBox(here, app)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(Ico.routes, null, Modifier.size(18.dp), tint = Z.text); Txt("Bucle rápido", size = 14.sp, weight = FontWeight.SemiBold)
+                }
+                Chips { listOf(3, 5, 8, 10, 15).forEach { k -> ChipB("$k km", St.rMode == "sug" && St.rKm == k, { St.rKm = k; St.rMode = "sug" }) } }
             }
         }
         if (St.rMode == "rec" && St.rDist == "all" && St.rSurf == "all" && q.isEmpty()) app.pickToday(shown)?.let { TodayCard(it) }
@@ -232,7 +235,6 @@ private fun RoutesMapScreen(shown: List<Route>, sel: Route?, here: LatLon?, app:
                     MAP_TYPES.forEach { (k, l) -> androidx.compose.material3.DropdownMenuItem({ Txt(l, weight = if (St.rLayer == k) FontWeight.SemiBold else FontWeight.Normal) }, { St.rLayer = k; layersOpen = false }) }
                 }
             }
-            if (sel != null && sel.ll.size >= 2) Box(Modifier.size(48.dp).shadow(8.dp, CircleShape).clip(CircleShape).background(c.surface).clickable { Nav.go(V3D, route = sel) }, contentAlignment = Alignment.Center) { Txt("3D", size = 15.sp, weight = FontWeight.Bold) }
             MapFab(Ico.locate, "Mi ubicación") { here?.let { ctl.center(it, 15.0, animate = true) } ?: toast("Buscando tu posición…") }
             Row(Modifier.height(48.dp).shadow(8.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp)).background(c.volt).clickable { St.rMode = "ask"; St.rSheet = 2 }.padding(horizontal = 18.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -249,7 +251,7 @@ private fun RoutesMapScreen(shown: List<Route>, sel: Route?, here: LatLon?, app:
                 }) { ch, dy -> ch.consume(); drag += dy }
             }.clickable { St.rSheet = if (St.rSheet == 2) 1 else St.rSheet + 1 }.padding(top = 10.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(Modifier.width(40.dp).height(5.dp).clip(RoundedCornerShape(3.dp)).background(c.line))
-                if (St.rSheet != 1) Txt(when (St.rMode) { "ask" -> "Crea tu ruta con Zeta"; "sug" -> "Bucles desde aquí"; "mine" -> "${shown.size} ${pl(shown.size, "recorrido guardado", "recorridos guardados")}"; else -> "${shown.size} ${pl(shown.size, "ruta")} · gratis, sin suscripción" },
+                if (St.rSheet != 1) Txt(when (St.rMode) { "ask", "sug" -> "Crear ruta"; "mine" -> "${shown.size} ${pl(shown.size, "recorrido guardado", "recorridos guardados")}"; else -> "${shown.size} ${pl(shown.size, "ruta")} · gratis, sin suscripción" },
                     Modifier.padding(top = 8.dp), size = 14.sp, weight = FontWeight.SemiBold)
             }
             when (St.rSheet) {
@@ -315,7 +317,7 @@ private fun AskBox(here: LatLon?, app: App) {
         val q = St.askQ.trim(); val h = here
         if (q.isEmpty() || St.askBusy != null) return
         if (h == null) { toast("Aún no sé dónde estás"); return }
-        St.askList = emptyList(); St.askErr = null; St.askSpec = null; St.askNote = null; St.askBusy = "Entendiendo lo que pides…"
+        St.rMode = "ask"; St.askList = emptyList(); St.askErr = null; St.askSpec = null; St.askNote = null; St.askBusy = "Entendiendo lo que pides…"
         scope.launch {
             val out = runCatching { Repo.askRoutes(h, q, app.userPace(), seed, { St.askBusy = it }, { St.askSpec = it }, { St.askList = it }) }.getOrNull()
             St.askBusy = null
@@ -329,7 +331,7 @@ private fun AskBox(here: LatLon?, app: App) {
     ZCard(dark = true, gap = 12.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ZetaAv(34.dp, 18)
-            Column(Modifier.weight(1f)) { Txt("Dime cómo la quieres", size = 16.sp, weight = FontWeight.SemiBold); Sub("Distancia o tiempo, llana o con cuestas, parques, río, fuentes…", size = 12.sp) }
+            Column(Modifier.weight(1f)) { Txt("Dime cómo la quieres", size = 16.sp, weight = FontWeight.SemiBold); Sub("Km, cuestas, parques, río…", size = 12.sp) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Field(St.askQ, { St.askQ = it }, "Ej.: 8 km llanos pasando por el río", Modifier.weight(1f), h = 52.dp, maxLen = 300, onDone = { search() }, radius = 14.dp)
@@ -468,7 +470,6 @@ fun RouteDetailScreen(r: Route) {
                 Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = ins.calculateTopPadding() + 14.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     IconBtn(Ico.back2, { Nav.back() })
                     Spacer(Modifier.weight(1f))
-                    ChipB("Vista 3D", false, { Nav.go(V3D, route = r) }, Modifier.padding(end = 10.dp, top = 3.dp), bg = c.bar, fg = c.onBar)
                     IconBtn(if (saved) Ico.saved else Ico.save, {
                         if (saved) { Repo.update { d -> d.copy(savedRoutes = d.savedRoutes.filter { it.id != r.id }) }; toast("Quitada de tus recorridos") }
                         else { Repo.update { d -> d.copy(savedRoutes = listOf(Route(r.id, r.name, r.ll, r.km, r.gain, created = System.currentTimeMillis())) + d.savedRoutes) }; toast("Guardada en Mis recorridos") }

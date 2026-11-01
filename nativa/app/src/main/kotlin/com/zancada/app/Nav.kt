@@ -53,13 +53,13 @@ import kotlin.math.abs
 /** Una pantalla de la app (los mismos nombres que las secciones de la web). */
 data class Scr(val id: String, val run: String? = null, val route: Route? = null)
 
-const val HOME = "home"; const val HISTORY = "history"; const val ROUTES = "routes"; const val PROFILE = "profile"; const val CLUBS = "clubs"
+const val HOME = "home"; const val HISTORY = "history"; const val ROUTES = "routes"; const val PROFILE = "profile"
 const val WELCOME = "welcome"; const val ROUTE = "routeDetail"; const val PLAN = "plan"; const val PLANSETUP = "planSetup"; const val PREP = "prep"
-const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val V3D = "view3d"; const val SPOT = "spot"; const val SETTINGS = "settings"
+const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val SETTINGS = "settings"
 val TABS = listOf(HOME, HISTORY, ROUTES, PROFILE)
 private val TRANSIENT = setOf(WELCOME, COUNT, RUN, CELE)
 /** Pantallas oscuras (para el color de los iconos de la barra de estado). */
-val DARK_SCREENS = setOf(WELCOME, PLANSETUP, COUNT, CELE, HEAT, REPLAY, RUN, V3D)
+val DARK_SCREENS = setOf(WELCOME, PLANSETUP, COUNT, CELE, HEAT, REPLAY, RUN)
 
 /** Navegación con el botón «atrás» de Android, como el historial de la web. */
 object Nav {
@@ -191,7 +191,6 @@ fun ZRoot() {
                     WELCOME -> WelcomeScreen()
                     HOME -> HomeScreen()
                     HISTORY -> HistoryScreen()
-                    CLUBS -> ClubsScreen()
                     PROFILE -> ProfileScreen()
                     SETTINGS -> SettingsScreen()
                     ROUTES -> RoutesScreen()
@@ -205,12 +204,10 @@ fun ZRoot() {
                     SUMMARY -> SummaryScreen(scr.run)
                     HEAT -> HeatScreen()
                     REPLAY -> ReplayScreen(scr.run)
-                    V3D -> Map3dScreen(scr.route, scr.run)
-                    SPOT -> SpotScreen()
                 }
             }
-            if (scr.id in TABS || scr.id == CLUBS) Tabs(scr.id, Modifier.align(Alignment.BottomCenter))
-            val showZeta = data.profile.done && scr.id in setOf(PLAN, CLUBS)
+            if (scr.id in TABS) Tabs(scr.id, Modifier.align(Alignment.BottomCenter))
+            val showZeta = data.profile.done && scr.id == PLAN
             if (showZeta) ZetaFab(scr.id == PLAN, data.settings.zetaSeen == null, Modifier.align(Alignment.BottomEnd))
             Modals()
             ToastHost(Modifier.align(Alignment.TopCenter))
@@ -227,7 +224,7 @@ fun Modifier.noSwipeNav(key: String): Modifier = composed {
 
 /** Deslizar entre pestañas (Inicio ↔ Actividad ↔ Rutas ↔ Perfil); hacia la derecha vuelve a Inicio desde Preparar y Resumen. */
 private fun Modifier.swipeNav(cur: String, view: android.view.View) = pointerInput(cur) {
-    if ((cur !in TABS && cur != CLUBS && cur != PREP && cur != SUMMARY && cur != SETTINGS) || cur == ROUTES) return@pointerInput
+    if ((cur !in TABS && cur != PREP && cur != SUMMARY && cur != SETTINGS) || cur == ROUTES) return@pointerInput
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
         val t0 = System.currentTimeMillis(); val start = down.position; var end = start; var multi = false
@@ -252,7 +249,6 @@ private fun Modifier.swipeNav(cur: String, view: android.view.View) = pointerInp
         if (cur == SETTINGS) { if (dx > 0) Nav.back(); return@awaitEachGesture }
         val i = TABS.indexOf(cur)
         if (i >= 0) { TABS.getOrNull(i + if (dx < 0) 1 else -1)?.let { Nav.go(it) }; return@awaitEachGesture }
-        if (cur == CLUBS) { if (dx > 0) Nav.go(PROFILE); return@awaitEachGesture }
         if (dx > 0) Nav.go(HOME)
     }
 }

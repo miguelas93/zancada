@@ -83,7 +83,6 @@ fun SummaryScreen(id: String?) {
             if (hasPts) Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 52.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (seg.size >= 3) MapPill(if (byPace) Ico.layers else Ico.bolt, if (byPace) "Color único" else "Por ritmo") { Repo.settings { it.copy(pacemap = if (it.pacemap == "1") "0" else "1") } }
                 Spacer(Modifier.weight(1f))
-                MapPill(Ico.map, "3D") { Nav.go(V3D, run = r.id) }
                 MapPill(Ico.play, "Repetición", tint = c.volt) { Nav.go(REPLAY, run = r.id) }
             }
             if (byPace) Row(Modifier.align(Alignment.BottomStart).padding(start = 20.dp, bottom = 102.dp).shadow(6.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(c.bar).padding(horizontal = 12.dp, vertical = 6.dp),
