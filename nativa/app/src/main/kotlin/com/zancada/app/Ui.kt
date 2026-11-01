@@ -1,5 +1,17 @@
 package com.zancada.app
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +38,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -130,9 +144,10 @@ fun Btn(
     val fg = color ?: when (kind) { BtnKind.Volt -> c.onVolt; BtnKind.Sec -> c.ink; BtnKind.Inv -> c.onBar; BtnKind.Ghost -> Z.muted }
     val h = if (kind == BtnKind.Ghost && height == 58.dp) 44.dp else height
     val fs = if (kind == BtnKind.Ghost && size == 16.sp) 14.sp else size
+    val buzz = rememberBuzz(if (kind == BtnKind.Volt) Buzz.Confirm else Buzz.Tap)
     Row(
         (if (fill) modifier.fillMaxWidth() else modifier).height(h).clip(RoundedCornerShape(50)).background(back)
-            .clickable(enabled = enabled, onClick = onClick).alpha(if (enabled) 1f else 0.4f).padding(horizontal = if (fill) 20.dp else 16.dp),
+            .clickable(enabled = enabled) { buzz(); onClick() }.alpha(if (enabled) 1f else 0.4f).padding(horizontal = if (fill) 20.dp else 16.dp),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) { Icon(icon, null, Modifier.size(20.dp), tint = fg); Spacer(Modifier.width(8.dp)) }
@@ -152,9 +167,9 @@ fun Chip(text: String, kind: String = "", size: TextUnit = 11.sp, modifier: Modi
 /** .chipb: botón píldora de 38 (filtros). */
 @Composable
 fun ChipB(text: String, on: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, bg: Color? = null, fg: Color? = null, shadow: Boolean = true) {
-    val c = Z.c
+    val c = Z.c; val buzz = rememberBuzz()
     Box(modifier.height(38.dp).then(if (shadow) Modifier.shadow(4.dp, RoundedCornerShape(50), ambientColor = Color(0x40000000), spotColor = Color(0x40000000)) else Modifier)
-        .clip(RoundedCornerShape(50)).background(bg ?: if (on) c.bar else c.surface).clickable(onClick = onClick).padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+        .clip(RoundedCornerShape(50)).background(bg ?: if (on) c.bar else c.surface).clickable { buzz(); onClick() }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
         Text(text, style = bodyStyle(if (Z.big) 14.sp else 13.sp, FontWeight.SemiBold).copy(color = fg ?: if (on) c.onBar else c.ink), maxLines = 1)
     }
 }
@@ -170,12 +185,12 @@ fun Chips(modifier: Modifier = Modifier, wrap: Boolean = false, content: @Compos
 /** .seg: control segmentado. */
 @Composable
 fun Seg(options: List<Pair<String, String>>, sel: String, onSel: (String) -> Unit, modifier: Modifier = Modifier, dark: Boolean = Z.dark, bg: Color? = null, h: Dp = 36.dp, pad: Dp = 4.dp, fill: Boolean = true) {
-    val c = Z.c
+    val c = Z.c; val buzz = rememberBuzz()
     Row(modifier.then(if (fill) Modifier.fillMaxWidth() else Modifier).clip(RoundedCornerShape(50)).background(bg ?: if (dark) Color(0x14F4F5F0) else c.surface2).padding(pad)) {
         options.forEach { (k, label) ->
             val on = k == sel
             Box((if (fill) Modifier.weight(1f) else Modifier).height(h).clip(RoundedCornerShape(50))
-                .background(if (on) (if (dark) c.volt else c.bar) else Color.Transparent).clickable { onSel(k) }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
+                .background(if (on) (if (dark) c.volt else c.bar) else Color.Transparent).clickable { if (!on) buzz(); onSel(k) }.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
                 Text(label, style = bodyStyle(13.sp, if (on) FontWeight.SemiBold else FontWeight.Medium).copy(color = if (on) (if (dark) c.onVolt else c.onBar) else if (dark) c.onBarMuted else c.muted), maxLines = 1)
             }
         }
@@ -186,7 +201,7 @@ fun Seg(options: List<Pair<String, String>>, sel: String, onSel: (String) -> Uni
 @Composable
 fun Track(frac: Double, modifier: Modifier = Modifier, h: Dp = 6.dp, bg: Color? = null, color: Color = Z.c.volt) {
     Box(modifier.fillMaxWidth().height(h).clip(RoundedCornerShape(h / 2)).background(bg ?: if (Z.dark) Color(0x24F4F5F0) else Z.c.line)) {
-        Box(Modifier.fillMaxHeight().fillMaxWidth(frac.coerceIn(0.0, 1.0).toFloat()).clip(RoundedCornerShape(h / 2)).background(color))
+        Box(Modifier.fillMaxHeight().fillMaxWidth(animatedOnce(frac.coerceIn(0.0, 1.0).toFloat(), 800)).clip(RoundedCornerShape(h / 2)).background(color))
     }
 }
 
@@ -195,8 +210,9 @@ fun Divider(color: Color = if (Z.dark) Color(0x1FF4F5F0) else Z.c.line) = Box(Mo
 
 /** .icon: botón redondo de 44 con icono. */
 @Composable
-fun IconBtn(icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier, size: Dp = 44.dp, bg: Color = Z.c.surface, tint: Color = Z.c.ink, iconSize: Dp = 22.dp) {
-    Box(modifier.size(size).clip(CircleShape).background(bg).clickable(onClick = onClick), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(iconSize), tint = tint) }
+fun IconBtn(icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier, size: Dp = 44.dp, bg: Color = Z.c.surface, tint: Color = Z.c.ink, iconSize: Dp = 22.dp, label: String? = null) {
+    val buzz = rememberBuzz()
+    Box(modifier.size(size).clip(CircleShape).background(bg).clickable { buzz(); onClick() }, contentAlignment = Alignment.Center) { Icon(icon, label ?: Ico.label(icon), Modifier.size(iconSize), tint = tint) }
 }
 
 /** .opt: opción grande de los asistentes (oscuros). */
@@ -408,6 +424,15 @@ object Ico {
     val user = icon("M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", circle(12f, 7f, 4f))
     val flag = icon("M4 22V4", "M4 4c3-2 6-2 8 0s5 2 8 0v10c-3 2-6 2-8 0s-5-2-8 0")
     val list = icon("M3 6h.01", "M3 12h.01", "M3 18h.01", "M8 6h13", "M8 12h13", "M8 18h13")
+    /** Nombre de cada icono para los lectores de pantalla (TalkBack). */
+    private val names: Map<ImageVector, String> by lazy {
+        mapOf(back to "Atrás", back2 to "Atrás", close to "Cerrar", share to "Compartir", save to "Guardar", saved to "Guardada", pencil to "Editar",
+            plus to "Añadir", search to "Buscar", bell to "Novedades", gear to "Ajustes", locate to "Mi ubicación", layers to "Tipo de mapa",
+            expand to "Ampliar", shrink to "Reducir", sliders to "Filtros", play to "Empezar", pause to "Pausar", restart to "Volver al inicio",
+            chat to "Zeta", map to "Mapa", calendar to "Calendario", trash to "Borrar", download to "Descargar", upload to "Importar",
+            info to "Información", next to "Siguiente", chevron to "Abrir", check to "Hecho", mic to "Hablar", list to "Lista", sound to "Voz", lock to "Bloquear")
+    }
+    fun label(i: ImageVector): String? = names[i]
     val mic = icon("M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z", "M19 10v2a7 7 0 0 1-14 0v-2", "M12 19v3")
 }
 
@@ -422,29 +447,53 @@ fun IcoBox(icon: ImageVector, size: Dp = 38.dp, bg: Color = Z.c.surface2, tint: 
 /** Pestañas superiores subrayadas, como Progreso · Actividades de Strava. */
 @Composable
 fun TopTabs(options: List<Pair<String, String>>, sel: String, onSel: (String) -> Unit, modifier: Modifier = Modifier) {
-    val c = Z.c; val on = if (c.night) c.volt else c.ink
+    val c = Z.c; val on = if (c.night) c.volt else c.ink; val buzz = rememberBuzz()
+    // Deslizar el dedo de lado sobre la pantalla también cambia de pestaña (ver swipeNav).
+    val cb by rememberUpdatedState(onSel)
+    val token = remember { Any() }
+    SideEffect { TopSwipe.owner = token; TopSwipe.keys = options.map { it.first }; TopSwipe.sel = sel; TopSwipe.onSel = { k -> cb(k) } }
+    DisposableEffect(token) { onDispose { if (TopSwipe.owner === token) TopSwipe.clear() } }
+    val idx = options.indexOfFirst { it.first == sel }.coerceAtLeast(0)
+    val pos by animateFloatAsState(idx.toFloat(), if (Motion.reduced) snap() else spring(dampingRatio = 0.8f, stiffness = 500f), label = "tab")
     Column(modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth()) {
             options.forEach { (k, l) ->
                 val act = k == sel
-                Column(Modifier.weight(1f).clickable(onClickLabel = l) { onSel(k) }.padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(Modifier.weight(1f).clickable(onClickLabel = l) { if (!act) buzz(); onSel(k) }.padding(top = 8.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Txt(l, size = 15.sp, weight = if (act) FontWeight.SemiBold else FontWeight.Medium, color = if (act) Z.text else Z.muted, maxLines = 1)
-                    Box(Modifier.padding(top = 10.dp).fillMaxWidth(0.7f).height(3.dp).clip(RoundedCornerShape(2.dp)).background(if (act) on else Color.Transparent))
                 }
             }
+        }
+        // Subrayado que se desliza a la pestaña elegida.
+        BoxWithConstraints(Modifier.fillMaxWidth().height(3.dp)) {
+            val w = maxWidth / options.size.coerceAtLeast(1)
+            Box(Modifier.offset(x = w * pos + w * 0.15f).width(w * 0.7f).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(on))
         }
         Divider()
     }
 }
 
+/** Contenido de una pestaña: entra deslizándose desde el lado de la pestaña elegida. */
+@Composable
+fun TabBody(sel: String, order: List<String>, content: @Composable (String) -> Unit) {
+    AnimatedContent(sel, transitionSpec = {
+        if (Motion.reduced) EnterTransition.None togetherWith ExitTransition.None
+        else {
+            val dir = if (order.indexOf(targetState) >= order.indexOf(initialState)) 1 else -1
+            (slideInHorizontally(tween(260)) { it / 6 * dir } + fadeIn(tween(220))) togetherWith (slideOutHorizontally(tween(200)) { -it / 6 * dir } + fadeOut(tween(160)))
+        }
+    }, label = "tabBody") { t -> content(t) }
+}
+
 /** Anillo de progreso (objetivo cumplido / objetivo). */
 @Composable
 fun Ring(frac: Double, size: Dp, stroke: Dp = 8.dp, color: Color = Z.c.volt, track: Color = if (Z.dark) Color(0x24F4F5F0) else Z.c.line, content: @Composable BoxScope.() -> Unit = {}) {
+    val anim = animatedOnce(frac.coerceIn(0.0, 1.0).toFloat(), 900, 120)
     Box(Modifier.size(size), contentAlignment = Alignment.Center) {
         Canvas(Modifier.matchParentSize()) {
             val s = stroke.toPx(); val o = Offset(s / 2, s / 2); val r = androidx.compose.ui.geometry.Size(this.size.width - s, this.size.height - s)
             drawArc(track, -90f, 360f, false, o, r, style = Stroke(s))
-            val f = frac.coerceIn(0.0, 1.0).toFloat()
+            val f = anim
             if (f > 0f) drawArc(color, -90f, 360f * f, false, o, r, style = Stroke(s, cap = StrokeCap.Round))
         }
         content()
@@ -489,4 +538,45 @@ fun wxIcon(code: Int?): ImageVector = when (code ?: 0) {
     0, 1 -> Ico.sun
     in 51..67, in 80..82, in 95..99 -> Ico.rain
     else -> Ico.cloud
+}
+
+/**
+ * Ilustración de estado vacío con la marca: una ruta discontinua que se dibuja sola, de la salida A
+ * (píldora hueca) a la meta B (píldora llena), como en el logo B5.
+ */
+@Composable
+fun EmptyArt(modifier: Modifier = Modifier.size(150.dp, 96.dp), bg: Color = Z.c.bg) {
+    val ink = Z.text; val volt = Z.c.volt; val bgC = bg
+    val draw = animatedOnce(1f, 1100, 150)
+    Canvas(modifier) {
+        val w = size.width; val h = size.height; val s = 4.dp.toPx()
+        val p = Path().apply {
+            moveTo(w * 0.12f, h * 0.30f)
+            cubicTo(w * 0.45f, h * 0.05f, w * 0.30f, h * 0.85f, w * 0.58f, h * 0.70f)
+            cubicTo(w * 0.80f, h * 0.58f, w * 0.70f, h * 0.30f, w * 0.88f, h * 0.72f)
+        }
+        val pm = android.graphics.PathMeasure(p.asAndroidPath(), false); val len = pm.length
+        val part = android.graphics.Path(); pm.getSegment(0f, len * draw, part, true)
+        drawPath(part.asComposePath(), ink, style = Stroke(s, cap = StrokeCap.Round, join = StrokeJoin.Round, pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(s * 0.1f, s * 2.4f))))
+        // A: píldora hueca; B: píldora llena (lima con borde tinta).
+        val pa = Offset(w * 0.12f, h * 0.30f); val pb = Offset(w * 0.88f, h * 0.72f)
+        val pw = 22.dp.toPx(); val ph = 11.dp.toPx(); val cr = androidx.compose.ui.geometry.CornerRadius(ph / 2)
+        drawRoundRect(bgC, Offset(pa.x - pw / 2, pa.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr)
+        drawRoundRect(ink, Offset(pa.x - pw / 2, pa.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr, style = Stroke(2.5.dp.toPx()))
+        if (draw > 0.95f) {
+            drawRoundRect(volt, Offset(pb.x - pw / 2, pb.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr)
+            drawRoundRect(ink, Offset(pb.x - pw / 2, pb.y - ph / 2), androidx.compose.ui.geometry.Size(pw, ph), cr, style = Stroke(2.5.dp.toPx()))
+        }
+    }
+}
+
+/** Estado vacío: ilustración + título corto + una línea + acción opcional. */
+@Composable
+fun EmptyState(title: String, sub: String? = null, action: String? = null, onAction: (() -> Unit)? = null, modifier: Modifier = Modifier, bg: Color = Z.c.bg) {
+    Column(modifier.fillMaxWidth().padding(vertical = 28.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        EmptyArt(bg = bg)
+        Txt(title, size = 17.sp, weight = FontWeight.SemiBold, align = TextAlign.Center)
+        sub?.let { Sub(it, align = TextAlign.Center, modifier = Modifier.padding(horizontal = 24.dp)) }
+        if (action != null && onAction != null) Btn(action, onAction, Modifier.padding(top = 6.dp), BtnKind.Inv, 46.dp, 14.sp, fill = false)
+    }
 }

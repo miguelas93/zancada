@@ -172,8 +172,8 @@ fun SettingsScreen() {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             IconBtn(Ico.back, { Nav.back() }); H1("Ajustes", size = 28.sp)
         }
-        Seg(listOf("gen" to "General", "con" to "Conexiones", "dat" to "Datos y app"), tab, { tab = it })
-        when (tab) {
+        TopTabs(listOf("gen" to "General", "con" to "Conexiones", "dat" to "Datos y app"), tab, { tab = it })
+        TabBody(tab, listOf("gen", "con", "dat")) { t -> Column(verticalArrangement = Arrangement.spacedBy(14.dp)) { when (t) {
             "con" -> { HrCard(); HcCard(); SosCard() }
             "dat" -> {
                 ZCard(pad = PaddingValues(horizontal = 16.dp, vertical = 6.dp), gap = 0.dp) {
@@ -223,7 +223,7 @@ fun SettingsScreen() {
                 SelRow("Texto", listOf("0" to "Normal", "1" to "Grande"), s.bigtext, Ico.text) { v -> Repo.settings { it.copy(bigtext = v) } }
                 SelRow("Mapa", MAP_TYPES, s.map, Ico.map) { v -> Repo.settings { it.copy(map = v) } }
             }
-        }
+        } } }
     }
 }
 
@@ -260,7 +260,7 @@ fun HrCard(onPick: (() -> Unit)? = null) {
                     scan?.stop(); Repo.settings { it.copy(hrAddr = f.addr, hrName = safeText(f.name, 30)) }; toast("${f.name} guardado"); onPick?.invoke()
                 }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)
             }
-            if (!searching && found.isEmpty() && scan != null) Sub("No he encontrado ninguno. Comprueba que está encendido y emitiendo (en relojes, el modo «emitir pulso»).", size = 12.sp)
+            if (!searching && found.isEmpty() && scan != null) Sub("No encuentro ninguno. ¿Está encendido y emitiendo?", size = 12.sp)
             if (!searching) Btn(if (scan == null) "Buscar pulsómetro" else "Buscar otra vez", { search() }, height = 46.dp, size = 15.sp)
         }
     }
@@ -284,7 +284,7 @@ private fun HcCard() {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { IcoBox(Ico.pulse, 34.dp); H2("Health Connect") }; if (st.hc == "1") Chip("Activado")
         }
         Sub(if (avail) "Tus carreras en Google Fit, Samsung Health… Solo escribe, no lee."
-            else "Este móvil no tiene Health Connect instalado o actualizado. Instálalo desde Google Play para enviar ahí tus carreras.")
+            else "Falta Health Connect: instálalo desde Google Play.")
         if (avail) {
             if (st.hc == "1") {
                 Btn("Enviar todas mis carreras", { Hc.push(ctx, all = true) { n -> scope.launch { toast(if (n > 0) "Enviadas $n ${pl(n, "carrera", "carreras")}" else "Ya estaban todas", 3000) } } }, kind = BtnKind.Sec, height = 44.dp, size = 14.sp)

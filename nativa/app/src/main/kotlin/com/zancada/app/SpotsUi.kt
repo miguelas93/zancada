@@ -48,8 +48,8 @@ fun SpotsBlock(here: LatLon?) {
     }
     when {
         here == null -> InfoCard("Buscando tu posición…", "Los sitios se buscan alrededor de donde estás.")
-        St.spotsBusy && list.isEmpty() -> repeat(3) { Box(Modifier.fillMaxWidth().height(84.dp).clip(RoundedCornerShape(24.dp)).background(c.surface)) }
-        list.isEmpty() -> InfoCard("No he podido cargar los sitios", "Hace falta conexión (los datos vienen de OpenStreetMap). Vuelve a intentarlo en un momento.")
+        St.spotsBusy && list.isEmpty() -> repeat(3) { SkeletonRow() }
+        list.isEmpty() -> InfoCard("No he podido cargar los sitios", "Sin conexión. Prueba en un momento.")
         else -> list.forEach { s -> SpotCard(s, here) }
     }
 }

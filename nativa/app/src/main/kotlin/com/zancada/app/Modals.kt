@@ -131,7 +131,7 @@ private fun CoachSheet() {
             var (ans, wait) = call()
             if (ans == null && wait != null && wait <= 45) { St.coachWait = wait; delay(wait * 1000L + 500); St.coachWait = null; val r = call(); ans = r.first; wait = r.second }
             St.coachBusy = false
-            val msg = if (ans != null) CoachMsg("assistant", ans) else CoachMsg("assistant", if (wait != null) "La IA gratuita está saturada ahora mismo. Vuelve a enviar la pregunta en un minuto." else "No he podido contestar (sin conexión o el servicio no responde). Vuelve a intentarlo en un momento.", err = true)
+            val msg = if (ans != null) CoachMsg("assistant", ans) else CoachMsg("assistant", if (wait != null) "La IA está saturada. Prueba en un minuto." else "Sin conexión. Prueba en un momento.", err = true)
             Repo.update { it.copy(coach = (it.coach + msg).takeLast(30)) }
         }
     }
@@ -147,14 +147,14 @@ private fun CoachSheet() {
                 Bubble("Hola${if (data.profile.name.isNotEmpty()) ", " + data.profile.name else ""}. $COACH_HELLO".replace("Hola. Soy", "Hola. Soy"), me = false)
                 data.coach.forEach { m -> Bubble(m.content, m.role == "user", m.err) }
                 St.coachWait?.let { Bubble("Hay cola en la IA gratuita. Lo intento de nuevo en $it s…", false, true) }
-                if (St.coachBusy) Bubble("• • •", false)
+                if (St.coachBusy) Box(Modifier.clip(RoundedCornerShape(18.dp, 18.dp, 18.dp, 6.dp)).background(c.surface2).padding(horizontal = 16.dp, vertical = 8.dp)) { TypingDots() }
             }
             Chips { COACH_QS.forEach { (l, qq) -> ChipB(l, false, { ask(qq) }) } }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Field(q, { q = it }, "Pregúntale lo que quieras", Modifier.weight(1f), h = 48.dp, maxLen = 400, onDone = { ask(q); q = "" }, radius = 14.dp)
                 Btn("Enviar", { ask(q); q = "" }, height = 48.dp, size = 15.sp, enabled = !St.coachBusy, fill = false)
             }
-            Sub("Conoce tu plan, tus últimas carreras y tus récords. Es una IA gratuita (Pollinations): puede equivocarse, y si algo duele de verdad, consulta a un profesional.", size = 11.sp)
+            Sub("Conoce tu plan y tus carreras. Es una IA: si algo duele, consulta a un profesional.", size = 11.sp)
         }
     }
 }
@@ -183,7 +183,7 @@ private fun MedalModal(b: Badge) {
                 Medal(b, 150.dp, pop = b.`when` > 0, shine = b.`when` > 0)
                 Lbl(if (b.`when` > 0) TIER_NAME[tierOf(b.id)] ?: "" else "Por conseguir")
                 H1(b.name, size = 26.sp)
-                Sub(if (b.`when` > 0) "Conseguida el ${app.es.dayMonLongYear(b.`when`)}." else "Aún no la tienes. Sigue sumando carreras: te avisaré en cuanto la consigas.", size = 14.sp, align = TextAlign.Center)
+                Sub(if (b.`when` > 0) "Conseguida el ${app.es.dayMonLongYear(b.`when`)}." else "Aún no la tienes. Te aviso al conseguirla.", size = 14.sp, align = TextAlign.Center)
                 Btn("Cerrar", ::closeModal, Modifier.padding(top = 6.dp), height = 48.dp, size = 15.sp)
             }
         }
@@ -249,7 +249,7 @@ private fun CintaModal() {
         ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 24.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl("Cinta · sin GPS"); Underline("Cancelar", ::closeModal) }
             Text(fmtTime(sec().toDouble()), Modifier.fillMaxWidth(), style = numStyle(84.sp, -0.04).copy(color = Z.c.ink, textAlign = TextAlign.Center))
-            Sub("Te aviso por voz cada 5 minutos. Al terminar, apunta los km que marca la cinta.", Modifier.fillMaxWidth(), size = 14.sp, align = TextAlign.Center)
+            Sub("Aviso por voz cada 5 min. Al final, apunta los km de la cinta.", Modifier.fillMaxWidth(), size = 14.sp, align = TextAlign.Center)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Btn(if (pauseAt > 0) "Seguir" else "Pausa", { if (pauseAt > 0) { pausedMs += System.currentTimeMillis() - pauseAt; pauseAt = 0 } else pauseAt = System.currentTimeMillis() }, Modifier.weight(1f), BtnKind.Sec, 52.dp, 15.sp)
                 Btn("Terminar", {
@@ -280,7 +280,7 @@ private fun ManualModal() {
     Sheet {
         ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 24.dp), gap = 12.dp) {
             H2("Carrera a mano")
-            Sub("Para la cinta o una carrera medida con el reloj. Sin mapa ni parciales, pero cuenta para la semana, el plan, las insignias y las zapatillas.")
+            Sub("Cinta o reloj: cuenta para la semana, el plan y las insignias.")
             @Composable fun row(label: String, content: @Composable () -> Unit) = Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Txt(label, Modifier.weight(1f), size = 16.sp, weight = FontWeight.Medium); content()
             }

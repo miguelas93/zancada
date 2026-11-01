@@ -105,9 +105,9 @@ fun PrepScreen() {
                 H1(when { mode == "plan" && s != null -> "${s.title} · ${fmtKmS(s.m)} km"; tr != null -> "${tr.title} · ${if (tr.timed) "${tr.min} min" else fmtKmS(tr.m) + " km"}"; goal != "0" && mode == "libre" -> "Carrera libre · ${goalSession(goal).title}"; else -> "Carrera libre" },
                     Modifier.padding(top = 4.dp), size = 30.sp)
                 Sub(when {
-                    mode == "plan" && s != null -> "${s.desc} Ritmo objetivo ~${app.targetPace(s.type)}/km.${if (s.struct != null) " Te guío por voz en cada tramo." else ""}"
+                    mode == "plan" && s != null -> "${s.desc} Ritmo objetivo ~${app.targetPace(s.type)}/km.${if (s.struct != null) " Te guío por voz." else ""}"
                     tr != null -> "${tr.desc} Ritmo fuerte ~${app.targetPace(tr.type)}/km. Te guío por voz en cada tramo."
-                    goal != "0" && mode == "libre" -> "${goalSession(goal).desc} Sin más guía: ritmo y parciales en directo."
+                    goal != "0" && mode == "libre" -> "${goalSession(goal).desc} Ritmo y parciales en directo."
                     else -> "Sin objetivo. Distancia, ritmo y parciales en directo."
                 }, Modifier.padding(top = 6.dp))
                 wx?.let { Sub(wxText(it), Modifier.padding(top = 8.dp)) }
@@ -137,7 +137,7 @@ fun PrepScreen() {
                 Sub("Modo seguridad: avisaré por SMS a ${st.sosName?.ifEmpty { null } ?: st.sosPhone} cada ${st.sosEvery ?: 10} min y si me quedo parado.", size = 12.sp)
             }
             Sub(when {
-                !perm || denied -> "Necesito permiso de ubicación para medir tu carrera. Si lo negaste, actívalo en Ajustes › Apps › Zancada › Permisos."
+                !perm || denied -> "Necesito tu ubicación. Actívala en Ajustes del móvil › Zancada."
                 ui.gpsError != null -> ui.gpsError!!
                 acc == null -> "Sal a cielo abierto y espera unos segundos."
                 acc <= 25 -> "Cuando quieras."

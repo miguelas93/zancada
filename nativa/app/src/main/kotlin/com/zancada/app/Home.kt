@@ -55,7 +55,7 @@ fun WelcomeScreen() {
         when (step) {
             0 -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Lbl("Bienvenida"); H1("Corre.\nMide.\nMejora.", size = 40.sp)
-                Sub("Zancada graba tus carreras con el GPS del móvil: distancia, ritmo, parciales y la ruta en el mapa. ¿Cómo te llamas?", size = 15.sp, modifier = Modifier.padding(bottom = 10.dp))
+                Sub("Graba tus carreras con el GPS: km, ritmo y mapa. ¿Cómo te llamas?", size = 15.sp, modifier = Modifier.padding(bottom = 10.dp))
                 Field(name, { name = it }, "Tu nombre", Modifier.fillMaxWidth(), h = 56.dp, size = 18.sp, maxLen = 20, dark = true, onDone = ::next, radius = 18.dp)
             }
             1 -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -71,13 +71,13 @@ fun WelcomeScreen() {
             }
             2 -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Lbl("Qué hay dentro"); H1("Tres cosas, nada más.", size = 32.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Feat(Ico.play, "Correr", "GPS, ritmo en directo, voz en cada km, autopausa y pantalla bloqueada.", first = true)
-                Feat(Ico.plan, "Plan", "Un plan de 5K, 10K o media que cada lunes se adapta a lo que corriste.")
-                Feat(Ico.routes, "Rutas", "Sitios investigados para correr en Madrid y San Fernando, con trazado, perfil y guía por voz.")
+                Feat(Ico.play, "Correr", "GPS, voz en cada km y autopausa.", first = true)
+                Feat(Ico.plan, "Plan", "5K, 10K o media, que se adapta a ti.")
+                Feat(Ico.routes, "Rutas", "Sitios para correr cerca, con guía por voz.")
             }
             else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Lbl("Todo listo"); H1(if (n.isNotEmpty()) "Listo, $n." else "Listo.", size = 36.sp)
-                Sub("Objetivo: $goal carreras a la semana. Cada semana que lo cumplas suma una semana seguida. Pulsa el botón lima cuando quieras salir; en Perfil tienes insignias, zapatillas y copia de seguridad.", size = 15.sp)
+                Sub("$goal carreras a la semana. Cada semana cumplida suma a tu racha. Pulsa ▶ para salir.", size = 15.sp)
             }
         }
         Spacer(Modifier.weight(1f))
@@ -204,7 +204,7 @@ private fun GoalTile(w: HomeWeek, modifier: Modifier) {
     ZCard(modifier, dark = true, pad = PaddingValues(16.dp), gap = 10.dp, radius = 24.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Ico.target, null, Modifier.size(16.dp), tint = c.onBarMuted); Lbl("Objetivo") }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Ring(f, 62.dp, 7.dp) { Num("${min(100, (f * 100).roundToInt())}%", 15.sp, color = c.onBar) }
+            Ring(f, 62.dp, 7.dp) { Num(countUp(min(100.0, f * 100)) { "${it.roundToInt()}%" }, 15.sp, color = c.onBar) }
             Column { Num("${w.count}/${w.goal}", 22.sp, color = c.onBar); Sub("carreras", size = 11.sp, color = c.onBarMuted) }
         }
     }
@@ -231,7 +231,7 @@ private fun StartCard() {
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl("¿Empiezas de cero?"); Underline("Ya corro", { Repo.settings { it.copy(startSeen = "1") } }, size = 12.sp) }
         Txt("Corre 1 min · anda 1,5 min · 8 veces", size = 19.sp, weight = FontWeight.SemiBold, lineHeight = 1.15)
-        Sub("29 minutos guiados por voz: la forma más segura de empezar. Cuando te salga fácil, pasa a \"Corre 3 min\".")
+        Sub("29 min guiados por voz. Cuando sea fácil, pasa a «Corre 3 min».")
         Btn("Probar hoy", { St.prepMode = "tramos"; Repo.settings { it.copy(tramos = "anda1") }; St.tramos = Repo.app().tramosSession("anda1"); Nav.go(PREP) }, height = 46.dp, size = 15.sp)
     }
 }

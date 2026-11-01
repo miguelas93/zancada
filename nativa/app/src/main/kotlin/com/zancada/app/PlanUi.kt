@@ -71,6 +71,7 @@ fun PlanScreenUi() {
                 }
             }
         }
+        WeekCalendar(ps.sessions)
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(c.surface).padding(horizontal = 16.dp, vertical = 4.dp)) {
             ps.sessions.forEachIndexed { i, s ->
                 if (i > 0) Divider()
@@ -95,7 +96,7 @@ fun PlanScreenUi() {
             SelRow("Hora del aviso", listOf(6, 7, 8, 9, 10, 12, 14, 17, 18, 19, 20).map { "$it" to "$it:00" }, "${p.remind?.hour ?: 8}") { v ->
                 Repo.update { d -> d.copy(plan = d.plan?.let { it.copy(remind = (it.remind ?: Remind()).copy(hour = v.toInt())) }) }; Reminders.sync(ctx)
             }
-            Sub("Te avisará el móvil a esa hora los días de entreno, aunque la app esté cerrada.", size = 12.sp, modifier = Modifier.padding(top = 4.dp))
+            Sub("Aviso los días de entreno, aunque la app esté cerrada.", size = 12.sp, modifier = Modifier.padding(top = 4.dp))
             Btn("Añadir el plan a mi calendario", {
                 val ics = app.planIcs(p); if (ics == null) toast("No quedan sesiones pendientes en el plan")
                 else Share.file(ctx, "zancada-plan.ics", "text/calendar", ics.first.toByteArray(), "Mi plan de Zancada: ${ics.second} sesiones")
@@ -117,10 +118,62 @@ fun PlanScreenUi() {
     }
 }
 
+/** Color de cada tipo de sesión, como en el calendario de Runna: suave lima, largo tinta, ritmo ámbar, series rojo. */
+@Composable
+fun sessColor(type: String): Pair<Color, Color> {
+    val c = Z.c
+    return when (type) {
+        "suave" -> c.volt to c.onVolt
+        "largo" -> (if (c.night) Color(0xFF3A3E39) else c.bar) to c.onBar
+        "tempo" -> Color(0xFFFFB020) to Ink
+        "series", "fartlek" -> Color(0xFFFF5A47) to Color.White
+        "carrera" -> c.volt to c.onVolt
+        else -> c.surface2 to c.ink
+    }
+}
+private val SESS_L = mapOf("suave" to "Suave", "largo" to "Largo", "tempo" to "Ritmo", "series" to "Series", "fartlek" to "Series", "carrera" to "Carrera")
+
+/** La semana como calendario: un bloque de color por sesión, con sus km; hecho = check; hoy = borde. */
+@Composable
+private fun WeekCalendar(list: List<Sess>) {
+    val c = Z.c; val buzz = rememberBuzz()
+    val byDay = list.associateBy { it.dayIdx }
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(c.surface).padding(horizontal = 12.dp, vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            (0..6).forEach { d ->
+                val s = byDay[d]
+                Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Txt(DAY_L[d], size = 12.sp, weight = FontWeight.SemiBold, color = if (s?.state == "today") Z.text else Z.muted)
+                    val (bg, fg) = if (s == null) Color.Transparent to Z.muted else sessColor(s.type)
+                    val faded = s != null && (s.state == "miss" || s.state == "skip")
+                    Box(Modifier.fillMaxWidth().height(62.dp).alpha(if (faded) 0.35f else 1f).clip(RoundedCornerShape(14.dp))
+                        .background(if (s == null) c.surface2.copy(alpha = 0.5f) else bg)
+                        .then(if (s?.state == "today") Modifier.border(2.dp, Z.text, RoundedCornerShape(14.dp)) else Modifier)
+                        .then(if (s != null) Modifier.clickable { buzz(); if (s.run != null) Nav.go(SUMMARY, run = s.run!!.id) else if (s.state == "today") Nav.go(PREP) else toast(s.desc, 4000) } else Modifier),
+                        contentAlignment = Alignment.Center) {
+                        if (s != null) Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (s.state == "ok") Icon(Ico.check, null, Modifier.size(16.dp), tint = fg)
+                            Text(fmtKmS(s.m), style = numStyle(15.sp, 0.0).copy(color = fg))
+                            Txt("km", size = 10.sp, color = fg.copy(alpha = 0.7f), lineHeight = 1.0)
+                        }
+                    }
+                }
+            }
+        }
+        val types = list.map { it.type }.distinctBy { SESS_L[it] ?: it }
+        if (types.isNotEmpty()) Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            types.forEach { t -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                Box(Modifier.size(9.dp).clip(CircleShape).background(sessColor(t).first)); Sub(SESS_L[t] ?: t, size = 11.sp)
+            } }
+        }
+    }
+}
+
 @Composable
 private fun SessIcon(s: Sess) {
     val c = Z.c
-    val (bg, fg) = when (s.state) { "ok" -> c.volt to c.onVolt; "today" -> c.bar to c.onBar; "miss" -> Color.Transparent to c.muted; else -> c.surface2 to c.muted }
+    val tc = sessColor(s.type)
+    val (bg, fg) = when (s.state) { "ok" -> c.volt to c.onVolt; "today" -> c.bar to c.onBar; "miss" -> Color.Transparent to c.muted; else -> tc.first.copy(alpha = 0.22f) to Z.text }
     Box(Modifier.size(40.dp).alpha(if (s.state == "skip") 0.4f else 1f).clip(CircleShape).background(bg)
         .then(if (s.state == "miss") Modifier.border(1.5.dp, c.line, CircleShape) else Modifier), contentAlignment = Alignment.Center) {
         if (s.state == "ok") Icon(Ico.check, null, Modifier.size(18.dp), tint = fg) else Num(DAY_L[s.dayIdx], 13.sp, color = fg, spacing = 0.0)

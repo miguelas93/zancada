@@ -52,10 +52,24 @@ fun SummaryScreen(id: String?) {
     var note by remember(r.id) { mutableStateOf(r.note ?: "") }
     fun upd(f: (Run) -> Run) = Repo.update { d -> d.copy(runs = d.runs.map { if (it.id == r.id) f(it) else it }) }
 
+    var tab by remember(r.id) { mutableStateOf("res") }
+    var sureDel by remember(r.id) { mutableStateOf(false) }
+    LaunchedEffect(sureDel) { if (sureDel) { delay(3000); sureDel = false } }
+    val paceS = remember(r.id, r.points.size) { paceSeries(r.points) }
+    val eleS = remember(r.id, r.points.size) { elevSeries(r.points) }
+    val hrS = remember(r.id, r.hrs?.size) { hrSeries(r.hrs) }
+    val hasCharts = paceS.size >= 3 || eleS.size >= 3 || hrS.size >= 3
+    val tabs = listOfNotNull("res" to "Resumen", if (r.splits.isNotEmpty()) "spl" to "Parciales" else null, if (hasCharts) "gra" to "Gráficas" else null)
+    if (tabs.none { it.first == tab }) tab = "res"
+
     ScreenCol(withTabs = false, gap = 0.dp, pad = PaddingValues(0.dp)) {
-        Box(Modifier.fillMaxWidth().height(340.dp).background(c.mapLand)) {
+        Box(Modifier.fillMaxWidth().height(320.dp).background(c.mapLand)) {
             if (hasPts) ZMap(Modifier.matchParentSize(), data.settings.map, lines, dots, ctl, interactive = false, attrBottom = 36.dp)
-            else CompositionLocalProvider(LocalDark provides true) { Box(Modifier.matchParentSize().background(c.bar), contentAlignment = Alignment.Center) { Sub("Carrera añadida a mano: sin mapa", size = 14.sp) } }
+            else CompositionLocalProvider(LocalDark provides true) {
+                Column(Modifier.matchParentSize().background(c.bar), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    ZMark(64.dp, c.volt); Sub("Añadida a mano", Modifier.padding(top = 12.dp), size = 14.sp)
+                }
+            }
             Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = ins.calculateTopPadding() + 14.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 IconBtn(Ico.back, { Nav.back() })
                 IconBtn(Ico.share, {
@@ -66,26 +80,21 @@ fun SummaryScreen(id: String?) {
                     }
                 })
             }
-            if (seg.size >= 3) {
-                if (byPace) Row(Modifier.align(Alignment.BottomStart).padding(start = 20.dp, bottom = 108.dp).shadow(6.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(c.bar).padding(horizontal = 12.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Txt("rápido", size = 12.sp, weight = FontWeight.SemiBold, color = c.onBar)
-                    Box(Modifier.size(64.dp, 8.dp).clip(RoundedCornerShape(4.dp)).background(Brush.horizontalGradient(listOf(Color(0xFFD4FF3A), Color(0xFFFFB020), Color(0xFFFF4D4D)))))
-                    Txt("lento", size = 12.sp, weight = FontWeight.SemiBold, color = c.onBar)
-                }
-                Box(Modifier.align(Alignment.BottomStart).padding(start = 20.dp, bottom = 56.dp).height(44.dp).clip(RoundedCornerShape(22.dp)).background(c.bar)
-                    .clickable { Repo.settings { it.copy(pacemap = if (it.pacemap == "1") "0" else "1") } }.padding(horizontal = 16.dp), contentAlignment = Alignment.Center) {
-                    Txt(if (byPace) "Color único" else "Color por ritmo", size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar)
-                }
+            if (hasPts) Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 52.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (seg.size >= 3) MapPill(if (byPace) Ico.layers else Ico.bolt, if (byPace) "Color único" else "Por ritmo") { Repo.settings { it.copy(pacemap = if (it.pacemap == "1") "0" else "1") } }
+                Spacer(Modifier.weight(1f))
+                MapPill(Ico.map, "3D") { Nav.go(V3D, run = r.id) }
+                MapPill(Ico.play, "Repetición", tint = c.volt) { Nav.go(REPLAY, run = r.id) }
             }
-            if (hasPts) Box(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 108.dp).height(44.dp).clip(RoundedCornerShape(22.dp)).background(c.bar).clickable { Nav.go(V3D, run = r.id) }
-                .padding(horizontal = 16.dp), contentAlignment = Alignment.Center) { Txt("Vista 3D", size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar) }
-            if (hasPts) Row(Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 56.dp).height(44.dp).clip(RoundedCornerShape(22.dp)).background(c.bar).clickable { Nav.go(REPLAY, run = r.id) }
-                .padding(start = 12.dp, end = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(Ico.play, null, Modifier.size(18.dp), tint = c.volt); Txt("Repetición", size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar)
+            if (byPace) Row(Modifier.align(Alignment.BottomStart).padding(start = 20.dp, bottom = 102.dp).shadow(6.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(c.bar).padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Txt("rápido", size = 12.sp, weight = FontWeight.SemiBold, color = c.onBar)
+                Box(Modifier.size(64.dp, 8.dp).clip(RoundedCornerShape(4.dp)).background(Brush.horizontalGradient(listOf(Color(0xFFD4FF3A), Color(0xFFFFB020), Color(0xFFFF4D4D)))))
+                Txt("lento", size = 12.sp, weight = FontWeight.SemiBold, color = c.onBar)
             }
         }
         Column(Modifier.offset(y = (-36).dp).padding(start = 12.dp, end = 12.dp, bottom = ins.calculateBottomPadding() + 24.dp - 36.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Cabecera: fecha, nombre, km grandes y cuadrícula de cifras.
             ZCard(pad = PaddingValues(22.dp), gap = 18.dp) {
                 Column {
                     Sub(app.es.fmtDate(r.start))
@@ -96,80 +105,157 @@ fun SummaryScreen(id: String?) {
                         else H1(r.name, Modifier.weight(1f, fill = false), size = 28.sp)
                         IconBtn(if (renaming) Ico.check else Ico.pencil, {
                             if (renaming) { val v = safeText(name, 40); if (v.isNotEmpty()) upd { it.copy(name = v) }; renaming = false } else { name = r.name; renaming = true }
-                        }, size = 32.dp, bg = c.surface2, iconSize = 16.dp)
+                        }, size = 32.dp, bg = c.surface2, iconSize = 16.dp, label = if (renaming) "Guardar nombre" else "Cambiar nombre")
                     }
                 }
-                Num(fmtKm(r.dist), 76.sp, unit = "km", unitSize = 22.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
+                Num(countUp(r.dist) { fmtKm(it) }, 76.sp, unit = "km", unitSize = 22.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
                 val ok = r.splits.filter { !it.partial }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Stat("Tiempo", fmtTime(r.dur), 26.sp); Stat("Ritmo", app.pace(r.paceSec()), 26.sp, unit = "/km")
-                    Stat("Mejor km", if (ok.isNotEmpty()) app.pace(ok.minOf { it.split }) else "–:––", 26.sp, unit = "/km")
+                val cells = listOfNotNull(
+                    Triple("Tiempo", fmtTime(r.dur), null), Triple("Ritmo", app.pace(r.paceSec()), "/km"),
+                    if (ok.isNotEmpty()) Triple("Mejor km", app.pace(ok.minOf { it.split }), "/km") else null,
+                    r.gain?.let { Triple("Desnivel", "+$it", "m") }, r.hr?.let { Triple("Pulso", "$it", "ppm") }, r.cad?.let { Triple("Cadencia", "$it", "ppm") },
+                )
+                cells.chunked(3).forEachIndexed { i, row ->
+                    if (i > 0) Divider()
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        row.forEach { (l, v, u) -> Stat(l, v, 24.sp, unit = u, unitSize = 12.sp) }
+                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
                 }
-                val info = app.summaryInfo(r) + listOfNotNull(r.hr?.let { "Pulso medio $it ppm · máximo ${r.hrMax ?: it} ppm." to false }, cadenceTip(r.cad)?.let { it to false })
-                if (info.isNotEmpty()) Column { Divider(); Spacer(Modifier.height(12.dp)); info.forEach { (t, b) -> Txt(t, size = 13.sp, weight = if (b) FontWeight.SemiBold else FontWeight.Medium, color = if (b) c.ink else c.muted, lineHeight = 1.6) } }
+                val info = app.summaryInfo(r).filter { !it.first.startsWith("Desnivel") }
+                if (info.isNotEmpty()) Chips(wrap = true) { info.forEach { (t, _) -> InfoChip(t) } }
             }
-            app.runInsights(r).takeIf { it.isNotEmpty() }?.let { ins2 ->
-                ZCard(dark = true, pad = PaddingValues(horizontal = 22.dp, vertical = 20.dp), gap = 8.dp) { Lbl("Lectura de la carrera"); Txt(ins2, size = 15.sp, lineHeight = 1.5) }
-            }
-            app.zones(r)?.let { z ->
-                ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Tu esfuerzo"); Sub("ritmo habitual ${app.pace(z.userPace)}/km", size = 12.sp) }
-                    val tot = z.zones.sumOf { it.sec }.let { if (it == 0.0) 1.0 else it }
-                    Row(Modifier.fillMaxWidth().height(12.dp).clip(RoundedCornerShape(6.dp)).background(c.line)) { z.zones.forEach { x -> if (x.sec > 0) Box(Modifier.weight((x.sec / tot).toFloat()).fillMaxHeight().background(Color(x.color))) } }
-                    z.zones.forEachIndexed { i, x ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Box(Modifier.size(10.dp).clip(CircleShape).background(Color(x.color))); Txt(x.name, size = 14.sp)
-                                if (i == z.main) Sub("· la mayor parte", size = 12.sp)
+            if (tabs.size > 1) TopTabs(tabs, tab, { tab = it }, Modifier.padding(horizontal = 8.dp))
+            TabBody(tab, tabs.map { it.first }) { t ->
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    when (t) {
+                        "spl" -> SplitsCard(app, r)
+                        "gra" -> ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 20.dp), gap = 26.dp) {
+                            if (paceS.size >= 3) ScrubChart("Ritmo", Ico.bolt, paceS, { app.pace(it) }, "/km", "km", invert = true, key = "pace")
+                            if (hrS.size >= 3) ScrubChart("Pulso", Ico.heart, hrS, { "${it.toInt()}" }, "ppm", "min", color = Color(0xFFFF4D4D), key = "hr")
+                            if (eleS.size >= 3) ScrubChart("Altitud", Ico.trend, eleS, { "${it.toInt()}" }, "m", "km", key = "ele")
+                            Sub("Desliza el dedo por la gráfica para ver cada punto.", size = 12.sp)
+                        }
+                        else -> {
+                            app.runInsights(r).takeIf { it.isNotEmpty() }?.let { ins2 ->
+                                ZCard(dark = true, pad = PaddingValues(horizontal = 22.dp, vertical = 20.dp), gap = 8.dp) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Ico.bolt, null, Modifier.size(16.dp), tint = c.volt); Lbl("Lectura de la carrera") }
+                                    Txt(ins2, size = 15.sp, lineHeight = 1.5)
+                                }
                             }
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) { Txt("${x.pct} %", size = 14.sp, weight = FontWeight.SemiBold); Sub(fmtTime(x.sec)) }
+                            app.zones(r)?.let { z -> EffortCard(app, z) }
+                            FeelCard(r, note, { note = it }, { f -> upd(f) })
                         }
                     }
                 }
             }
-            ZCard(pad = PaddingValues(horizontal = 22.dp, vertical = 20.dp), gap = 12.dp) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("¿Cómo fue?"); Sub(r.feel?.let { FEEL_L.getOrNull(it) } ?: "sensación y notas", size = 12.sp) }
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    (1..5).forEach { v ->
-                        val on = r.feel == v
-                        Box(Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(12.dp)).background(if (on) c.bar else c.surface2).clickable { upd { it.copy(feel = if (it.feel == v) null else v) } }, contentAlignment = Alignment.Center) {
-                            Txt(FEEL_L[v], size = 12.sp, weight = FontWeight.SemiBold, color = if (on) c.volt else c.ink, maxLines = 1)
-                        }
-                    }
+            // Acciones: una fila de iconos en vez de cuatro botones apilados.
+            Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (r.points.size > 5 || (r.route != null && !r.route!!.id.startsWith("run-"))) ActionTile(Ico.restart, "Repetir") {
+                    val rr = r.route
+                    val base = if (rr != null && !rr.id.startsWith("run-")) (app.zr.firstOrNull { it.id == rr.id } ?: data.savedRoutes.firstOrNull { it.id == rr.id }) else null
+                    if (base != null) { St.pickedRoute = base; Nav.go(PREP) }
+                    else if (r.points.size <= 5) toast("Esta carrera no tiene trazado para repetir")
+                    else { St.pickedRoute = Route("run-" + r.id, r.name, r.points.map { listOf(it.lat, it.lon) }, jsRound(r.dist / 100) / 10.0, r.gain, start = LatLon(r.points[0].lat, r.points[0].lon), src = "run"); Nav.go(PREP) }
                 }
-                Field(note, { note = it; val n = it.trim(); upd { r0 -> r0.copy(note = n.ifEmpty { null }) } }, "Notas: dónde, con quién, cómo te sentiste…", Modifier.fillMaxWidth(), h = 64.dp, size = 14.sp, maxLen = 500, singleLine = false, radius = 14.dp)
-            }
-            val ele = r.points.mapNotNull { it.a }
-            if (ele.size >= 10) ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Perfil"); Sub("${ele.min()} – ${ele.max()} m${r.gain?.let { " · +$it m" } ?: ""}") }
-                ElevProfile(ele)
-            }
-            ZCard(pad = PaddingValues(22.dp), gap = 12.dp) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Parciales"); Sub("Mejor km en lima", size = 12.sp) }
-                if (r.splits.isEmpty()) Sub(if (r.manual) "Carrera añadida a mano: sin parciales." else "Menos de un kilómetro, sin parciales.")
-                val best = r.splits.filter { !it.partial }.minOfOrNull { it.split }; val maxS = r.splits.maxOfOrNull { it.split } ?: 1.0
-                r.splits.forEach { s ->
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Sub("${s.km}", Modifier.width(22.dp))
-                        Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(5.dp)).background(c.surface2)) {
-                            Box(Modifier.fillMaxHeight().fillMaxWidth((max(18.0, 100 * (maxS / s.split) * 0.84) / 100).toFloat().coerceAtMost(1f)).clip(RoundedCornerShape(5.dp))
-                                .background(if (s.split == best && !s.partial) c.volt else c.ink))
-                        }
-                        Txt(app.pace(s.split) + if (s.partial) "*" else "", Modifier.width(52.dp), size = 13.sp, weight = FontWeight.SemiBold, align = TextAlign.End)
-                    }
+                ActionTile(Ico.heart, "Estirar") { St.stretchWarm = false; St.modal = "stretch" }
+                if (hasPts) ActionTile(Ico.download, "GPX") { Share.file(ctx, "zancada-${isoMs(r.start).take(10)}.gpx", "application/gpx+xml", runGpx(r).toByteArray(), r.name) }
+                ActionTile(Ico.trash, if (sureDel) "¿Seguro?" else "Borrar", danger = true) {
+                    if (!sureDel) { sureDel = true; return@ActionTile }
+                    Repo.update { d -> d.copy(runs = d.runs.filter { it.id != r.id }) }; Repo.mutate { reviewPlan() }; toast("Carrera borrada"); Nav.reset(Scr(HOME))
                 }
             }
-            if (r.points.size > 5 || (r.route != null && !r.route!!.id.startsWith("run-"))) Btn("Volver a correr este recorrido", {
-                val rr = r.route
-                val base = if (rr != null && !rr.id.startsWith("run-")) (app.zr.firstOrNull { it.id == rr.id } ?: data.savedRoutes.firstOrNull { it.id == rr.id }) else null
-                if (base != null) { St.pickedRoute = base; Nav.go(PREP) }
-                else if (r.points.size <= 5) toast("Esta carrera no tiene trazado para repetir")
-                else { St.pickedRoute = Route("run-" + r.id, r.name, r.points.map { listOf(it.lat, it.lon) }, jsRound(r.dist / 100) / 10.0, r.gain, start = LatLon(r.points[0].lat, r.points[0].lon), src = "run"); Nav.go(PREP) }
-            }, kind = BtnKind.Sec, height = 48.dp, size = 15.sp)
-            Btn("Estirar 5 min, guiado", { St.stretchWarm = false; St.modal = "stretch" }, kind = BtnKind.Ghost)
-            if (hasPts) Btn("Exportar GPX (Strava, Garmin…)", { Share.file(ctx, "zancada-${isoMs(r.start).take(10)}.gpx", "application/gpx+xml", runGpx(r).toByteArray(), r.name) }, kind = BtnKind.Ghost)
-            Btn("Borrar esta carrera", { Repo.update { d -> d.copy(runs = d.runs.filter { it.id != r.id }) }; Repo.mutate { reviewPlan() }; toast("Carrera borrada"); Nav.reset(Scr(HOME)) }, kind = BtnKind.Ghost, color = c.danger)
         }
+    }
+}
+
+/** Botón redondo sobre el mapa del resumen. */
+@Composable
+private fun MapPill(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: Color = Z.c.onBar, onClick: () -> Unit) {
+    val c = Z.c; val buzz = rememberBuzz()
+    Row(Modifier.height(40.dp).shadow(6.dp, RoundedCornerShape(20.dp)).clip(RoundedCornerShape(20.dp)).background(c.bar).clickable { buzz(); onClick() }
+        .padding(start = 12.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Icon(icon, null, Modifier.size(16.dp), tint = tint); Txt(label, size = 13.sp, weight = FontWeight.SemiBold, color = c.onBar, maxLines = 1)
+    }
+}
+
+/** Dato secundario en una píldora (plan, ruta, objetivo…). */
+@Composable
+private fun InfoChip(t: String) {
+    val c = Z.c
+    Txt(t, Modifier.clip(RoundedCornerShape(50)).background(c.surface2).padding(horizontal = 10.dp, vertical = 5.dp), size = 12.sp, weight = FontWeight.Medium, color = Z.muted, maxLines = 1)
+}
+
+/** Icono con texto debajo: acciones del final del resumen. */
+@Composable
+private fun RowScope.ActionTile(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, danger: Boolean = false, onClick: () -> Unit) {
+    val c = Z.c; val buzz = rememberBuzz()
+    Column(Modifier.weight(1f).clip(RoundedCornerShape(20.dp)).background(c.surface).clickable { buzz(); onClick() }.padding(vertical = 14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Icon(icon, null, Modifier.size(20.dp), tint = if (danger) c.danger else Z.text)
+        Txt(label, size = 12.sp, weight = FontWeight.SemiBold, color = if (danger) c.danger else Z.text, maxLines = 1)
+    }
+}
+
+@Composable
+private fun SplitsCard(app: App, r: Run) {
+    val c = Z.c
+    val best = r.splits.filter { !it.partial }.minOfOrNull { it.split }; val maxS = r.splits.maxOfOrNull { it.split } ?: 1.0
+    val grow = animatedOnce(1f, 700)
+    ZCard(pad = PaddingValues(22.dp), gap = 12.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Lbl("km", Modifier.width(34.dp)); Lbl("Ritmo", Modifier.weight(1f))
+            Box(Modifier.size(8.dp).clip(CircleShape).background(c.volt)); Sub(" mejor", size = 11.sp)
+        }
+        r.splits.forEach { s ->
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Sub("${s.km}", Modifier.width(22.dp))
+                Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(5.dp)).background(c.surface2)) {
+                    Box(Modifier.fillMaxHeight().fillMaxWidth((grow * max(18.0, 100 * (maxS / s.split) * 0.84) / 100).toFloat().coerceIn(0f, 1f)).clip(RoundedCornerShape(5.dp))
+                        .background(if (s.split == best && !s.partial) c.volt else c.ink))
+                }
+                Txt(app.pace(s.split) + if (s.partial) "*" else "", Modifier.width(52.dp), size = 13.sp, weight = FontWeight.SemiBold, align = TextAlign.End)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EffortCard(app: App, z: Zones) {
+    val c = Z.c
+    ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Ico.gauge, null, Modifier.size(18.dp), tint = Z.text); H2("Tu esfuerzo") }
+            Sub("habitual ${app.pace(z.userPace)}/km", size = 12.sp)
+        }
+        val tot = z.zones.sumOf { it.sec }.let { if (it == 0.0) 1.0 else it }
+        val grow = animatedOnce(1f, 700)
+        Row(Modifier.fillMaxWidth(grow.coerceAtLeast(0.01f)).height(12.dp).clip(RoundedCornerShape(6.dp)).background(c.line)) { z.zones.forEach { x -> if (x.sec > 0) Box(Modifier.weight((x.sec / tot).toFloat()).fillMaxHeight().background(Color(x.color))) } }
+        z.zones.forEachIndexed { i, x ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(Modifier.size(10.dp).clip(CircleShape).background(Color(x.color))); Txt(x.name, size = 14.sp, weight = if (i == z.main) FontWeight.SemiBold else FontWeight.Normal)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) { Txt("${x.pct} %", size = 14.sp, weight = FontWeight.SemiBold); Sub(fmtTime(x.sec)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeelCard(r: Run, note: String, setNote: (String) -> Unit, upd: ((Run) -> Run) -> Unit) {
+    val c = Z.c; val buzz = rememberBuzz()
+    ZCard(pad = PaddingValues(horizontal = 22.dp, vertical = 20.dp), gap = 12.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("¿Cómo fue?"); r.feel?.let { Sub(FEEL_L.getOrNull(it) ?: "", size = 12.sp) } }
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            (1..5).forEach { v ->
+                val on = r.feel == v
+                Box(Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(12.dp)).background(if (on) c.bar else c.surface2).clickable { buzz(); upd { it.copy(feel = if (it.feel == v) null else v) } }, contentAlignment = Alignment.Center) {
+                    Txt(FEEL_L[v], size = 12.sp, weight = FontWeight.SemiBold, color = if (on) c.volt else c.ink, maxLines = 1)
+                }
+            }
+        }
+        Field(note, { setNote(it); val n = it.trim(); upd { r0 -> r0.copy(note = n.ifEmpty { null }) } }, "Notas", Modifier.fillMaxWidth(), h = 64.dp, size = 14.sp, maxLen = 500, singleLine = false, radius = 14.dp)
     }
 }
 

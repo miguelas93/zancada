@@ -84,8 +84,12 @@ fun RoutePhotoThumb(r: Route, w: Dp = 84.dp, h: Dp = 84.dp, bg: Color = Z.c.surf
 @Composable
 fun NetImage(url: String, modifier: Modifier, fallback: String? = null, fit: ContentScale = ContentScale.Crop, onFail: () -> Unit = {}) {
     var img by remember(url) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(url) { img = Img.get(url) ?: fallback?.let { Img.get(it) }; if (img == null) onFail() }
-    Box(modifier) { img?.let { Image(it, null, Modifier.matchParentSize(), contentScale = fit) } }
+    var done by remember(url) { mutableStateOf(false) }
+    LaunchedEffect(url) { img = Img.get(url) ?: fallback?.let { Img.get(it) }; done = true; if (img == null) onFail() }
+    Box(modifier) {
+        if (!done) Skeleton(Modifier.matchParentSize(), 0.dp)
+        img?.let { Image(it, null, Modifier.matchParentSize(), contentScale = fit, alpha = animatedOnce(1f, 300)) }
+    }
 }
 
 object RtSt { var seed by mutableStateOf(0); var token = 0 }
@@ -147,18 +151,18 @@ fun RoutesScreen() {
         if (St.rMode == "rec" && St.rDist == "all" && St.rSurf == "all" && q.isEmpty()) app.pickToday(shown)?.let { TodayCard(it) }
         shown.forEach { RouteCard(it, app) }
         if (shown.isEmpty()) when (St.rMode) {
-            "rec" -> if (app.zr.isEmpty()) InfoCard("No se han podido cargar las rutas", "Cierra la app y vuelve a abrirla. Si sigue igual, avísame desde Perfil › Avisar de un fallo.")
-                else InfoCard("Ninguna ruta con esos filtros", "Hay ${app.zoneRoutes(zone, here).size} rutas en esta zona con otro tiempo, suelo o nombre.") { Btn("Quitar filtros", { St.rDist = "all"; St.rSurf = "all"; St.rSort = "near"; St.rDiff = "all"; St.rQ = "" }, height = 44.dp, size = 14.sp) }
-            "mine" -> InfoCard("Aún no tienes recorridos", "Cada carrera que guardes aparecerá aquí para repetirla, y puedes guardar cualquier ruta desde su ficha.")
-            "ask" -> if (here == null) InfoCard("Buscando tu posición…", "Las rutas se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
+            "rec" -> if (app.zr.isEmpty()) InfoCard("No se han podido cargar las rutas", "Cierra y abre la app. Si sigue igual, avísame en Ajustes.")
+                else InfoCard("Ninguna ruta con esos filtros", "${app.zoneRoutes(zone, here).size} rutas más en esta zona.") { Btn("Quitar filtros", { St.rDist = "all"; St.rSurf = "all"; St.rSort = "near"; St.rDiff = "all"; St.rQ = "" }, height = 44.dp, size = 14.sp) }
+            "mine" -> ZCard { EmptyState("Aún no tienes recorridos", "Tus carreras y rutas guardadas, aquí.", bg = Z.c.surface) }
+            "ask" -> if (here == null) InfoCard("Buscando tu posición…", "Necesito tu ubicación: dale permiso desde Correr.")
                 else if (St.askErr != null && St.askBusy == null) InfoCard("No he podido calcular rutas ahora", St.askErr!!)
-            else -> if (here == null) InfoCard("Buscando tu posición…", "Los bucles se calculan desde donde estás. Si no has dado permiso de ubicación, ábrelo desde Correr.")
-                else if (St.rSugErr != null && !St.rSugBusy) InfoCard("No he podido calcular bucles ahora", "Hace falta conexión; el servicio de rutas (OpenStreetMap) puede estar saturado. Las rutas recomendadas sí funcionan sin él.") {
+            else -> if (here == null) InfoCard("Buscando tu posición…", "Necesito tu ubicación: dale permiso desde Correr.")
+                else if (St.rSugErr != null && !St.rSugBusy) InfoCard("No he podido calcular bucles ahora", "Sin conexión o el servicio está saturado. Las recomendadas sí funcionan.") {
                     Btn("Reintentar", { RtSt.seed = (RtSt.seed + 37) % 360 }, kind = BtnKind.Sec, height = 46.dp)
                 }
         }
-        if (St.rMode == "ask" && St.askBusy != null) repeat(maxOf(0, 3 - St.askList.size)) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface2).alpha(0.6f)) }
-        if (St.rMode == "sug" && St.rSugBusy) repeat(3 - St.rSug.size) { Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(24.dp)).background(c.surface2).alpha(0.6f)) }
+        if (St.rMode == "ask" && St.askBusy != null) repeat(maxOf(0, 3 - St.askList.size)) { SkeletonRow() }
+        if (St.rMode == "sug" && St.rSugBusy) repeat(maxOf(0, 3 - St.rSug.size)) { SkeletonRow() }
         if (St.rMode == "sug" && !St.rSugBusy && St.rSug.isNotEmpty()) Btn("Generar otros tres bucles", { RtSt.seed = (RtSt.seed + 37) % 360 }, Modifier.padding(top = 4.dp), BtnKind.Sec, 48.dp)
     }
 }
@@ -249,7 +253,7 @@ private fun RoutesMapScreen(shown: List<Route>, sel: Route?, here: LatLon?, app:
                     Modifier.padding(top = 8.dp), size = 14.sp, weight = FontWeight.SemiBold)
             }
             when (St.rSheet) {
-                1 -> if (shown.isEmpty()) Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) { InfoCard(if (St.rMode == "mine") "Aún no tienes recorridos" else "Ninguna ruta con esos filtros", "Desliza hacia arriba para ver más opciones.") }
+                1 -> if (shown.isEmpty()) Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) { InfoCard(if (St.rMode == "mine") "Aún no tienes recorridos" else "Ninguna ruta con esos filtros", "Desliza hacia arriba para ver más.") }
                     else androidx.compose.foundation.pager.HorizontalPager(pager, Modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp), pageSpacing = 10.dp) { i -> PeekCard(shown[i], app) }
                 2 -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = listContent)
                 else -> {}
@@ -315,7 +319,7 @@ private fun AskBox(here: LatLon?, app: App) {
         scope.launch {
             val out = runCatching { Repo.askRoutes(h, q, app.userPace(), seed, { St.askBusy = it }, { St.askSpec = it }, { St.askList = it }) }.getOrNull()
             St.askBusy = null
-            if (out == null || out.routes.isEmpty()) St.askErr = "Hace falta conexión; el servicio de rutas de OpenStreetMap puede estar saturado. Prueba otra vez en un momento."
+            if (out == null || out.routes.isEmpty()) St.askErr = "Sin conexión o el servicio está saturado. Prueba en un momento."
             else if (!out.allOk) St.askNote = "Ninguna cumple todo lo que pides por aquí (" + out.miss.joinToString(", ") + "). Te enseño las más cercanas: cambia algo de la frase si quieres."
         }
     }
@@ -508,7 +512,7 @@ fun RouteDetailScreen(r: Route) {
                 ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
                     H2("Cómo llegar")
                     val hist = data.runs.count { it.route?.id == r.id || "run-" + it.id == r.id }; val bestR = app.bestOnRoute(r.id)
-                    val a = if (away == null) "Activa la ubicación para saber a cuánto estás de la salida." else if (away <= 60) "Estás en la salida." else if (away <= 2500) "La salida está ${fmtAway(away / 1000)} de ti: al empezar te llevo hasta allí (cuenta como calentamiento)." else "La salida está ${fmtAway(away / 1000)} de ti: mejor ir en transporte."
+                    val a = if (away == null) "Activa la ubicación para saber a cuánto estás de la salida." else if (away <= 60) "Estás en la salida." else if (away <= 2500) "Salida a ${fmtAway(away / 1000)}: te llevo hasta allí calentando." else "Salida a ${fmtAway(away / 1000)}: mejor en transporte."
                     Txt(a + (bestR?.let { " La has corrido ${if (hist == 1) "una vez" else "$hist veces"}; tu mejor tiempo, ${fmtTime(it.dur)}: al repetirla te comparo en directo con esa marca." } ?: ""), size = 14.sp)
                     pois?.s?.takeIf { it.isNotEmpty() }?.let { Sub(transitText(it)) }
                     Btn("Transporte público (Google Maps)", { Share.open(ctx, "https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lon}&travelmode=transit") }, kind = BtnKind.Sec, height = 48.dp, size = 15.sp)

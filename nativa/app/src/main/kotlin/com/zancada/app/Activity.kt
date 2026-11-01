@@ -6,6 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -59,10 +61,12 @@ fun HistoryScreen() {
         TopTabs(listOf("prog" to "Progreso", "runs" to "Carreras", "retos" to "Retos"), St.histTab, { St.histTab = it }, Modifier.padding(horizontal = 8.dp))
         Box(Modifier.weight(1f)) {
             val pad = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = ins.calculateBottomPadding() + 110.dp)
-            when (St.histTab) {
-                "runs" -> ScreenCol(pad = pad, gap = 12.dp, scroll = rememberScrollState()) { RunsTab(app, data) }
-                "retos" -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { RetosTab(app) }
-                else -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { ProgressTab(app) }
+            TabBody(St.histTab, listOf("prog", "runs", "retos")) { t ->
+                when (t) {
+                    "runs" -> RunsTab(app, data, pad)
+                    "retos" -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { RetosTab(app) }
+                    else -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { ProgressTab(app) }
+                }
             }
         }
     }
@@ -81,10 +85,10 @@ private fun ProgressTab(app: App) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Lbl(mo.name)
-                Num(toFixed(mo.km / 1000, 1).replace('.', ','), 52.sp, unit = "km", unitSize = 18.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
+                Num(countUp(mo.km) { toFixed(it / 1000, 1).replace('.', ',') }, 52.sp, unit = "km", unitSize = 18.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
             }
             if (g != null) Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Ring(g.pct / 100, 64.dp, 7.dp) { Num("${min(100.0, g.pct).roundToInt()}%", 14.sp) }
+                Ring(g.pct / 100, 64.dp, 7.dp) { Num(countUp(min(100.0, g.pct)) { "${it.roundToInt()}%" }, 14.sp) }
                 Sub("de ${g.goal} km", size = 11.sp)
             }
         }
@@ -157,18 +161,28 @@ private fun MarksCard(app: App) {
 }
 
 @Composable
-private fun RunsTab(app: App, data: AppData) {
+private fun RunsTab(app: App, data: AppData, pad: PaddingValues) {
     val c = Z.c
-    Field(St.histQ, { St.histQ = it }, "Buscar por nombre, ruta o notas", Modifier.fillMaxWidth(), h = 44.dp, size = 14.sp, radius = 14.dp)
-    Chips {
-        listOf("all" to "Todas", "plan" to "Del plan", "route" to "Con ruta", "long" to "Largas", "note" to "Con notas").forEach { (k, l) -> ChipB(l, St.histFilter == k, { St.histFilter = k }) }
-    }
-    val shown = app.historyList(St.histFilter, St.histQ)
-    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().padding(vertical = 40.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        ZMark(40.dp, if (c.night) c.volt else c.ink)
-        Sub(if (data.runs.isNotEmpty()) "Ninguna carrera con ese filtro" else "Aún no hay carreras", align = TextAlign.Center)
-    } else Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(c.surface).padding(horizontal = 14.dp, vertical = 2.dp)) {
-        shown.forEachIndexed { i, r -> if (i > 0) Divider(); HistRow(r, app) }
+    val shown = remember(data, St.histFilter, St.histQ) { app.historyList(St.histFilter, St.histQ) }
+    // Lista perezosa: solo se dibujan las filas que se ven, aunque haya cientos de carreras.
+    LazyColumn(Modifier.fillMaxSize().background(c.bg), contentPadding = pad) {
+        item(key = "q") { Field(St.histQ, { St.histQ = it }, "Buscar", Modifier.fillMaxWidth(), h = 44.dp, size = 14.sp, radius = 14.dp) }
+        item(key = "f") {
+            Chips(Modifier.padding(top = 12.dp, bottom = 12.dp)) {
+                listOf("all" to "Todas", "plan" to "Del plan", "route" to "Con ruta", "long" to "Largas", "note" to "Con notas").forEach { (k, l) -> ChipB(l, St.histFilter == k, { St.histFilter = k }) }
+            }
+        }
+        if (shown.isEmpty()) item(key = "empty") {
+            if (data.runs.isNotEmpty()) EmptyState("Nada con ese filtro", action = "Ver todas", onAction = { St.histFilter = "all"; St.histQ = "" })
+            else EmptyState("Tu primera carrera te espera", "Aquí verás cada salida con su mapa.", "Salir a correr", { Nav.go(PREP) })
+        }
+        else itemsIndexed(shown, key = { _, r -> r.id }) { i, r ->
+            val top = if (i == 0) 24.dp else 0.dp; val bot = if (i == shown.size - 1) 24.dp else 0.dp
+            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(top, top, bot, bot)).background(c.surface).padding(horizontal = 14.dp)) {
+                if (i > 0) Divider()
+                HistRow(r, app)
+            }
+        }
     }
 }
 
@@ -201,9 +215,9 @@ private fun RetosTab(app: App) {
 
 @Composable
 fun HistRow(r: Run, app: App) {
-    val c = Z.c
+    val c = Z.c; val ll = remember(r.id, r.points.size) { r.points.map { LatLon(it.lat, it.lon) } }
     Row(Modifier.fillMaxWidth().clickable { Nav.go(SUMMARY, run = r.id) }.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(60.dp).clip(RoundedCornerShape(14.dp)).background(c.mapLand)) { RunThumb(r.points.map { LatLon(it.lat, it.lon) }, Modifier.matchParentSize(), 5f) }
+        Box(Modifier.size(60.dp).clip(RoundedCornerShape(14.dp)).background(c.mapLand)) { RunThumb(ll, Modifier.matchParentSize(), 5f) }
         Column(Modifier.weight(1f)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Txt(r.name, Modifier.weight(1f, fill = false), size = 15.sp, weight = FontWeight.SemiBold, maxLines = 1)
@@ -323,7 +337,7 @@ fun ClubsScreen() {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { H1("Clubs"); IconBtn(Ico.close, { Nav.go(PROFILE) }) }
         ZCard(dark = true, pad = PaddingValues(24.dp), gap = 12.dp) {
             Chip("Muy pronto"); Num("Corre con tu gente", 30.sp)
-            Sub("Clubs, clasificación semanal y quedadas llegarán cuando Zancada tenga cuentas. En esta beta todo vive en tu móvil, así que todavía no hay nada que compartir con otros.", size = 14.sp)
+            Sub("Clubs y quedadas llegarán con las cuentas.", size = 14.sp)
         }
         ZCard(gap = 4.dp) {
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) { H2("Clasificación semanal"); Sub("km", size = 12.sp) }
@@ -365,7 +379,7 @@ fun HeatScreen() {
             Lbl("Todas tus carreras")
             val first = rs.minOfOrNull { it.start } ?: app.now()
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Stat("Carreras", rs.size.toString(), 26.sp); Stat("Km", jsRound(rs.sumOf { it.dist } / 1000).toString(), 26.sp); Stat("Desde", app.es.monShortYY(first), 26.sp) }
-            Sub("Cuanto más repites un camino, más intenso se ve. Pellizca para acercarte.", size = 12.sp)
+            Sub("Más intenso = más veces. Pellizca para acercar.", size = 12.sp)
         }
     }
 }
