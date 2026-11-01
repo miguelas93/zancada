@@ -54,8 +54,8 @@ fun App.planCard(): PlanCard {
     val td = ws.firstOrNull { it.state == "today" }; val nx = td ?: nextSession(weeks)
     val whenS = if (nx == null) "" else if (nx === td) "Hoy" else if (dayStart(nx.date) == dayStart(now()) + DAY) "Mañana" else "El " + DAY_N[nx.dayIdx]
     val rv = p.lastReview?.takeIf { it.week == wi - 1 }?.let { "Semana pasada: ${it.done} de ${it.total} sesiones, ${fmtKmS(it.doneKm)} de ${fmtKmS(it.planKm)} km. ${it.text}" }
-    val daysLeft = max(0.0, kotlin.math.ceil((p.start + p.weeks * WEEK - now()) / DAY.toDouble())).toLong()
-    val head = "Plan ${g.name} · semana ${wi + 1} de ${p.weeks}${if (g.race > 0) " · $daysLeft días" else ""}"
+    val daysLeft = max(0.0, kotlin.math.ceil(((p.raceDate ?: (p.start + p.weeks * WEEK)) - now()) / DAY.toDouble())).toLong()
+    val head = "${p.raceName ?: "Plan " + g.name} · semana ${wi + 1} de ${p.weeks}${if (g.race > 0) " · $daysLeft días" else ""}"
     return PlanCard.Week(head, "$done/$total", nx?.let { whenS }, nx?.let { "${it.title} · ${fmtKmS(it.m)} km" }, nx?.desc, if (total > 0) done.toDouble() / total else 0.0, rv)
 }
 
@@ -205,7 +205,7 @@ fun App.planScreen(view: Int?): PlanScreen? {
     val f = p.factor?.getOrNull(w)
     val note = if (f != null && abs(f - 1) > 0.01) "${if (f > 1) "Subida" else "Bajada"} del ${jsRound(abs(f - 1) * 100)} % tras la revisión"
         else if (g.race > 0 && w == p.weeks - 1) "Semana de carrera: afinar" else if (w % 4 == 3 && w < p.weeks - 1) "Semana de descarga" else null
-    return PlanScreen(if (g.name == "Constancia") "Hábito" else g.name, "${p.weeks} semanas · ${listEs(p.days.map { DAY_N[it] })}",
+    return PlanScreen(if (g.name == "Constancia") "Hábito" else g.name, (p.raceName?.let { "$it · " + es.dayMon(p.raceDate ?: 0) } ?: "${p.weeks} semanas · ${listEs(p.days.map { DAY_N[it] })}"),
         if (curWeek(p) >= p.weeks) "Plan terminado" else "Semana ${wi + 1} de ${p.weeks}", pred, w, wi, if (w == wi) "Esta semana" else "Semana ${w + 1}", note,
         done, km, ss, weeks.map { x -> jsRound(x.sumOf { it.m } / 1000) })
 }

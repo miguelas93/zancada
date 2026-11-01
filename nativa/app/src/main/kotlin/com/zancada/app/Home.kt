@@ -142,6 +142,8 @@ fun HomeScreen() {
             }
         }
         PlanCardUi(app)
+        app.wrapToShow()?.let { w -> WrapCard(w, app) }
+        DiscoverStrip(app, wx?.t)
         app.recap()?.let { r -> RecapCard(r) }
         data.runs.firstOrNull()?.let { LastRunCard(it, app) }
         app.nearRoute(here)?.let { n -> NearCard(n) }
@@ -306,4 +308,42 @@ fun RowScope.StatCols(r: Run, app: App, size: Int) {
     Stat("Distancia", fmtKm(r.dist), size.sp, unit = "km")
     Stat("Ritmo", app.pace(r.paceSec()), size.sp, unit = "/km")
     Stat("Tiempo", fmtTime(r.dur), size.sp)
+}
+
+/** Los 7 primeros días de cada mes: «Tu octubre en Zancada», para verlo en historias y compartirlo. */
+@Composable
+private fun WrapCard(w: MonthWrap, app: App) {
+    val c = Z.c
+    ZCard(dark = true, gap = 10.dp, onClick = { DiscSt.wrapFrom = w.from; Nav.go(MONTH) }) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Lbl("Tu ${app.es.monLong(w.from)} en Zancada", color = c.volt)
+                Num(fmtKmS(w.km * 1000), 40.sp, unit = "km · ${w.runs} ${pl(w.runs, "salida")}", unitSize = 14.sp)
+            }
+            IcoBox(Ico.play, 44.dp, bg = c.volt, tint = c.onVolt)
+        }
+    }
+}
+
+/** Descubre: carreras, aprender y clips, más el consejo de comida del día. */
+@Composable
+private fun DiscoverStrip(app: App, temp: Long?) {
+    val c = Z.c
+    val next = remember(app) { app.upcomingRaces().firstOrNull() }
+    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        listOf(Triple("carreras", Ico.flag, "Carreras" to (next?.let { "${it.city} · ${app.es.dayMon(it.day(app.zone))}" } ?: "En España")),
+            Triple("aprende", Ico.bolt, "Aprende" to "En 1 minuto"), Triple("clips", Ico.play, "Clips" to "Calentar y fuerza")).forEach { (k, ic, t) ->
+            Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(20.dp)).background(c.surface).clickable { openDiscover(k) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                IcoBox(ic, 32.dp)
+                Txt(t.first, size = 14.sp, weight = FontWeight.SemiBold, maxLines = 1)
+                Sub(t.second, size = 11.sp, maxLines = 2)
+            }
+        }
+    }
+    val tip = remember(app, temp) { app.fuelTip(temp) }
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(c.surface).clickable { openDiscover("aprende") }.padding(horizontal = 14.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        IcoBox(lessonIcon(tip.icon), 34.dp, bg = c.volt, tint = c.onVolt)
+        Column(Modifier.weight(1f)) { Txt(tip.title, size = 14.sp, weight = FontWeight.SemiBold, maxLines = 1); Sub(tip.text, size = 12.sp, maxLines = 2) }
+    }
 }

@@ -184,7 +184,16 @@ private fun SessIcon(s: Sess) {
 object PlanSetupSt {
     var goal by mutableStateOf("10k"); var weeks by mutableStateOf(8); var days by mutableStateOf(listOf(1, 3, 5)); var level by mutableStateOf("medio")
     var step by mutableStateOf(0); var hint = ""
+    /** Plan para una carrera del calendario: objetivo y semanas fijos, se empieza en «días». */
+    var race by mutableStateOf<Race?>(null)
+    fun openRace(r: Race) {
+        open(null); race = r
+        val a = Repo.app(); goal = r.goal() ?: "10k"; weeks = a.weeksTo(r).coerceIn(1, RACE_MAX_WEEKS)
+        if (goal == "maraton" && level == "inicio") level = "medio"
+        step = 1
+    }
     fun open(prev: Plan? = null) {
+        race = null
         val a = Repo.app(); val h = a.histWeeklyKm()
         val lvl = if (h.n >= 2) (if (h.km < 10) "inicio" else if (h.km < 25) "medio" else "avanzado") else "medio"
         val g = a.goalOf(); val def = if (g <= 2) listOf(1, 5) else if (g == 3) listOf(1, 3, 5) else listOf(0, 2, 4, 6)
@@ -202,7 +211,7 @@ fun PlanSetupScreen() {
     val nd = s.days.size
     ScreenFix(c.bar, dark = true) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            IconBtn(Ico.close, { if (data.plan != null) Nav.back() else Nav.reset(Scr(HOME)) }, bg = Color(0x14F4F5F0), tint = c.onBar)
+            IconBtn(Ico.close, { if (data.plan != null || s.race != null) Nav.back() else Nav.reset(Scr(HOME)) }, bg = Color(0x14F4F5F0), tint = c.onBar)
             Dots(4, s.step); Spacer(Modifier.width(44.dp))
         }
         Spacer(Modifier.weight(1f))
@@ -226,8 +235,12 @@ fun PlanSetupScreen() {
                     }
                 }
                 Sub(if (nd < 2) "Elige al menos 2 días." else if (nd > 5) "Más de 5 días no es buena idea por ahora." else "$nd días: ${listEs(s.days.map { DAY_N[it] })}. El rodaje largo cae en ${DAY_N[s.days.last()]}.", color = c.onBarMuted)
-                Lbl("Semanas", Modifier.padding(top = 6.dp))
-                Seg(listOf("6", "8", "10", "12").map { it to it }, "${s.weeks}", { s.weeks = it.toInt() }, dark = true)
+                val r = s.race
+                if (r != null) Sub("${s.weeks} semanas hasta ${r.name} (${Repo.app().es.dayMon(r.day(Repo.app().zone))}). La carrera cae ese día aunque no sea uno de los tuyos.", color = c.onBarMuted)
+                else {
+                    Lbl("Semanas", Modifier.padding(top = 6.dp))
+                    Seg(listOf("6", "8", "10", "12").map { it to it }, "${s.weeks}", { s.weeks = it.toInt() }, dark = true)
+                }
             }
             2 -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Lbl("Nivel"); H1("¿Cuánto corres ahora?", size = 32.sp)
@@ -238,13 +251,14 @@ fun PlanSetupScreen() {
             }
             else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 val (t, txt) = Repo.app().planSetupText(s.goal, s.weeks, s.days, s.level, true)
-                Lbl("Tu plan"); H1(t, size = 32.sp); Sub(txt, size = 15.sp, color = c.onBarMuted)
+                Lbl("Tu plan"); H1(s.race?.name ?: t, size = 32.sp); Sub((if (s.race != null) "$t. " else "") + txt, size = 15.sp, color = c.onBarMuted)
+                if (s.goal == "maraton" && s.level == "inicio") Sub("Ojo: un maratón empezando de cero es mucho. Si puedes, elige una media antes.", size = 13.sp, color = c.volt)
             }
         }
         Spacer(Modifier.weight(1f))
         Btn(if (s.step < 3) "Continuar" else if (data.plan != null) "Sustituir mi plan" else "Crear el plan", {
             if (s.step < 3) { s.step++; return@Btn }
-            val plan = Repo.app().newPlan(s.goal, s.weeks, s.days, s.level, true)
+            val plan = s.race?.let { Repo.app().newRacePlan(it, s.days, s.level, true) } ?: Repo.app().newPlan(s.goal, s.weeks, s.days, s.level, true)
             Repo.update { it.copy(plan = plan, profile = it.profile.copy(goal = s.days.size)) }
             St.planView = null
             Perm.notifications { ok -> if (!ok) Repo.update { d -> d.copy(plan = d.plan?.let { it.copy(remind = (it.remind ?: Remind()).copy(on = false)) }) }; Reminders.sync(ctx) }

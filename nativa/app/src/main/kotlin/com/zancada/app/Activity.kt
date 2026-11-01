@@ -80,8 +80,8 @@ private fun HeadIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, labe
 @Composable
 private fun ProgressTab(app: App) {
     val c = Z.c; val mo = app.month(); val g = app.monthGoal()
-    // Mes: km, anillo del objetivo y barras por día.
-    ZCard(pad = PaddingValues(18.dp), gap = 12.dp) {
+    // Mes: km, anillo del objetivo y barras por día. Al tocar: «Tu mes en Zancada» en historias.
+    ZCard(pad = PaddingValues(18.dp), gap = 12.dp, onClick = { val m0 = app.monthStart(app.now()); val from = if (app.monthWrap(m0) != null) m0 else app.monthStart(app.now(), 1); DiscSt.wrapFrom = from; Nav.go(MONTH) }) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Lbl(mo.name)

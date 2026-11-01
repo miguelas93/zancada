@@ -136,6 +136,10 @@ data class Plan(
     val reviewed: Int = 0,
     val lastReview: Review? = null,
     val remind: Remind? = null,
+    /** Plan para una carrera concreta (calendario de carreras): día, nombre e id. */
+    val raceDate: Long? = null,
+    val raceName: String? = null,
+    val raceId: String? = null,
 )
 
 @Serializable

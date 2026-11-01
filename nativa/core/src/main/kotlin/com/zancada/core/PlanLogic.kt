@@ -11,7 +11,7 @@ data class Level(val base: Double, val max: Double, val reps: Pair<Int, Int>)
 
 val GOALS = linkedMapOf(
     "5k" to Goal("5K", 5000.0, 22.0, 1.5), "10k" to Goal("10K", 10000.0, 32.0, 1.6),
-    "media" to Goal("Media maratón", 21097.5, 48.0, 1.8), "constancia" to Goal("Constancia", 0.0, 0.0, 1.35),
+    "media" to Goal("Media maratón", 21097.5, 48.0, 1.8), "maraton" to Goal("Maratón", 42195.0, 62.0, 2.1), "constancia" to Goal("Constancia", 0.0, 0.0, 1.35),
 )
 val LEVELS = linkedMapOf("inicio" to Level(8.0, 30.0, 4 to 7), "medio" to Level(16.0, 50.0, 6 to 9), "avanzado" to Level(26.0, 70.0, 8 to 12))
 val DAY_L = listOf("L", "M", "X", "J", "V", "S", "D")
@@ -52,7 +52,9 @@ fun planWeekKm(p: Plan, w: Int): Double {
 
 fun planSessions(p: Plan): List<List<Sess>> {
     val g = GOALS[p.goal]!!; val lv = LEVELS[p.level]!!; val days = p.days.sorted(); val n = days.size; val race = g.race > 0
-    val unit = if (p.goal == "10k") 800 else if (p.goal == "media") 1000 else 400
+    val unit = if (p.goal == "10k") 800 else if (p.goal == "media" || p.goal == "maraton") 1000 else 400
+    // Plan para una carrera con fecha: la sesión «Carrera» cae ese día y no hay nada después.
+    val raceDow = p.raceDate?.let { rd -> Math.round((rd - p.start).toDouble() / DAY).toInt() - (p.weeks - 1) * 7 }?.takeIf { it in 0..6 }
     val warm = if (p.level == "inicio") 1000 else 1500
     val weeks = mutableListOf<List<Sess>>()
     for (w in 0 until p.weeks) {
@@ -73,9 +75,13 @@ fun planSessions(p: Plan): List<List<Sess>> {
                         "Calienta ${fmtKmS(warm.toDouble())} km, $reps repeticiones fuertes de $unit m con $off m al trote entre ellas, y 1 km suave para acabar.", days[i]) }
                 "tempo" -> { val on = max(2000, jsRoundI(km * 0.22 * 2) * 500); val st = Struct(warm, 1, on, 0, 1000)
                     Tmp(type, (warm + on + 1000).toDouble(), st, "Tempo ${fmtKmS(on.toDouble())} km", "Calienta ${fmtKmS(warm.toDouble())} km, ${fmtKmS(on.toDouble())} km a ritmo controlado (frases cortas, nada de charla) y 1 km suave.", days[i]) }
-                "carrera" -> Tmp(type, g.race, null, "Carrera: ${g.name}", "El día. Sal conservador los primeros km y disfruta.", days[i])
+                "carrera" -> Tmp(type, g.race, null, p.raceName ?: "Carrera: ${g.name}", "El día. Sal conservador los primeros km y disfruta.", days[i])
                 else -> Tmp(type, null, null, "Rodaje suave", "Ritmo fácil. Si no puedes hablar, frena.", days[i])
             }
+        }.toMutableList()
+        if (last && raceDow != null) {
+            val keep = list.filter { it.type == "carrera" || it.dayIdx < raceDow }.map { if (it.type == "carrera") it.copy(dayIdx = raceDow) else it }
+            list.clear(); list.addAll(keep)
         }
         val fixed = list.sumOf { it.m ?: 0.0 }; val rest = max(nEasy * 3000.0, km * 1000 - fixed)
         list.forEach { s -> if (s.m == null) s.m = rest / nEasy; if (s.type != "carrera") s.m = max(3000.0, jsRound(s.m!! / 500) * 500.0) }

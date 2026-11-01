@@ -147,6 +147,27 @@ object Images {
         x.drawText("Ritmo medio ${app.pace(dur / (dist / 1000))} /km", 90f, 1300f, paint(f.b500, 26f, mut(.6)))
         return png(bmp)
     }
+
+    /** «Tu mes en Zancada»: km grandes, un punto por día y las cifras del mes. */
+    fun month(ctx: Context, app: App, w: MonthWrap): ByteArray {
+        val f = Fonts(ctx); val bmp = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888); val x = Canvas(bmp)
+        x.drawColor(INK)
+        lockup(ctx, x, 90f, 92f, 42f)
+        x.drawText("Mi ${app.es.monYear(w.from)}", 90f, 180f, paint(f.b500, 30f, mut(.6)))
+        val big = paint(f.disp, 230f, FG); val km = fmtKmS(w.km * 1000); x.drawText(km, 80f, 450f, big)
+        x.drawText("km", 96f + big.measureText(km) + 12f, 450f, paint(f.b600, 64f, mut(.6)))
+        val dot = 92f; val gap = (900f - 7 * dot) / 6
+        w.dayKm.forEachIndexed { i, v ->
+            val cx = 90f + (i % 7) * (dot + gap) + dot / 2; val cy = 560f + (i / 7) * (dot * 0.62f + 18f) + dot * 0.31f
+            x.drawCircle(cx, cy, dot * 0.31f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = if (v > 0) VOLT else 0x24F4F5F0 })
+        }
+        listOf("Salidas" to w.runs.toString(), "Tiempo" to fmtTime(w.dur), "Días" to w.days.toString()).forEachIndexed { i, (l, v) ->
+            val cx = 90f + i * 310f; x.drawText(l.uppercase(), cx, 1060f, paint(f.b600, 24f, mut(.5))); x.drawText(v, cx, 1135f, paint(f.disp, 64f, if (i == 0) VOLT else FG))
+        }
+        w.longest?.let { x.drawText("La más larga: ${fmtKm(it.dist)} km", 90f, 1220f, paint(f.b600, 32f, FG)) }
+        x.drawText(w.verdict(), 90f, 1290f, paint(f.b500, 26f, mut(.6)))
+        return png(bmp)
+    }
 }
 
 /**
