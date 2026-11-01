@@ -72,6 +72,8 @@ data class Run(
     /** Pulso medio y máximo (pulsómetro Bluetooth). Solo la nativa. */
     val hr: Int? = null,
     val hrMax: Int? = null,
+    /** Pulso a lo largo de la carrera: pares [segundo de carrera, ppm] cada 5 s. Solo la nativa. */
+    val hrs: List<List<Int>>? = null,
 )
 
 @Serializable

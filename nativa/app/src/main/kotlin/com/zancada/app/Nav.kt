@@ -1,6 +1,17 @@
 package com.zancada.app
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -54,27 +65,58 @@ val DARK_SCREENS = setOf(WELCOME, PLANSETUP, COUNT, CELE, HEAT, REPLAY, RUN, V3D
 object Nav {
     val stack = mutableStateListOf(Scr(HOME))
     val cur: Scr get() = stack.last()
+    /** Cómo se llegó a la pantalla actual, para animar el cambio: entrar, volver, pestaña o fundido. */
+    var move = Move.Fade; private set
+    var tabDir = 1; private set
 
     fun go(id: String, run: String? = null, route: Route? = null) {
         val s = Scr(id, run, route)
-        if (id in TABS) { stack.clear(); stack.add(Scr(HOME)); if (id != HOME) stack.add(s); return }
+        if (id in TABS) {
+            val from = TABS.indexOf(cur.id)
+            if (from >= 0) { move = Move.Tab; tabDir = if (TABS.indexOf(id) >= from) 1 else -1 } else move = Move.Pop
+            stack.clear(); stack.add(Scr(HOME)); if (id != HOME) stack.add(s); return
+        }
+        move = Move.Push
         if (cur.id == id && id != ROUTE && id != SUMMARY) { stack[stack.size - 1] = s; return }
         stack.add(s)
     }
     /** Sustituye la pantalla actual (la cuenta atrás por la carrera, la carrera por la celebración…). */
-    fun replace(id: String, run: String? = null, route: Route? = null) { if (stack.isNotEmpty()) stack.removeAt(stack.size - 1); stack.add(Scr(id, run, route)) }
-    fun reset(vararg s: Scr) { stack.clear(); stack.addAll(s.toList().ifEmpty { listOf(Scr(HOME)) }) }
+    fun replace(id: String, run: String? = null, route: Route? = null) { move = Move.Fade; if (stack.isNotEmpty()) stack.removeAt(stack.size - 1); stack.add(Scr(id, run, route)) }
+    fun reset(vararg s: Scr) { move = Move.Fade; stack.clear(); stack.addAll(s.toList().ifEmpty { listOf(Scr(HOME)) }) }
 
     /** Devuelve false si no queda nada atrás (la app se cierra). Nunca sale de una carrera en marcha. */
     fun back(): Boolean {
         if (cur.id == RUN || cur.id == COUNT) return true
         if (!Repo.data.value.profile.done) return true
         if (stack.size <= 1) return false
+        move = Move.Pop
         stack.removeAt(stack.size - 1)
         while (stack.size > 1 && stack.last().id in TRANSIENT) stack.removeAt(stack.size - 1)
         if (stack.last().id in TRANSIENT) stack[0] = Scr(HOME)
         return true
     }
+}
+
+enum class Move { Push, Pop, Tab, Fade }
+
+/** Pestañas de arriba de la pantalla visible (Actividad, Ajustes, Resumen): el gesto de lado las cambia. */
+object TopSwipe {
+    var owner: Any? = null; var keys: List<String> = emptyList(); var sel: String = ""; var onSel: ((String) -> Unit)? = null
+    fun clear() { owner = null; keys = emptyList(); sel = ""; onSel = null }
+}
+
+private val FULL = setOf(RUN, COUNT, CELE, WELCOME)
+
+/** Animación entre pantallas (unos 250 ms): entrar desliza desde la derecha, volver hacia la derecha, las pestañas de lado. */
+private fun AnimatedContentTransitionScope<Scr>.navSpec(): ContentTransform {
+    val ms = Motion.SCREEN_MS
+    if (Motion.reduced) return EnterTransition.None togetherWith ExitTransition.None
+    if (initialState.id in FULL || targetState.id in FULL || Nav.move == Move.Fade) return fadeIn(tween(ms)) togetherWith fadeOut(tween(ms / 2))
+    return when (Nav.move) {
+        Move.Push -> (slideInHorizontally(tween(ms)) { it / 4 } + fadeIn(tween(ms))) togetherWith (slideOutHorizontally(tween(ms)) { -it / 10 } + fadeOut(tween(ms)))
+        Move.Pop -> (slideInHorizontally(tween(ms)) { -it / 10 } + fadeIn(tween(ms))) togetherWith (slideOutHorizontally(tween(ms)) { it / 4 } + fadeOut(tween(ms * 3 / 4)))
+        else -> { val d = Nav.tabDir; (slideInHorizontally(tween(ms)) { it / 8 * d } + fadeIn(tween(ms))) togetherWith (slideOutHorizontally(tween(ms)) { -it / 8 * d } + fadeOut(tween(ms / 2))) }
+    }.using(SizeTransform(clip = false))
 }
 
 /** Estado de la interfaz que sobrevive al cambiar de pantalla (como las variables sueltas de la web). */
@@ -143,8 +185,8 @@ fun ZRoot() {
     val colors = if (night) NightColors else DayColors
     CompositionLocalProvider(LocalZ provides colors, LocalBig provides (data.settings.bigtext == "1"), LocalDark provides false) {
         val scr = Nav.cur
-        Box(Modifier.fillMaxSize().background(colors.bg).swipeNav(scr.id)) {
-            key(scr) {
+        Box(Modifier.fillMaxSize().background(colors.bg).swipeNav(scr.id, LocalView.current)) {
+            AnimatedContent(scr, Modifier.fillMaxSize(), transitionSpec = { navSpec() }, label = "nav") { scr ->
                 when (scr.id) {
                     WELCOME -> WelcomeScreen()
                     HOME -> HomeScreen()
@@ -184,8 +226,8 @@ fun Modifier.noSwipeNav(key: String): Modifier = composed {
 }
 
 /** Deslizar entre pestañas (Inicio ↔ Actividad ↔ Rutas ↔ Perfil); hacia la derecha vuelve a Inicio desde Preparar y Resumen. */
-private fun Modifier.swipeNav(cur: String) = pointerInput(cur) {
-    if ((cur !in TABS && cur != CLUBS && cur != PREP && cur != SUMMARY) || cur == ROUTES) return@pointerInput
+private fun Modifier.swipeNav(cur: String, view: android.view.View) = pointerInput(cur) {
+    if ((cur !in TABS && cur != CLUBS && cur != PREP && cur != SUMMARY && cur != SETTINGS) || cur == ROUTES) return@pointerInput
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
         val t0 = System.currentTimeMillis(); val start = down.position; var end = start; var multi = false
@@ -201,6 +243,13 @@ private fun Modifier.swipeNav(cur: String) = pointerInput(cur) {
         if (abs(dx) < 60 || abs(dx) < 1.6 * abs(dy) || dt > 700) return@awaitEachGesture
         // En Preparar y Resumen el mapa ocupa la parte de arriba: solo cuenta el gesto en la hoja de abajo.
         if ((cur == PREP || cur == SUMMARY) && start.y < size.height * (if (cur == SUMMARY) 0.42f else 0.45f)) return@awaitEachGesture
+        // Primero, las pestañas de arriba de la pantalla (Progreso · Carreras · Retos…); en la última, sigue a la pestaña de abajo.
+        val ts = TopSwipe
+        if (ts.onSel != null && ts.keys.size > 1) {
+            val k = ts.keys.indexOf(ts.sel); val j = k + if (dx < 0) 1 else -1
+            if (k >= 0 && j in ts.keys.indices) { view.buzz(Buzz.Tap); ts.onSel?.invoke(ts.keys[j]); return@awaitEachGesture }
+        }
+        if (cur == SETTINGS) { if (dx > 0) Nav.back(); return@awaitEachGesture }
         val i = TABS.indexOf(cur)
         if (i >= 0) { TABS.getOrNull(i + if (dx < 0) 1 else -1)?.let { Nav.go(it) }; return@awaitEachGesture }
         if (cur == CLUBS) { if (dx > 0) Nav.go(PROFILE); return@awaitEachGesture }

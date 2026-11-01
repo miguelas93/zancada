@@ -59,6 +59,8 @@ class RunService : LifecycleService() {
     private val steps by lazy { StepMeter(this) }
     private val sos by lazy { SosSender(this) }
     private val hr by lazy { HrMonitor(this) }
+    /** Pulso cada 5 s de carrera, [segundo, ppm], para la gráfica del resumen. */
+    private val hrSamples = mutableListOf<List<Int>>()
     /** Tiempo de carrera cuando empezó a contar el sensor de pasos (tras recuperar una carrera no es 0). */
     private var stepsFromSec = 0.0
 
@@ -133,7 +135,7 @@ class RunService : LifecycleService() {
         RunBus.track.value = emptyList(); RunBus.cele.value = null
         wire(cfg, prevFix?.let { LatLon(it.lat, it.lon) })
         session.begin(System.currentTimeMillis())
-        stepsFromSec = 0.0; steps.start(); hr.start(Repo.data.value.settings.hrAddr)
+        stepsFromSec = 0.0; steps.start(); hr.start(Repo.data.value.settings.hrAddr); hrSamples.clear()
         sos.begin(System.currentTimeMillis(), prevFix?.lat, prevFix?.lon)
         startTicker(); persist(); publish()
     }
@@ -147,7 +149,10 @@ class RunService : LifecycleService() {
                 steps.paused = session.paused; hr.paused = session.paused
                 sos.tick(now, session.dist, session.elapsed(now), session.lastFix?.lat, session.lastFix?.lon, manualPause = session.paused && !session.autoPaused)
                 publish()
-                if (++ticks % 10 == 0) persist()   // cada 5 s
+                if (++ticks % 10 == 0) {   // cada 5 s
+                    persist()
+                    if (session.active && !session.paused) hr.now(now)?.let { b -> if (hrSamples.size < 20_000) hrSamples.add(listOf(session.elapsed(now).toInt(), b)) }
+                }
                 delay(500)
             }
         }
@@ -189,7 +194,7 @@ class RunService : LifecycleService() {
                 val w = Repo.wxFresh()?.let { RunWx(it.t.toInt(), it.wind.toInt(), if (it.now) 1 else 0) }
                 val cele = Repo.mutate {
                     val prevBest = runs.maxOfOrNull { it.dist } ?: 0.0
-                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w).copy(cad = cadenceOf(steps.steps, res.run.dur - stepsFromSec), hr = hr.avg(), hrMax = hr.avg()?.let { hr.max })
+                    val r = decorateRun(res.run, cfg.sess, cfg.route, live?.ghostRef, w).copy(cad = cadenceOf(steps.steps, res.run.dur - stepsFromSec), hr = hr.avg(), hrMax = hr.avg()?.let { hr.max }, hrs = hrSamples.toList().takeIf { it.size >= 6 })
                     val nb = addRun(r)
                     val wk = weekStats()
                     Voice.say(finishSpeech(r, nb))

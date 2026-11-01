@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         Perm.act = this
-        Repo.init(this); Voice.init(this); mapsInit(this)
+        Repo.init(this); Voice.init(this); mapsInit(this); Motion.init(this)
         val d = Repo.data.value
         if (!d.profile.done) Nav.reset(Scr(WELCOME))
         // ¿Quedó una carrera a medias (Android cerró la app)? Se retoma sola y se vuelve a la pantalla de carrera.
