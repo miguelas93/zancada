@@ -10,7 +10,7 @@ import kotlin.math.min
  * de la web, y se comprueba contra las mismas carreras de prueba (ver RunSessionParityTest).
  * No sabe nada de Android: el reloj ([now]) se lo pasa quien la usa.
  */
-class RunSession(private val autopause: Boolean = true, val mode: Mode = Mode.FIXED, private val minStep: Double = 8.0) {
+class RunSession(var autopause: Boolean = true, val mode: Mode = Mode.FIXED, private val minStep: Double = 8.0) {
     /**
      * WEB = igual que la beta (para las pruebas de paridad).
      * FIXED = con los fallos de la beta corregidos:

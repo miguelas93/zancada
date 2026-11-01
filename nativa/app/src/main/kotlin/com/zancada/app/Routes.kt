@@ -1,5 +1,7 @@
 package com.zancada.app
 
+import androidx.compose.ui.unit.Dp
+import kotlinx.coroutines.sync.withPermit
 import android.graphics.BitmapFactory
 import android.util.LruCache
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -46,6 +48,31 @@ object Img {
         cache.get(url)?.let { return it }
         val b = Net.bytes(url) ?: return null
         return withContext(Dispatchers.Default) { runCatching { BitmapFactory.decodeByteArray(b, 0, b.size)?.asImageBitmap() }.getOrNull() }?.also { cache.put(url, it) }
+    }
+}
+
+private val photoGate = kotlinx.coroutines.sync.Semaphore(2)
+
+/** Primera foto de la zona de la ruta (Wikimedia Commons, con caché); null mientras no hay. */
+@Composable
+fun routePhoto(r: Route): String? {
+    val cached = Repo.data.collectAsState().value.photos[r.id]?.p?.firstOrNull()?.src
+    var url by remember(r.id) { mutableStateOf(cached) }
+    LaunchedEffect(r.id) {
+        if (url == null && r.ll.size > 1) url = runCatching { photoGate.withPermit { Repo.photos(r) }.firstOrNull()?.src }.getOrNull()
+    }
+    return url ?: cached
+}
+
+/** Miniatura con foto del sitio y el trazado encima; sin foto, solo el trazado. */
+@Composable
+fun RoutePhotoThumb(r: Route, w: Dp = 84.dp, h: Dp = 84.dp, bg: Color = Z.c.surface2, stroke: Color = Z.text) {
+    val url = routePhoto(r)
+    if (url == null) { RouteThumb(r.ll, w = w, h = h, bg = bg, stroke = stroke); return }
+    Box(Modifier.size(w, h).clip(RoundedCornerShape(18.dp)).background(bg)) {
+        NetImage(url, Modifier.matchParentSize())
+        Box(Modifier.matchParentSize().background(Color(0x55000000)))
+        RouteSvg(r.ll, Modifier.matchParentSize(), Color.White)
     }
 }
 
@@ -164,7 +191,7 @@ private fun TodayCard(t: Today) {
     ZCard(dark = true, gap = 12.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Lbl("Para hoy", color = c.volt); Sub(r.zone ?: "", Modifier.alpha(0.65f), color = c.onBar) }
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            RouteThumb(r.ll, bg = Color(0x2E7F7F7F), stroke = c.onBar)
+            RoutePhotoThumb(r, bg = Color(0x2E7F7F7F), stroke = c.onBar)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { Txt(r.name, size = 19.sp, weight = FontWeight.SemiBold, lineHeight = 1.15); Sub(t.why.joinToString(" · "), Modifier.alpha(0.7f), color = c.onBar) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -189,7 +216,7 @@ fun RouteCard(r: Route, app: App) {
     val sub = when (r.src) { "rec" -> "${r.zone ?: ""}${r.away?.let { " · " + fmtAway(it) } ?: ""}"; "sug" -> "Desde tu ubicación${r.away?.takeIf { it > 0.05 }?.let { " · " + fmtAway(it) } ?: ""}"; else -> r.sub ?: "" }
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(c.surface).clickable { Nav.go(ROUTE, route = r) }.padding(start = 14.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-        RouteThumb(r.ll)
+        RoutePhotoThumb(r)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Txt(r.name, size = 15.sp, weight = FontWeight.SemiBold, lineHeight = 1.2)
             if (sub.isNotEmpty()) Sub(sub, size = 14.sp)
@@ -218,7 +245,8 @@ fun RouteDetailScreen(r: Route) {
     val ll = remember(r) { r.ll.toLL() }
     val ctl = remember { MapCtl() }
     var big by remember { mutableStateOf(false) }
-    var sat by remember { mutableStateOf(false) }
+    var layer by remember { mutableStateOf("calles") }
+    var layersOpen by remember { mutableStateOf(false) }
     var photos by remember { mutableStateOf<List<Photo>>(emptyList()) }
     var pois by remember { mutableStateOf<PoiCache?>(null) }
     var wx by remember { mutableStateOf<Wx?>(null) }
@@ -263,7 +291,7 @@ fun RouteDetailScreen(r: Route) {
     Box(Modifier.fillMaxSize().background(c.bg)) {
         ScreenCol(withTabs = false, gap = 0.dp, pad = PaddingValues(0.dp)) {
             Box(Modifier.fillMaxWidth().height(mapH)) {
-                ZMap(Modifier.matchParentSize(), if (sat) "sat" else "calles", lines, dots, ctl, onTouch = { if (flying) flying = false })
+                ZMap(Modifier.matchParentSize(), layer, lines, dots, ctl, onTouch = { if (flying) flying = false })
                 if (flyP != null) ZCard(Modifier.padding(start = 14.dp, top = ins.calculateTopPadding() + 72.dp).wrapContentWidth(), dark = true, pad = PaddingValues(horizontal = 14.dp, vertical = 8.dp), radius = 14.dp) {
                     Txt(flyInfo, size = 13.sp, weight = FontWeight.SemiBold)
                 }
@@ -276,7 +304,7 @@ fun RouteDetailScreen(r: Route) {
                 }
                 Row(Modifier.align(Alignment.BottomEnd).padding(14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChipB(if (flying) "■ Parar" else "▶ Recorrido", false, { flying = !flying }, bg = c.bar, fg = c.onBar)
-                    ChipB(if (sat) "Mapa" else "Satélite", false, { sat = !sat })
+                    ChipB("Capas", false, { layersOpen = true })
                     ChipB(if (big) "Reducir mapa" else "Ampliar mapa", false, { big = !big; if (!flying) ctl.fit(ll, 36f, 36f, 36f, 36f) })
                 }
             }
@@ -335,5 +363,6 @@ fun RouteDetailScreen(r: Route) {
             }
         }
         Btn("Correr esta ruta", { St.pickedRoute = r; Nav.go(PREP) }, Modifier.align(Alignment.BottomCenter).padding(start = 16.dp, end = 16.dp, bottom = ins.calculateBottomPadding() + 14.dp).shadow(10.dp, RoundedCornerShape(50)))
+        if (layersOpen) MapTypeSheet(layer, { layer = it }) { layersOpen = false }
     }
 }

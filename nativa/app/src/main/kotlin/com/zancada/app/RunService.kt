@@ -38,6 +38,8 @@ class RunService : LifecycleService() {
         const val FINISH = "finish"; const val SAVE_SHORT = "save_short"; const val DISCARD = "discard"; const val STOP = "stop"
         /** Retomar una carrera que Android cerró a medias (la guarda [LiveStore]). */
         const val RECOVER = "recover"
+        /** En mitad de la carrera: cargar la ruta de [RunBus.loadRoute], aplicar los ajustes cambiados y conectar el pulsómetro. */
+        const val LOAD_ROUTE = "load_route"; const val SETTINGS = "settings"; const val HR_ON = "hr_on"
         private const val CHANNEL = "run"; private const val NOTIF_ID = 1
         fun send(ctx: Context, action: String) {
             val i = Intent(ctx, RunService::class.java).setAction(action)
@@ -90,6 +92,15 @@ class RunService : LifecycleService() {
             SAVE_SHORT -> finishRun(force = true)
             // Se pidió recuperar pero no había nada (o ya se borró): cerrar limpio. Android exige mostrar la notificación igualmente.
             RECOVER -> if (!session.active) { goForeground("Zancada"); shutdown() }
+            LOAD_ROUTE -> if (session.active) RunBus.loadRoute?.let { r ->
+                RunBus.loadRoute = null
+                val cfg = RunBus.config.copy(route = r); RunBus.config = cfg
+                runCatching { cfgFile.writeText(Store.json.encodeToString(RunConfig.serializer(), cfg)) }
+                wire(cfg, session.lastFix?.let { LatLon(it.lat, it.lon) }, ghostOk = false); publish()
+                Voice.say("Ruta cargada: ${r.name}")
+            }
+            SETTINGS -> { session.autopause = Repo.data.value.settings.autopause == "1"; if (!session.autopause && session.autoPaused) session.resume(System.currentTimeMillis()); publish() }
+            HR_ON -> if (session.active) hr.start(Repo.data.value.settings.hrAddr)
             null -> if (!session.active) stopSelf()
             DISCARD, STOP -> { if (!session.active || intent.action == DISCARD) { if (intent.action == DISCARD) sos.end(session.dist, session.elapsed(System.currentTimeMillis())); clearLive(); RunBus.state.value = RunUi(); shutdown() } }
         }
@@ -99,10 +110,11 @@ class RunService : LifecycleService() {
 
     private fun newSession() = RunSession(autopause = Repo.data.value.settings.autopause == "1")
 
-    private fun wire(cfg: RunConfig, startPos: LatLon?) {
+    private fun wire(cfg: RunConfig, startPos: LatLon?, ghostOk: Boolean = true) {
         val app = Repo.app()
-        val ghost = cfg.route?.let { app.bestOnRoute(it.id) }
-        val lv = LiveRun(app, cfg.sess, cfg.route, ghost, startPos, speak = { Voice.say(it, buzz = true) }, toast = { RunBus.toast.value = System.currentTimeMillis() to it })
+        val ghost = if (ghostOk) cfg.route?.let { app.bestOnRoute(it.id) } else null
+        val lv = LiveRun(app, cfg.sess, cfg.route, ghost, startPos, speak = { Voice.say(it, buzz = true) }, toast = { RunBus.toast.value = System.currentTimeMillis() to it },
+            settingsOf = { Repo.data.value.settings })
         live = lv
         session.onKm = { km, split -> lv.onKm(km, split, session, System.currentTimeMillis()) }
         session.onPause = { auto -> Voice.say(if (auto) "Pausa automática" else "Pausa", buzz = true) }
@@ -210,6 +222,8 @@ class RunService : LifecycleService() {
             bestKm = session.bestKm, paused = session.paused, autoPaused = session.autoPaused,
             live = lv?.state ?: cur.live, lockLine = lv?.lockLine() ?: "",
             cad = if (session.active) steps.live(now) else null, hr = hr.now(now), sos = sos.active,
+            splits = session.liveSplits.map { it.split },
+            kmPace = session.liveSplits.sumOf { it.split }.let { t0 -> val d = session.dist - session.lastKm * 1000.0; if (session.active && d > 30) (el - t0) / (d / 1000) else Double.NaN },
         )
         if (session.active) updateNotification("${fmtKm(session.dist)} km · ${fmtTime(el)}${if (session.paused) " · en pausa" else ""}")
         else session.lastFix?.let { updateNotification("GPS listo · ±${Math.round(it.acc)} m") }

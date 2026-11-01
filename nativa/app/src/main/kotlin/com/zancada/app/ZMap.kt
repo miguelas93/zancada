@@ -31,7 +31,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.zancada.core.LatLon
 import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
@@ -56,6 +59,19 @@ import kotlin.math.tan
 object EsriSat : OnlineTileSourceBase("EsriSat", 0, 19, 256, "", arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"), "Imágenes © Esri, Maxar, Earthstar Geographics") {
     override fun getTileURLString(idx: Long) = baseUrl + MapTileIndex.getZoom(idx) + "/" + MapTileIndex.getY(idx) + "/" + MapTileIndex.getX(idx)
 }
+
+/** Capa de nombres y calles de Esri, encima del satélite (mapa híbrido). */
+class EsriRef(name: String, private val path: String) : OnlineTileSourceBase(name, 0, 19, 256, "", arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/")) {
+    override fun getTileURLString(idx: Long) = baseUrl + path + "/MapServer/tile/" + MapTileIndex.getZoom(idx) + "/" + MapTileIndex.getY(idx) + "/" + MapTileIndex.getX(idx)
+}
+val EsriRoads = EsriRef("EsriRoads", "World_Transportation")
+val EsriPlaces = EsriRef("EsriPlaces", "World_Boundaries_and_Places")
+/** Relieve: curvas de nivel y sombreado (OpenTopoMap, uso moderado y con atribución). */
+val OpenTopo = XYTileSource("OpenTopo", 0, 17, 256, ".png", arrayOf("https://a.tile.opentopomap.org/", "https://b.tile.opentopomap.org/", "https://c.tile.opentopomap.org/"), "© OpenStreetMap · SRTM · OpenTopoMap (CC-BY-SA)")
+
+/** Tipos de mapa: clave, nombre. "calles" es el gris de siempre. */
+val MAP_TYPES = listOf("calles" to "Claro", "color" to "Estándar", "sat" to "Satélite", "hibrido" to "Híbrido", "relieve" to "Relieve")
+fun mapAttribution(layer: String) = when (layer) { "sat" -> "© Esri, Maxar"; "hibrido" -> "© Esri, Maxar, HERE"; "relieve" -> "© OpenStreetMap · OpenTopoMap"; else -> "© OpenStreetMap" }
 
 fun mapsInit(ctx: Context) {
     Configuration.getInstance().apply {
@@ -185,6 +201,7 @@ fun ZMap(
     val c = Z.c
     val night = c.night
     val holder = remember { arrayOfNulls<ZOverlay>(1) }
+    val refs = remember { mutableListOf<TilesOverlay>() }
     val state = remember { arrayOf<String?>(null, null) }
     Box(modifier.background(c.mapLand)) {
         AndroidView(factory = {
@@ -201,15 +218,20 @@ fun ZMap(
             val key = layer + night
             if (state[0] != key) {
                 state[0] = key
-                v.setTileSource(if (layer == "sat") EsriSat else TileSourceFactory.MAPNIK)
-                v.overlayManager.tilesOverlay.setColorFilter(if (layer == "sat") null else streetsFilter(night))
+                v.setTileSource(when (layer) { "sat", "hibrido" -> EsriSat; "relieve" -> OpenTopo; else -> TileSourceFactory.MAPNIK })
+                v.overlayManager.tilesOverlay.setColorFilter(if (layer == "calles") streetsFilter(night) else null)
+                refs.forEach { v.overlays.remove(it); it.onDetach(v) }; refs.clear()
+                if (layer == "hibrido") listOf(EsriRoads, EsriPlaces).forEach { src ->
+                    val o = TilesOverlay(MapTileProviderBasic(v.context, src), v.context).apply { loadingBackgroundColor = android.graphics.Color.TRANSPARENT; loadingLineColor = android.graphics.Color.TRANSPARENT }
+                    refs += o; v.overlays.add(0, o)
+                }
                 v.overlayManager.tilesOverlay.loadingBackgroundColor = c.mapLand.toArgb()
             }
             if (interactive) v.setOnTouchListener(null) else v.setOnTouchListener { _, _ -> true }
             holder[0]?.let { o -> o.lines = lines; o.dots = dots; o.onTap = onTap; o.onTouch = onTouch }
             v.invalidate()
         }, onRelease = { it.onDetach() })
-        if (attribution) Text(if (layer == "sat") "© Esri, Maxar" else "© OpenStreetMap", Modifier.align(Alignment.BottomEnd).padding(bottom = attrBottom).clip(RoundedCornerShape(topStart = 6.dp)).background(Color(0xAAFFFFFF)).padding(horizontal = 4.dp, vertical = 1.dp),
+        if (attribution) Text(mapAttribution(layer), Modifier.align(Alignment.BottomEnd).padding(bottom = attrBottom).clip(RoundedCornerShape(topStart = 6.dp)).background(Color(0xAAFFFFFF)).padding(horizontal = 4.dp, vertical = 1.dp),
             style = bodyStyle(9.sp).copy(color = Color(0xFF333333), lineHeight = 11.sp))
     }
     DisposableEffect(Unit) { onDispose { ctl?.view = null } }

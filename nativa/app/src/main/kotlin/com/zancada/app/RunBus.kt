@@ -38,6 +38,9 @@ data class RunUi(
     val cad: Int? = null,
     /** Pulso del pulsómetro Bluetooth; null si no hay o no llega señal. */
     val hr: Int? = null,
+    /** Parciales cerrados (segundos por km) y ritmo del km en curso. */
+    val splits: List<Double> = emptyList(),
+    val kmPace: Double = Double.NaN,
     /** Modo seguridad activo en esta carrera. */
     val sos: Boolean = false,
 )
@@ -49,7 +52,10 @@ data class Cele(val run: Run, val badges: List<Badge>, val text: String, val wee
 @Serializable
 data class RunConfig(val sess: Sess? = null, val route: Route? = null)
 
+
 object RunBus {
+    /** Ruta elegida en mitad de la carrera (la recoge el servicio con LOAD_ROUTE). */
+    @Volatile var loadRoute: Route? = null
     val state = MutableStateFlow(RunUi())
     /** Trazado en directo para el mapa. */
     val track = MutableStateFlow<List<LatLon>>(emptyList())

@@ -246,6 +246,41 @@ fun RunScreen() {
     val bigVal = when (bigm) { "time" -> fmtTime(el); "pace" -> avgTxt; else -> fmtKm(ui.dist) }
     val secVal = if (bigm == "dist") fmtTime(el) else fmtKm(ui.dist) + " km"
     val stateText = if (ui.paused) (if (ui.autoPaused) "Autopausa · muévete para seguir" else "En pausa") else ui.live.stateText
+    var menu by remember { mutableStateOf<String?>(null) }
+    val dataView = data.settings.runView == "data"
+    val layer = data.settings.runMap ?: "calles"
+    fun setView(v: String) { Repo.settings { it.copy(runView = v) } }
+    val controls: @Composable () -> Unit = {
+        if (!ui.paused) Box(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+            IconBtn(Ico.lock, { locked = true }, Modifier.align(Alignment.CenterStart).padding(start = 40.dp), size = 56.dp)
+            Box(Modifier.align(Alignment.Center).size(88.dp).clip(CircleShape).background(c.volt).clickable { RunService.send(ctx, RunService.PAUSE) }, contentAlignment = Alignment.Center) {
+                Icon(Ico.pause, "Pausar", Modifier.size(30.dp), tint = c.onVolt)
+            }
+            IconBtn(Ico.sliders, { menu = "main" }, Modifier.align(Alignment.CenterEnd).padding(end = 40.dp), size = 56.dp)
+        } else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Btn("Seguir", { RunService.send(ctx, RunService.RESUME) }, Modifier.weight(1f))
+                IconBtn(Ico.sliders, { menu = "main" }, size = 58.dp)
+            }
+            SlideToFinish { RunService.send(ctx, RunService.FINISH) }
+        }
+    }
+    if (dataView) Box(Modifier.fillMaxSize().background(c.bar)) {
+        CompositionLocalProvider(LocalDark provides true) {
+            Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = ins.calculateTopPadding() + 10.dp, bottom = ins.calculateBottomPadding() + 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    IconBtn(Ico.shrink, { setView("map") }, bg = c.surface2, tint = c.ink)
+                    Lbl(stateText, Modifier.weight(1f).padding(horizontal = 12.dp), color = c.onBarMuted)
+                    Box(Modifier.size(8.dp).clip(CircleShape).background(if (ui.acc != null && ui.acc!! <= 25) c.volt else if (ui.acc != null && ui.acc!! <= 60) c.onBarMuted else c.danger))
+                }
+                RunDataView(ui, paceTxt, Modifier.weight(1f).fillMaxWidth())
+                controls()
+            }
+        }
+        menu?.let { m -> RunMenu(ui, m) { menu = null } }
+        if (locked) LockOverlay(ui, paceTxt) { locked = false }
+        return
+    }
     Box(Modifier.fillMaxSize().background(c.bg)) {
         Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = ins.calculateTopPadding() + 14.dp, bottom = ins.calculateBottomPadding() + 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             ZCard(dark = true, pad = PaddingValues(22.dp), gap = 16.dp, radius = 32.dp) {
@@ -297,17 +332,14 @@ fun RunScreen() {
                 ui.cad?.let { Stat("Cadencia", "$it", 28.sp, unit = "ppm") }
                 ui.hr?.let { Stat("Pulso", "$it", 28.sp, unit = "ppm") }
             }
-            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(20.dp))) { ZMap(Modifier.matchParentSize(), "calles", lines, dots, ctl) }
-            if (!ui.paused) Box(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                IconBtn(Ico.lock, { locked = true }, Modifier.align(Alignment.CenterStart).padding(start = 40.dp), size = 56.dp)
-                Box(Modifier.align(Alignment.Center).size(88.dp).clip(CircleShape).background(c.volt).clickable { RunService.send(ctx, RunService.PAUSE) }, contentAlignment = Alignment.Center) {
-                    Icon(Ico.pause, "Pausar", Modifier.size(30.dp), tint = c.onVolt)
-                }
-            } else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Btn("Seguir", { RunService.send(ctx, RunService.RESUME) })
-                SlideToFinish { RunService.send(ctx, RunService.FINISH) }
+            Box(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(20.dp))) {
+                ZMap(Modifier.matchParentSize(), layer, lines, dots, ctl)
+                IconBtn(Ico.expand, { setView("data") }, Modifier.align(Alignment.TopStart).padding(10.dp), size = 40.dp, iconSize = 18.dp)
+                IconBtn(Ico.layers, { menu = "map" }, Modifier.align(Alignment.TopEnd).padding(10.dp), size = 40.dp, iconSize = 18.dp)
             }
+            controls()
         }
+        menu?.let { m -> RunMenu(ui, m) { menu = null } }
         if (locked) LockOverlay(ui, paceTxt) { locked = false }
     }
 }

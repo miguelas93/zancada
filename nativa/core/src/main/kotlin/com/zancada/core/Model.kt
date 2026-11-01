@@ -108,6 +108,9 @@ data class Settings(
     /** Pulsómetro Bluetooth elegido (solo la nativa). */
     val hrAddr: String? = null,
     val hrName: String? = null,
+    /** Pantalla de carrera: tipo de mapa y vista ("map" o "data", solo datos). */
+    val runMap: String? = null,
+    val runView: String? = null,
 )
 
 @Serializable

@@ -209,7 +209,7 @@ fun PlanCardUi(app: App) {
 private fun NearCard(n: Near) {
     ZCard(pad = PaddingValues(start = 18.dp, top = 14.dp, end = 16.dp, bottom = 14.dp), onClick = { Nav.go(ROUTE, route = n.r) }) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            RouteThumb(n.r.ll, w = 64.dp, h = 48.dp)
+            RoutePhotoThumb(n.r, w = 64.dp, h = 48.dp)
             Column(Modifier.weight(1f)) {
                 Lbl("Ruta cerca · a ${fmtM(n.d)}")
                 Txt(n.r.name, size = 15.sp, weight = FontWeight.SemiBold, maxLines = 1)
