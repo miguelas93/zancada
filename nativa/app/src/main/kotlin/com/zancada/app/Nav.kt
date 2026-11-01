@@ -259,7 +259,7 @@ private fun Modifier.swipeNav(cur: String, view: android.view.View) = pointerInp
 
 @Composable
 private fun Tabs(cur: String, modifier: Modifier) {
-    val c = Z.c; val ins = WindowInsets.navigationBars.asPaddingValues()
+    val c = Z.c; val ins = WindowInsets.navigationBars.asPaddingValues(); val buzz = rememberBuzz(); val go = rememberBuzz(Buzz.Confirm)
     Row(
         modifier.padding(start = 16.dp, end = 16.dp, bottom = ins.calculateBottomPadding() + 14.dp).fillMaxWidth().height(68.dp)
             .shadow(18.dp, RoundedCornerShape(34.dp), ambientColor = Color(0x40000000), spotColor = Color(0x40000000))
@@ -268,14 +268,14 @@ private fun Tabs(cur: String, modifier: Modifier) {
     ) {
         @Composable fun tab(id: String, label: String, ico: androidx.compose.ui.graphics.vector.ImageVector) {
             val on = cur == id
-            Column(Modifier.width(58.dp).clip(RoundedCornerShape(14.dp)).clickable { Nav.go(id) }.padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Column(Modifier.width(58.dp).clip(RoundedCornerShape(14.dp)).clickable { if (!on) buzz(); Nav.go(id) }.padding(vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Icon(ico, label, Modifier.size(22.dp), tint = if (on) c.onBar else c.onBarMuted)
                 Text(label, style = bodyStyle(if (Z.big) 12.sp else 11.sp, if (on) FontWeight.SemiBold else FontWeight.Medium).copy(color = if (on) c.onBar else c.onBarMuted, lineHeight = 13.sp), maxLines = 1)
                 Box(Modifier.size(4.dp).clip(CircleShape).background(if (on) c.volt else Color.Transparent))
             }
         }
         tab(HOME, "Inicio", Ico.home); tab(HISTORY, "Actividad", Ico.history)
-        Box(Modifier.size(52.dp).clip(CircleShape).background(c.volt).clickable { Nav.go(PREP) }, contentAlignment = Alignment.Center) { Icon(Ico.play, "Correr", Modifier.size(20.dp), tint = c.onVolt) }
+        Box(Modifier.size(52.dp).clip(CircleShape).background(c.volt).clickable { go(); Nav.go(PREP) }, contentAlignment = Alignment.Center) { Icon(Ico.play, "Correr", Modifier.size(20.dp), tint = c.onVolt) }
         tab(ROUTES, "Rutas", Ico.routes); tab(PROFILE, "Perfil", Ico.profile)
     }
 }

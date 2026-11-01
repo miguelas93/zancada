@@ -172,8 +172,8 @@ fun SettingsScreen() {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             IconBtn(Ico.back, { Nav.back() }); H1("Ajustes", size = 28.sp)
         }
-        Seg(listOf("gen" to "General", "con" to "Conexiones", "dat" to "Datos y app"), tab, { tab = it })
-        when (tab) {
+        TopTabs(listOf("gen" to "General", "con" to "Conexiones", "dat" to "Datos y app"), tab, { tab = it })
+        TabBody(tab, listOf("gen", "con", "dat")) { t -> Column(verticalArrangement = Arrangement.spacedBy(14.dp)) { when (t) {
             "con" -> { HrCard(); HcCard(); SosCard() }
             "dat" -> {
                 ZCard(pad = PaddingValues(horizontal = 16.dp, vertical = 6.dp), gap = 0.dp) {
@@ -223,7 +223,7 @@ fun SettingsScreen() {
                 SelRow("Texto", listOf("0" to "Normal", "1" to "Grande"), s.bigtext, Ico.text) { v -> Repo.settings { it.copy(bigtext = v) } }
                 SelRow("Mapa", MAP_TYPES, s.map, Ico.map) { v -> Repo.settings { it.copy(map = v) } }
             }
-        }
+        } } }
     }
 }
 

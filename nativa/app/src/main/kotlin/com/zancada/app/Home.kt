@@ -204,7 +204,7 @@ private fun GoalTile(w: HomeWeek, modifier: Modifier) {
     ZCard(modifier, dark = true, pad = PaddingValues(16.dp), gap = 10.dp, radius = 24.dp) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Ico.target, null, Modifier.size(16.dp), tint = c.onBarMuted); Lbl("Objetivo") }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Ring(f, 62.dp, 7.dp) { Num("${min(100, (f * 100).roundToInt())}%", 15.sp, color = c.onBar) }
+            Ring(f, 62.dp, 7.dp) { Num(countUp(min(100.0, f * 100)) { "${it.roundToInt()}%" }, 15.sp, color = c.onBar) }
             Column { Num("${w.count}/${w.goal}", 22.sp, color = c.onBar); Sub("carreras", size = 11.sp, color = c.onBarMuted) }
         }
     }
