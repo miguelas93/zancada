@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,11 +54,90 @@ const val APP_DATE = "31 oct 2026"
 
 @Composable
 fun ProfileScreen() {
-    val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope()
+    val c = Z.c
     val data by Repo.data.collectAsState()
     val app = remember(data) { Repo.app() }
-    val s = data.settings
     val w = app.weekStats()
+    ScreenCol(gap = 16.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            H1("Perfil", Modifier.weight(1f), size = 28.sp)
+            Box(Modifier.size(44.dp).clip(CircleShape).clickable(onClickLabel = "Ajustes") { Nav.go(SETTINGS) }, contentAlignment = Alignment.Center) { Icon(Ico.gear, "Ajustes", Modifier.size(24.dp), tint = Z.text) }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(Modifier.size(72.dp).clip(CircleShape).background(c.bar), contentAlignment = Alignment.Center) { Num(data.profile.name.ifEmpty { "Z" }.take(1).uppercase(), 28.sp, color = c.volt, spacing = 0.0) }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Num(data.profile.name.ifEmpty { "Tú" }, 26.sp)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(Ico.target, null, Modifier.size(15.dp), tint = Z.muted); Sub("${app.goalOf()} por semana", size = 12.sp)
+                    Icon(Ico.flame, null, Modifier.size(15.dp), tint = Z.muted); Sub("${w.streak} en racha", size = 12.sp)
+                }
+            }
+        }
+        ZCard(pad = PaddingValues(18.dp)) {
+            val total = data.runs.sumOf { it.dist }; val yr = app.es.z(app.now()).year
+            val y = data.runs.filter { app.es.z(it.start).year == yr }.sumOf { it.dist }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                IcoStat(Ico.flag, data.runs.size.toString(), "carreras"); IcoStat(Ico.routes, jsRound(total / 1000).toString(), "km en total"); IcoStat(Ico.calendar, jsRound(y / 1000).toString(), "km este año")
+            }
+        }
+        // Insignias: una fila y «Ver todas».
+        val B = app.badges(); val got = B.filter { it.`when` > 0 }
+        ZCard(pad = PaddingValues(18.dp), gap = 12.dp) {
+            SectionHead("Insignias · ${got.size}/${B.size}", "Ver todas", Ico.medal) { St.histTab = "retos"; Nav.go(HISTORY) }
+            val row = (got.sortedByDescending { it.`when` } + B.filter { it.`when` == 0L }).take(4)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                row.forEach { b ->
+                    Column(Modifier.width(68.dp).clip(RoundedCornerShape(14.dp)).clickable { St.medal = b; St.modal = "medal" }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Medal(b, 50.dp); Sub(b.name, size = 10.sp, align = TextAlign.Center, maxLines = 1)
+                    }
+                }
+            }
+        }
+        ShoesCard(app)
+        ZCard(pad = PaddingValues(horizontal = 16.dp, vertical = 6.dp), gap = 0.dp) {
+            IconRow(Ico.plan, "Plan de entrenamiento", app.planCard().let { if (it == PlanCard.None) "Crea uno a tu medida" else "Ver semanas y sesiones" }) {
+                if (app.planCard() == PlanCard.None) PlanSetupSt.open() else { St.planView = null; Nav.go(PLAN) }
+            }
+            Divider()
+            IconRow(Ico.chat, "Hablar con Zeta", "Tu entrenador", onClick = ::openCoach)
+            Divider()
+            IconRow(Ico.gear, "Ajustes", "Voz, avisos, conexiones y datos") { Nav.go(SETTINGS) }
+        }
+    }
+}
+
+/** Todas las insignias (Actividad › Retos). */
+@Composable
+fun BadgeGrid(app: App) {
+    val c = Z.c; val data by Repo.data.collectAsState()
+    val B = app.badges(); val got = B.filter { it.`when` > 0 }
+    val seen = remember { data.badgeSeen }
+    LaunchedEffect(got.size) { if (got.map { it.id }.toSet() != data.badgeSeen.toSet()) Repo.update { it.copy(badgeSeen = got.map { b -> b.id }) } }
+    SectionHead("Insignias · ${got.size}/${B.size}", icon = Ico.medal)
+    (got + B.filter { it.`when` == 0L }).chunked(4).forEach { row ->
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            row.forEach { b ->
+                val new = b.`when` > 0 && b.id !in seen
+                Box(Modifier.weight(1f)) {
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { St.medal = b; St.modal = "medal"; if (b.`when` > 0) Voice.buzz(longArrayOf(0, 30, 60, 30)) }
+                        .padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Medal(b, 50.dp, pop = new)
+                        Sub(b.name, size = 10.sp, align = TextAlign.Center, maxLines = 2, color = if (b.`when` > 0) Z.text else Z.muted)
+                    }
+                    if (new) Box(Modifier.align(Alignment.TopEnd).size(10.dp).clip(CircleShape).background(c.volt))
+                }
+            }
+            repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+        }
+    }
+}
+
+/** Ajustes: lo que antes llenaba el Perfil, en tres pestañas. */
+@Composable
+fun SettingsScreen() {
+    val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope()
+    val data by Repo.data.collectAsState()
+    val s = data.settings
     val restore = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         scope.launch {
@@ -87,107 +167,63 @@ fun ProfileScreen() {
     }
     var sure by remember { mutableStateOf(false) }
     LaunchedEffect(sure) { if (sure) { delay(3000); sure = false } }
-
-    ScreenCol(gap = 18.dp) {
-        H1("Perfil")
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Box(Modifier.size(72.dp).clip(CircleShape).background(c.bar), contentAlignment = Alignment.Center) { Num(data.profile.name.ifEmpty { "Z" }.take(1).uppercase(), 28.sp, color = c.volt, spacing = 0.0) }
-            Column { Num(data.profile.name.ifEmpty { "Tú" }, 26.sp); Sub("Objetivo: ${app.goalOf()} carreras a la semana · ${w.streak} sem seguidas") }
+    var tab by rememberSaveable { mutableStateOf("gen") }
+    ScreenCol(gap = 14.dp, withTabs = false) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            IconBtn(Ico.back, { Nav.back() }); H1("Ajustes", size = 28.sp)
         }
-        ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp)) {
-            val total = data.runs.sumOf { it.dist }; val yr = app.es.z(app.now()).year
-            val y = data.runs.filter { app.es.z(it.start).year == yr }.sumOf { it.dist }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { Stat("Carreras", data.runs.size.toString(), 26.sp); Stat("Total", jsRound(total / 1000).toString(), 26.sp, unit = "km"); Stat("Este año", jsRound(y / 1000).toString(), 26.sp, unit = "km") }
-        }
-        // Mejores marcas
-        ZCard(pad = PaddingValues(start = 20.dp, top = 18.dp, end = 20.dp, bottom = 8.dp), gap = 0.dp) {
-            Row(Modifier.fillMaxWidth().padding(bottom = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) { H2("Mejores marcas"); Sub("en esta app") }
-            val marks = app.marks(); val newest = marks.filter { it.best.isFinite() }.maxByOrNull { it.`when` ?: 0 }
-            marks.forEachIndexed { i, x ->
-                if (i > 0) Divider()
-                Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Column(Modifier.weight(1f)) { Txt(x.name, weight = FontWeight.SemiBold); Sub(if (x.best.isFinite()) app.es.dayMonYear(x.`when`!!) else "Aún sin marca", size = 12.sp) }
-                    if (newest === x && data.runs.size > 1) Chip("Nueva", size = 9.sp)
-                    Num(if (x.best.isFinite()) fmtTime(x.best) else "—", 22.sp, color = if (x.best.isFinite()) Z.text else Z.muted)
-                }
-            }
-        }
-        // Insignias
-        val B = app.badges(); val got = B.filter { it.`when` > 0 }
-        val seen = remember { data.badgeSeen }
-        LaunchedEffect(got.size) { if (got.map { it.id }.toSet() != data.badgeSeen.toSet()) Repo.update { it.copy(badgeSeen = got.map { b -> b.id }) } }
-        ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 12.dp) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Insignias"); Sub("${got.size} de ${B.size}") }
-            val order = got + B.filter { it.`when` == 0L }
-            order.chunked(3).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    row.forEach { b ->
-                        val new = b.`when` > 0 && b.id !in seen
-                        Box(Modifier.weight(1f)) {
-                            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(c.surface2).clickable { St.medal = b; St.modal = "medal"; if (b.`when` > 0) Voice.buzz(longArrayOf(0, 30, 60, 30)) }
-                                .padding(start = 6.dp, end = 6.dp, top = 12.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Medal(b, 58.dp, pop = new)
-                                if (b.`when` > 0) { Txt(b.name, size = 11.sp, weight = FontWeight.SemiBold, align = TextAlign.Center, lineHeight = 1.25); Sub(app.es.dayMon(b.`when`), size = 11.sp, align = TextAlign.Center) }
-                                else Sub(b.name, size = 11.sp, align = TextAlign.Center)
-                            }
-                            if (new) Chip("Nueva", size = 9.sp, modifier = Modifier.align(Alignment.TopEnd).offset(4.dp, (-6).dp))
-                        }
+        Seg(listOf("gen" to "General", "con" to "Conexiones", "dat" to "Datos y app"), tab, { tab = it })
+        when (tab) {
+            "con" -> { HrCard(); HcCard(); SosCard() }
+            "dat" -> {
+                ZCard(pad = PaddingValues(horizontal = 16.dp, vertical = 6.dp), gap = 0.dp) {
+                    IconRow(Ico.download, "Exportar copia", "Guárdala en Drive o Telegram") { val a = Repo.app(); Share.file(ctx, "zancada-copia-${isoMs(a.now()).take(10)}.json", "application/json", Store.backup(a.data, a.now()).toByteArray(), "Copia de seguridad de Zancada") }
+                    Divider()
+                    IconRow(Ico.upload, "Importar copia") { restore.launch(arrayOf("application/json", "text/plain", "application/octet-stream", "*/*")) }
+                    Divider()
+                    IconRow(Ico.upload, "Importar GPX", "Strava, Garmin…") { gpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }
+                    Divider()
+                    IconRow(Ico.file, "Exportar CSV") {
+                        val a = Repo.app(); if (a.runs.isEmpty()) toast("Aún no hay carreras que exportar")
+                        else Share.file(ctx, "zancada-carreras-${isoMs(a.now()).take(10)}.csv", "text/csv", a.runsCsv().toByteArray(), "Carreras de Zancada")
                     }
-                    repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                }
+                ZCard(pad = PaddingValues(horizontal = 16.dp, vertical = 6.dp), gap = 0.dp) {
+                    IconRow(Ico.user, "Nombre y objetivo") { Nav.go(WELCOME) }
+                    Divider()
+                    IconRow(Ico.flag, "Carrera de ejemplo") { Repo.mutate { addRun(demoRun()) }; toast("Carrera de ejemplo añadida"); Nav.go(HOME) }
+                    Divider()
+                    IconRow(Ico.userPlus, "Invitar a un amigo") { Share.text(ctx, INVITE_TEXT, "Zancada") }
+                    Divider()
+                    IconRow(Ico.info, "Avisar de un fallo") {
+                        val env = "Android ${Build.VERSION.RELEASE} · ${Build.MANUFACTURER} ${Build.MODEL}".take(120)
+                        val body = Uri.encode("**Qué ha pasado**\n\n\n**Qué esperaba**\n\n\n**Pasos**\n1. \n\n---\n$APP_VER · $env")
+                        Share.open(ctx, "https://github.com/miguelas93/zancada/issues/new?title=${Uri.encode("[nativa] ")}&body=$body")
+                    }
+                    Divider()
+                    IconRow(Ico.bell, "Novedades") { Share.open(ctx, "https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades") }
+                    Divider()
+                    IconRow(Ico.trash, if (sure) "Pulsa otra vez para confirmar" else "Borrar todos los datos", tint = c.danger) {
+                        if (!sure) { sure = true; return@IconRow }
+                        Repo.update { it.copy(runs = emptyList(), plan = null, savedRoutes = emptyList(), shoes = emptyList()) }; Reminders.sync(ctx); toast("Datos borrados"); Nav.go(HOME)
+                    }
+                }
+                Column(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    ZLockup(18.dp, if (c.night) c.volt else c.ink, c.ink)
+                    Sub("$APP_VER · $APP_DATE · datos solo en este móvil", size = 11.sp, align = TextAlign.Center)
                 }
             }
-        }
-        // Ajustes
-        ZCard(gap = 4.dp) {
-            H2("Ajustes", Modifier.padding(bottom = 6.dp))
-            SelRow("Objetivo de km al mes", listOf("0" to "Sin objetivo") + listOf(30, 50, 80, 100, 150, 200).map { "$it" to "$it km" }, s.monthkm) { v -> Repo.settings { it.copy(monthkm = v) } }
-            SelRow("Avisos de ritmo en sesiones", listOf("1" to "Sí", "0" to "No"), s.pacealert ?: "1") { v -> Repo.settings { it.copy(pacealert = v) } }
-            SelRow("Vibrar en los avisos", listOf("1" to "Sí", "0" to "No"), s.vibrate ?: "1") { v -> Repo.settings { it.copy(vibrate = v) } }
-            SelRow("Avisos de voz", listOf("1" to "Cada km", "half" to "Cada 500 m", "min5" to "Cada 5 min", "0" to "Sin voz"), s.voice) { v -> Repo.settings { it.copy(voice = v) } }
-            SelRow("Texto más grande", listOf("0" to "Normal", "1" to "Grande"), s.bigtext) { v -> Repo.settings { it.copy(bigtext = v) } }
-            SelRow("Modo noche", listOf("auto" to "Automático", "on" to "Siempre", "off" to "Nunca"), s.night) { v -> Repo.settings { it.copy(night = v) } }
-            SelRow("Mapa del resumen", MAP_TYPES, s.map) { v -> Repo.settings { it.copy(map = v) } }
-            SelRow("Autopausa al pararte", listOf("1" to "Sí", "0" to "No"), s.autopause) { v -> Repo.settings { it.copy(autopause = v) } }
-        }
-        ShoesCard(app)
-        HrCard()
-        SosCard()
-        HcCard()
-        // Tus datos
-        ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
-            H2("Tus datos")
-            Sub("Todo se guarda solo en este móvil. Haz una copia de vez en cuando y guárdala en Drive o Telegram; con ella recuperas carreras, plan y rutas en otro teléfono.")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Btn("Exportar copia", { val a = Repo.app(); Share.file(ctx, "zancada-copia-${isoMs(a.now()).take(10)}.json", "application/json", Store.backup(a.data, a.now()).toByteArray(), "Copia de seguridad de Zancada") }, Modifier.weight(1f), BtnKind.Sec, 46.dp, 14.sp)
-                Btn("CSV", {
-                    val a = Repo.app(); if (a.runs.isEmpty()) toast("Aún no hay carreras que exportar")
-                    else Share.file(ctx, "zancada-carreras-${isoMs(a.now()).take(10)}.csv", "text/csv", a.runsCsv().toByteArray(), "Carreras de Zancada")
-                }, kind = BtnKind.Sec, height = 46.dp, size = 14.sp, fill = false)
-                Btn("Importar copia", { restore.launch(arrayOf("application/json", "text/plain", "application/octet-stream", "*/*")) }, Modifier.weight(1f), BtnKind.Sec, 46.dp, 14.sp)
+            else -> ZCard(pad = PaddingValues(horizontal = 16.dp, vertical = 10.dp), gap = 2.dp) {
+                SelRow("Avisos de voz", listOf("1" to "Cada km", "half" to "Cada 500 m", "min5" to "Cada 5 min", "0" to "Sin voz"), s.voice, Ico.sound) { v -> Repo.settings { it.copy(voice = v) } }
+                SelRow("Vibrar", listOf("1" to "Sí", "0" to "No"), s.vibrate ?: "1", Ico.vibrate) { v -> Repo.settings { it.copy(vibrate = v) } }
+                SelRow("Avisos de ritmo", listOf("1" to "Sí", "0" to "No"), s.pacealert ?: "1", Ico.gauge) { v -> Repo.settings { it.copy(pacealert = v) } }
+                SelRow("Autopausa", listOf("1" to "Sí", "0" to "No"), s.autopause, Ico.pause) { v -> Repo.settings { it.copy(autopause = v) } }
+                SelRow("Km al mes", listOf("0" to "Sin objetivo") + listOf(30, 50, 80, 100, 150, 200).map { "$it" to "$it km" }, s.monthkm, Ico.target) { v -> Repo.settings { it.copy(monthkm = v) } }
+                SelRow("Modo noche", listOf("auto" to "Auto", "on" to "Siempre", "off" to "Nunca"), s.night, Ico.moon) { v -> Repo.settings { it.copy(night = v) } }
+                SelRow("Texto", listOf("0" to "Normal", "1" to "Grande"), s.bigtext, Ico.text) { v -> Repo.settings { it.copy(bigtext = v) } }
+                SelRow("Mapa", MAP_TYPES, s.map, Ico.map) { v -> Repo.settings { it.copy(map = v) } }
             }
-            Btn("Importar carreras GPX (Strava, Garmin…)", { gpx.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream", "*/*")) }, kind = BtnKind.Ghost)
         }
-        // Clubs se oculta hasta que Zancada tenga cuentas (ClubsScreen se queda para entonces).
-        Btn("Cambiar mi nombre u objetivo", { Nav.go(WELCOME) }, kind = BtnKind.Sec)
-        Btn("Cargar una carrera de ejemplo", { Repo.mutate { addRun(demoRun()) }; toast("Carrera de ejemplo añadida"); Nav.go(HOME) }, kind = BtnKind.Ghost)
-        ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { ZLockup(20.dp, if (Z.c.night) Z.c.volt else Z.c.ink, Z.c.ink); Sub(APP_VER, size = 12.sp) }
-            Sub("Estás probando la app nativa. Si algo falla o se te ocurre algo, cuéntalo: cada aviso mejora la app.")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Btn("Invitar a un amigo", { Share.text(ctx, INVITE_TEXT, "Zancada") }, Modifier.weight(1f), BtnKind.Sec, 44.dp, 14.sp)
-                Btn("Avisar de un fallo", {
-                    val env = "Android ${Build.VERSION.RELEASE} · ${Build.MANUFACTURER} ${Build.MODEL}".take(120)
-                    val body = Uri.encode("**Qué ha pasado**\n\n\n**Qué esperaba**\n\n\n**Pasos**\n1. \n\n---\n$APP_VER · $env")
-                    Share.open(ctx, "https://github.com/miguelas93/zancada/issues/new?title=${Uri.encode("[nativa] ")}&body=$body")
-                }, Modifier.weight(1f), BtnKind.Sec, 44.dp, 14.sp)
-            }
-            Underline("Ver las novedades de cada versión", { Share.open(ctx, "https://github.com/miguelas93/zancada/blob/main/LEEME.md#novedades") }, Modifier.fillMaxWidth(), size = 12.sp)
-        }
-        Btn(if (sure) "Pulsa otra vez para confirmar" else "Borrar todos los datos de este móvil", {
-            if (!sure) { sure = true; return@Btn }
-            Repo.update { it.copy(runs = emptyList(), plan = null, savedRoutes = emptyList(), shoes = emptyList()) }; Reminders.sync(ctx); toast("Datos borrados"); Nav.go(HOME)
-        }, kind = BtnKind.Ghost, color = c.danger)
-        Sub("$APP_VER · $APP_DATE", size = 12.sp, align = TextAlign.Center, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -211,13 +247,13 @@ fun HrCard(onPick: (() -> Unit)? = null) {
     }
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            H2("Pulsómetro"); if (st.hrAddr != null) Chip("Conectado")
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { IcoBox(Ico.heart, 34.dp); H2("Pulsómetro") }; if (st.hrAddr != null) Chip("Conectado")
         }
         if (st.hrAddr != null) {
-            Sub("Usarás ${st.hrName ?: "tu pulsómetro"} en cada carrera: verás el pulso mientras corres y el medio y el máximo en el resumen. Póntelo antes de empezar.")
+            Sub("${st.hrName ?: "Tu pulsómetro"} se usa en cada carrera.", size = 12.sp)
             Btn("Olvidar pulsómetro", { Repo.settings { it.copy(hrAddr = null, hrName = null) }; toast("Pulsómetro olvidado") }, kind = BtnKind.Ghost, height = 40.dp, size = 13.sp)
         } else {
-            Sub("Conecta una banda de pecho o un reloj que emita el pulso por Bluetooth (Polar, Garmin, Wahoo, Coros…). Póntelo y actívalo antes de buscar.")
+            Sub("Banda o reloj por Bluetooth (Polar, Garmin, Coros…).", size = 12.sp)
             if (searching) Sub("Buscando…", size = 12.sp)
             found.forEach { f ->
                 Btn(f.name, {
@@ -245,9 +281,9 @@ private fun HcCard() {
     }
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            H2("Health Connect"); if (st.hc == "1") Chip("Activado")
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { IcoBox(Ico.pulse, 34.dp); H2("Health Connect") }; if (st.hc == "1") Chip("Activado")
         }
-        Sub(if (avail) "Guarda cada carrera (hora, duración y distancia) en Health Connect para verla en Google Fit, Samsung Health, Fitbit… Zancada solo escribe: no lee datos de tu salud."
+        Sub(if (avail) "Tus carreras en Google Fit, Samsung Health… Solo escribe, no lee."
             else "Este móvil no tiene Health Connect instalado o actualizado. Instálalo desde Google Play para enviar ahí tus carreras.")
         if (avail) {
             if (st.hc == "1") {
@@ -267,8 +303,8 @@ private fun SosCard() {
     var phone by remember { mutableStateOf(st.sosPhone ?: "") }
     var name by remember { mutableStateOf(st.sosName ?: "") }
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
-        H2("Modo seguridad")
-        Sub("Al empezar a correr, Zancada manda un SMS a tu contacto con tu ubicación, otro cada pocos minutos, uno si te quedas parado mucho rato y otro al terminar. Los SMS los paga tu tarifa como cualquier otro.")
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { IcoBox(Ico.shield, 34.dp); H2("Modo seguridad") }
+        Sub("Tu contacto recibe tu ubicación por SMS mientras corres.", size = 12.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Field(name, { name = it }, "Nombre (Ana)", Modifier.weight(1f), maxLen = 20)
             Field(phone, { phone = it.filter { ch -> ch.isDigit() || ch == '+' || ch == ' ' } }, "Teléfono", Modifier.weight(1.3f), numeric = true, maxLen = 18)
@@ -296,8 +332,8 @@ private fun ShoesCard(app: App) {
     val c = Z.c; val s = app.settings
     var name by remember { mutableStateOf("") }; var km0 by remember { mutableStateOf("") }
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Zapatillas"); Sub("km por par") }
-        if (app.shoes.isEmpty()) Sub("Añade tus zapatillas y cada carrera sumará km al par en uso. A los 700 km te aviso.")
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Ico.shoe, null, Modifier.size(20.dp), tint = Z.text); H2("Zapatillas") }; Sub("km por par", size = 12.sp) }
+        if (app.shoes.isEmpty()) Sub("Cada carrera suma km al par en uso. Aviso a los 700 km.", size = 12.sp)
         app.shoes.forEach { sh ->
             val km = app.shoeKm(sh); val on = s.shoe == sh.id
             Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(if (on) c.surface2 else Color.Transparent).padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

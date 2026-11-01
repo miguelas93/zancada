@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,99 +33,170 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+/** Actividad: pestañas fijas arriba (Progreso · Carreras · Retos), como «Tú» de Strava. */
 @Composable
 fun HistoryScreen() {
-    val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope()
+    val c = Z.c; val ctx = LocalContext.current; val scope = rememberCoroutineScope(); val ins = WindowInsets.systemBars.asPaddingValues()
     val data by Repo.data.collectAsState()
     val minute by Repo.minute.collectAsState()
     val app = remember(data, minute) { Repo.app() }
-    val mo = app.month()
-    ScreenCol(gap = 22.dp) {
-        H1("Actividad")
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Lbl(mo.name)
-            Num(toFixed(mo.km / 1000, 1).replace('.', ','), 80.sp, unit = "km", unitSize = 22.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            val mx = max(5000.0, mo.perDay.maxOrNull() ?: 0.0)
-            Row(Modifier.fillMaxWidth().height(100.dp), horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.Bottom) {
-                mo.perDay.forEachIndexed { i, m ->
-                    Box(Modifier.weight(1f).height(max(3, (m / mx * 100).roundToInt()).dp).clip(RoundedCornerShape(3.dp)).background(c.ink)
-                        .alpha(if (m == 0.0) 0.12f else if (i == mo.today) 1f else 0.8f))
-                }
-            }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { listOf(1, 8, 15, 22, mo.days).forEach { Sub(it.toString(), size = 11.sp) } }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Stat("Carreras", mo.n.toString(), 26.sp); Stat("Tiempo", fmtTime(mo.dur), 26.sp)
-            Stat("Ritmo medio", if (mo.km > 0) app.pace(mo.avg) else "–:––", 26.sp, unit = "/km")
-        }
-        CalendarCard(app)
-        Weeks12Card(app)
-        app.months()?.let { MonthsCard(it) }
-        app.monthGoal()?.let { g ->
-            ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 16.dp), gap = 10.dp) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Objetivo del mes"); Sub("${jsRound(g.km)} de ${g.goal} km") }
-                Track(g.pct / 100); Sub(g.text)
-            }
-        }
-        val ch = app.challenges()
-        ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 16.dp), gap = 12.dp) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Retos del mes"); Sub(ch.head) }
-            ch.list.forEach { x ->
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Row(Modifier.weight(1f)) { Txt((if (x.done) "✓ " else "") + x.title, size = 14.sp, weight = FontWeight.SemiBold); Sub(" · " + x.desc) }
-                        Sub(if (x.done) "Hecho" else x.fmt(x.v) + " / " + x.fmt(x.goal), size = 12.sp, maxLines = 1)
+    Column(Modifier.fillMaxSize().background(c.bg)) {
+        Column(Modifier.fillMaxWidth().padding(start = 20.dp, end = 12.dp, top = ins.calculateTopPadding() + 10.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                H1("Actividad", Modifier.weight(1f), size = 28.sp)
+                HeadIcon(Ico.plus, "Añadir una carrera a mano") { St.manualPrefill = null; St.modal = "manual" }
+                HeadIcon(Ico.map, "Mapa de todas tus carreras") { if (data.runs.none { it.points.size > 1 }) toast("Cuando tengas carreras, aquí verás todas juntas") else Nav.go(HEAT) }
+                HeadIcon(Ico.share, "Compartir tu semana") {
+                    scope.launch {
+                        val a = Repo.app(); val png = withContext(Dispatchers.Default) { Images.week(ctx, a) }
+                        if (png == null) { toast("Cuando corras esta semana, podrás compartirla"); return@launch }
+                        val ws = a.weekStart(a.now()); val wr = a.runs.filter { it.start >= ws }
+                        Share.file(ctx, "zancada-semana-${isoMs(ws).take(10)}.png", "image/png", png, "Mi semana con Zancada: ${fmtKm(wr.sumOf { it.dist })} km en ${wr.size} ${pl(wr.size, "salida")} 🏃")
                     }
-                    Track(x.v / x.goal)
                 }
             }
         }
-        app.trend()?.let { TrendCard(it, app) }
-        app.paces()?.let { p ->
-            ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 12.dp) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Tus ritmos"); Sub(p.src, size = 12.sp) }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { p.preds.forEach { (l, v) -> Stat(l, v, 22.sp) } }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { p.train.forEach { (l, v) -> Stat(l, v, 18.sp, unit = "/km", unitSize = 11.sp) } }
+        TopTabs(listOf("prog" to "Progreso", "runs" to "Carreras", "retos" to "Retos"), St.histTab, { St.histTab = it }, Modifier.padding(horizontal = 8.dp))
+        Box(Modifier.weight(1f)) {
+            val pad = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = ins.calculateBottomPadding() + 110.dp)
+            when (St.histTab) {
+                "runs" -> ScreenCol(pad = pad, gap = 12.dp, scroll = rememberScrollState()) { RunsTab(app, data) }
+                "retos" -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { RetosTab(app) }
+                else -> ScreenCol(pad = pad, gap = 14.dp, scroll = rememberScrollState()) { ProgressTab(app) }
             }
         }
-        val recs = app.personalRecords()
-        if (recs.isNotEmpty()) ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 12.dp) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Tus récords"); Sub("toca uno para ver la carrera", size = 12.sp) }
+    }
+}
+
+@Composable
+private fun HeadIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+    Box(Modifier.size(44.dp).clip(CircleShape).clickable(onClickLabel = label, onClick = onClick), contentAlignment = Alignment.Center) { Icon(icon, label, Modifier.size(22.dp), tint = Z.text) }
+}
+
+@Composable
+private fun ProgressTab(app: App) {
+    val c = Z.c; val mo = app.month(); val g = app.monthGoal()
+    // Mes: km, anillo del objetivo y barras por día.
+    ZCard(pad = PaddingValues(18.dp), gap = 12.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Lbl(mo.name)
+                Num(toFixed(mo.km / 1000, 1).replace('.', ','), 52.sp, unit = "km", unitSize = 18.sp, unitWeight = FontWeight.SemiBold, spacing = -0.05)
+            }
+            if (g != null) Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Ring(g.pct / 100, 64.dp, 7.dp) { Num("${min(100.0, g.pct).roundToInt()}%", 14.sp) }
+                Sub("de ${g.goal} km", size = 11.sp)
+            }
+        }
+        val mx = max(5000.0, mo.perDay.maxOrNull() ?: 0.0)
+        Row(Modifier.fillMaxWidth().height(64.dp), horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.Bottom) {
+            mo.perDay.forEachIndexed { i, m ->
+                Box(Modifier.weight(1f).height(max(3, (m / mx * 64).roundToInt()).dp).clip(RoundedCornerShape(3.dp)).background(if (i == mo.today) c.volt else c.ink)
+                    .alpha(if (m == 0.0) 0.12f else 1f))
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { listOf(1, 8, 15, 22, mo.days).forEach { Sub(it.toString(), size = 11.sp) } }
+        Divider()
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            IcoStat(Ico.flag, mo.n.toString(), "carreras"); IcoStat(Ico.clock, fmtTime(mo.dur), "tiempo")
+            IcoStat(Ico.gauge, if (mo.km > 0) app.pace(mo.avg) else "–:––", "ritmo medio", "/km")
+        }
+    }
+    // 12 semanas o meses en la misma tarjeta.
+    val ms = app.months()
+    ZCard(pad = PaddingValues(18.dp), gap = 12.dp) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Ico.history, null, Modifier.size(20.dp), tint = Z.text); Spacer(Modifier.width(8.dp))
+            Txt("Volumen", Modifier.weight(1f), size = 17.sp, weight = FontWeight.SemiBold)
+            if (ms != null) Seg(listOf("w" to "12 sem", "m" to "Meses"), St.weeksView, { St.weeksView = it }, fill = false, h = 30.dp, pad = 3.dp)
+        }
+        if (St.weeksView == "m" && ms != null) MonthsBars(ms) else Weeks12(app)
+    }
+    CalendarCard(app)
+    app.trend()?.let { TrendCard(it, app) }
+    app.paces()?.let { p ->
+        ZCard(pad = PaddingValues(18.dp), gap = 12.dp) {
+            SectionHead("Ritmos y predicciones", icon = Ico.bolt)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                p.preds.forEach { (l, v) -> Column(Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).background(c.surface2).padding(12.dp)) { Lbl(l, size = 10.sp); Num(v, 18.sp) } }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { p.train.forEach { (l, v) -> Stat(l, v, 16.sp, unit = "/km", unitSize = 11.sp) } }
+            Sub(p.src, size = 11.sp)
+        }
+    }
+    MarksCard(app)
+}
+
+/** Mejores marcas y récords juntos (antes en Perfil y en Actividad). */
+@Composable
+private fun MarksCard(app: App) {
+    val c = Z.c; val marks = app.marks(); val recs = app.personalRecords()
+    ZCard(pad = PaddingValues(18.dp), gap = 10.dp) {
+        SectionHead("Mejores marcas", icon = Ico.trophy)
+        marks.forEach { x ->
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Txt(x.name, Modifier.weight(1f), size = 14.sp, weight = FontWeight.SemiBold)
+                if (x.best.isFinite() && x.`when` != null) Sub(app.es.dayMon(x.`when`!!), size = 11.sp)
+                Num(if (x.best.isFinite()) fmtTime(x.best) else "—", 18.sp, color = if (x.best.isFinite()) Z.text else Z.muted)
+            }
+        }
+        if (recs.isNotEmpty()) {
+            Divider()
             recs.chunked(2).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     row.forEach { x ->
-                        Column(Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(c.surface2).clickable { x.run?.let { Nav.go(SUMMARY, run = it.id) } }.padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Lbl(x.label, size = 10.sp); Num(x.value, 22.sp); Sub(x.run?.let { app.es.fmtDate(it.start).split(" · ")[0] } ?: "objetivo semanal", size = 11.sp)
+                        Column(Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).background(c.surface2).clickable { x.run?.let { Nav.go(SUMMARY, run = it.id) } }.padding(horizontal = 12.dp, vertical = 10.dp)) {
+                            Lbl(x.label, size = 10.sp); Num(x.value, 20.sp)
                         }
                     }
                     if (row.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
         }
-        Btn("Añadir una carrera a mano (cinta, reloj…)", { St.manualPrefill = null; St.modal = "manual" }, kind = BtnKind.Ghost)
-        LinkCard("Compartir tu semana", "Una imagen con tus km, salidas y días de esta semana") {
-            scope.launch {
-                val a = Repo.app(); val png = withContext(Dispatchers.Default) { Images.week(ctx, a) }
-                if (png == null) { toast("Cuando corras esta semana, podrás compartirla"); return@launch }
-                val ws = a.weekStart(a.now()); val wr = a.runs.filter { it.start >= ws }
-                Share.file(ctx, "zancada-semana-${isoMs(ws).take(10)}.png", "image/png", png, "Mi semana con Zancada: ${fmtKm(wr.sumOf { it.dist })} km en ${wr.size} ${pl(wr.size, "salida")} 🏃")
+    }
+}
+
+@Composable
+private fun RunsTab(app: App, data: AppData) {
+    val c = Z.c
+    Field(St.histQ, { St.histQ = it }, "Buscar por nombre, ruta o notas", Modifier.fillMaxWidth(), h = 44.dp, size = 14.sp, radius = 14.dp)
+    Chips {
+        listOf("all" to "Todas", "plan" to "Del plan", "route" to "Con ruta", "long" to "Largas", "note" to "Con notas").forEach { (k, l) -> ChipB(l, St.histFilter == k, { St.histFilter = k }) }
+    }
+    val shown = app.historyList(St.histFilter, St.histQ)
+    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().padding(vertical = 40.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        ZMark(40.dp, if (c.night) c.volt else c.ink)
+        Sub(if (data.runs.isNotEmpty()) "Ninguna carrera con ese filtro" else "Aún no hay carreras", align = TextAlign.Center)
+    } else Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(c.surface).padding(horizontal = 14.dp, vertical = 2.dp)) {
+        shown.forEachIndexed { i, r -> if (i > 0) Divider(); HistRow(r, app) }
+    }
+}
+
+@Composable
+private fun RetosTab(app: App) {
+    val c = Z.c
+    app.monthGoal()?.let { g ->
+        ZCard(dark = true, pad = PaddingValues(18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Ring(g.pct / 100, 76.dp, 8.dp) { Num("${min(100.0, g.pct).roundToInt()}%", 16.sp, color = c.onBar) }
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) { Lbl("Objetivo del mes"); Num("${jsRound(g.km)} / ${g.goal} km", 24.sp, color = c.onBar) }
             }
         }
-        LinkCard("Mapa de todas tus carreras", "Tus recorridos superpuestos: donde más corres") {
-            if (data.runs.none { it.points.size > 1 }) toast("Cuando tengas carreras, aquí verás todas juntas") else Nav.go(HEAT)
-        }
-        Chips(wrap = true) {
-            listOf("all" to "Todas", "plan" to "Del plan", "route" to "Con ruta", "long" to "Largas", "note" to "Con notas").forEach { (k, l) -> ChipB(l, St.histFilter == k, { St.histFilter = k }) }
-        }
-        if (data.runs.size >= 6 || St.histQ.isNotEmpty()) Field(St.histQ, { St.histQ = it }, "Buscar por nombre, ruta o notas", Modifier.fillMaxWidth(), h = 44.dp, size = 14.sp, radius = 14.dp)
-        val shown = app.historyList(St.histFilter, St.histQ)
-        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(c.surface).padding(horizontal = 16.dp, vertical = 4.dp)) {
-            if (shown.isEmpty()) Sub(if (data.runs.isNotEmpty()) "Ninguna carrera con ese filtro." else "Sin carreras todavía.", align = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 28.dp, horizontal = 4.dp))
-            shown.forEachIndexed { i, r -> if (i > 0) Divider(); HistRow(r, app) }
+    }
+    val ch = app.challenges()
+    ZCard(pad = PaddingValues(18.dp), gap = 4.dp) {
+        SectionHead("Retos del mes", icon = Ico.target)
+        Sub(ch.head, size = 12.sp)
+        ch.list.forEach { x ->
+            val f = (x.v / x.goal).coerceIn(0.0, 1.0)
+            Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Ring(f, 44.dp, 5.dp) { if (x.done) Icon(Ico.check, null, Modifier.size(18.dp), tint = Z.text) else Txt("${(f * 100).roundToInt()}%", size = 11.sp, weight = FontWeight.SemiBold) }
+                Column(Modifier.weight(1f)) { Txt(x.title, size = 14.sp, weight = FontWeight.SemiBold, maxLines = 1); Sub(x.desc, size = 12.sp, maxLines = 1) }
+                Sub(if (x.done) "Hecho" else x.fmt(x.v) + "/" + x.fmt(x.goal), size = 12.sp, maxLines = 1)
+            }
         }
     }
+    ZCard(pad = PaddingValues(18.dp), gap = 12.dp) { BadgeGrid(app) }
 }
 
 @Composable
@@ -186,38 +258,32 @@ private fun CalendarCard(app: App) {
 }
 
 @Composable
-private fun Weeks12Card(app: App) {
+private fun Weeks12(app: App) {
     val c = Z.c; val w = app.weeks12()
-    ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Últimas 12 semanas"); Sub(w.sub) }
-        Row(Modifier.fillMaxWidth().height(90.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Bottom) {
-            w.list.forEachIndexed { i, x ->
-                Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom), horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (x.km > 0) Txt(jsRound(x.km).toString(), size = 10.sp, weight = FontWeight.SemiBold, color = Z.muted)
-                    Box(Modifier.fillMaxWidth().height(max(3, (x.km / w.max * 64).roundToInt()).dp).clip(RoundedCornerShape(4.dp))
-                        .background(if (i == 11) c.volt else c.ink).alpha(if (x.km == 0.0) 0.12f else if (i == 11) 1f else 0.8f))
-                }
+    Sub(w.sub, size = 12.sp)
+    Row(Modifier.fillMaxWidth().height(90.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Bottom) {
+        w.list.forEachIndexed { i, x ->
+            Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom), horizontalAlignment = Alignment.CenterHorizontally) {
+                if (x.km > 0) Txt(jsRound(x.km).toString(), size = 10.sp, weight = FontWeight.SemiBold, color = Z.muted)
+                Box(Modifier.fillMaxWidth().height(max(3, (x.km / w.max * 64).roundToInt()).dp).clip(RoundedCornerShape(4.dp))
+                    .background(if (i == 11) c.volt else c.ink).alpha(if (x.km == 0.0) 0.12f else 1f))
             }
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { w.axis.forEach { Sub(it, size = 11.sp) } }
     }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { w.axis.forEach { Sub(it, size = 11.sp) } }
 }
 
 @Composable
-private fun MonthsCard(m: Months) {
+private fun MonthsBars(m: Months) {
     val c = Z.c
-    ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 10.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Por meses"); Sub(m.sub, size = 12.sp) }
-        m.rows.forEach { r ->
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Txt(r.label, size = 13.sp, weight = FontWeight.SemiBold); Sub("${r.n} ${pl(r.n, "carrera")} · ${fmtTime(r.dur)}") }
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(5.dp)).background(c.surface2)) {
-                        Box(Modifier.fillMaxHeight().fillMaxWidth(max(0.03, r.km / m.max).toFloat().coerceAtMost(1f)).clip(RoundedCornerShape(5.dp)).background(c.ink))
-                    }
-                    Num(toFixed(r.km, 1).replace('.', ',') + " km", 14.sp, Modifier.width(66.dp))
-                }
+    Sub(m.sub, size = 12.sp)
+    m.rows.forEach { r ->
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Txt(r.label, Modifier.width(52.dp), size = 12.sp, weight = FontWeight.SemiBold, maxLines = 1)
+            Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(5.dp)).background(c.surface2)) {
+                Box(Modifier.fillMaxHeight().fillMaxWidth(max(0.03, r.km / m.max).toFloat().coerceAtMost(1f)).clip(RoundedCornerShape(5.dp)).background(c.ink))
             }
+            Num(toFixed(r.km, 1).replace('.', ','), 14.sp, Modifier.width(44.dp))
         }
     }
 }
@@ -226,7 +292,7 @@ private fun MonthsCard(m: Months) {
 private fun TrendCard(t: Trend, app: App) {
     val c = Z.c; val ink = Z.text; val muted = Z.muted
     ZCard(pad = PaddingValues(horizontal = 20.dp, vertical = 18.dp), gap = 8.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { H2("Evolución del ritmo"); Sub(t.sub, size = 12.sp) }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Ico.trend, null, Modifier.size(20.dp), tint = Z.text); H2("Ritmo") }; Sub(t.sub, size = 12.sp) }
         Box(Modifier.fillMaxWidth().aspectRatio(320f / 110f)) {
             Canvas(Modifier.matchParentSize()) {
                 val k = size.width / 320f
@@ -241,7 +307,7 @@ private fun TrendCard(t: Trend, app: App) {
             Sub(app.pace(t.lo), size = 10.sp, modifier = Modifier.align(Alignment.TopStart))
             Sub(app.pace(t.hi), size = 10.sp, modifier = Modifier.align(Alignment.BottomStart))
         }
-        Sub(t.note)
+        Sub(t.note, size = 12.sp)
     }
 }
 

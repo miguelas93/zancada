@@ -44,7 +44,7 @@ data class Scr(val id: String, val run: String? = null, val route: Route? = null
 
 const val HOME = "home"; const val HISTORY = "history"; const val ROUTES = "routes"; const val PROFILE = "profile"; const val CLUBS = "clubs"
 const val WELCOME = "welcome"; const val ROUTE = "routeDetail"; const val PLAN = "plan"; const val PLANSETUP = "planSetup"; const val PREP = "prep"
-const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val V3D = "view3d"; const val SPOT = "spot"
+const val COUNT = "count"; const val RUN = "run"; const val CELE = "cele"; const val SUMMARY = "summary"; const val HEAT = "heat"; const val REPLAY = "replay"; const val V3D = "view3d"; const val SPOT = "spot"; const val SETTINGS = "settings"
 val TABS = listOf(HOME, HISTORY, ROUTES, PROFILE)
 private val TRANSIENT = setOf(WELCOME, COUNT, RUN, CELE)
 /** Pantallas oscuras (para el color de los iconos de la barra de estado). */
@@ -85,7 +85,7 @@ object St {
     var stretchWarm by mutableStateOf(false)
     var manualPrefill by mutableStateOf<Pair<Long, String>?>(null)
     // Actividad
-    var histFilter by mutableStateOf("all"); var histQ by mutableStateOf(""); var calOff by mutableStateOf(0)
+    var histTab by mutableStateOf("prog"); var histFilter by mutableStateOf("all"); var weeksView by mutableStateOf("w"); var histQ by mutableStateOf(""); var calOff by mutableStateOf(0)
     // Rutas
     var rMode by mutableStateOf("rec"); var rView by mutableStateOf("list"); var rZone by mutableStateOf<String?>(null)
     var rDist by mutableStateOf("all"); var rSurf by mutableStateOf("all"); var rSort by mutableStateOf("near"); var rMore by mutableStateOf(false)
@@ -151,6 +151,7 @@ fun ZRoot() {
                     HISTORY -> HistoryScreen()
                     CLUBS -> ClubsScreen()
                     PROFILE -> ProfileScreen()
+                    SETTINGS -> SettingsScreen()
                     ROUTES -> RoutesScreen()
                     ROUTE -> scr.route?.let { RouteDetailScreen(it) }
                     PLAN -> PlanScreenUi()
@@ -167,7 +168,7 @@ fun ZRoot() {
                 }
             }
             if (scr.id in TABS || scr.id == CLUBS) Tabs(scr.id, Modifier.align(Alignment.BottomCenter))
-            val showZeta = data.profile.done && scr.id in setOf(HISTORY, PROFILE, PLAN, CLUBS)
+            val showZeta = data.profile.done && scr.id in setOf(PLAN, CLUBS)
             if (showZeta) ZetaFab(scr.id == PLAN, data.settings.zetaSeen == null, Modifier.align(Alignment.BottomEnd))
             Modals()
             ToastHost(Modifier.align(Alignment.TopCenter))

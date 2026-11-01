@@ -219,10 +219,11 @@ fun Dots(n: Int, i: Int) = Row(horizontalArrangement = Arrangement.spacedBy(6.dp
 
 /** .setrow con un desplegable (.sel). */
 @Composable
-fun SelRow(label: String, options: List<Pair<String, String>>, value: String, onChange: (String) -> Unit) {
+fun SelRow(label: String, options: List<Pair<String, String>>, value: String, icon: ImageVector? = null, onChange: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     val c = Z.c
-    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) IcoBox(icon)
         Txt(label, Modifier.weight(1f), size = 15.sp, weight = FontWeight.Medium)
         Box {
             Box(Modifier.clip(RoundedCornerShape(12.dp)).background(c.surface2).clickable { open = true }.padding(horizontal = 12.dp, vertical = 8.dp)) {
@@ -378,5 +379,114 @@ object Ico {
     val search = icon(circle(11f, 11f, 7f), "m20 20-4-4")
     val bell = icon("M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9", "M10.3 21a1.94 1.94 0 0 0 3.4 0")
     val locate = icon(circle(12f, 12f, 3f), circle(12f, 12f, 8f), "M12 2v2", "M12 20v2", "M2 12h2", "M20 12h2")
+    val gear = icon("M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z", circle(12f, 12f, 3f))
+    val flame = icon("M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z")
+    val trophy = icon("M6 9H4.5a2.5 2.5 0 0 1 0-5H6", "M18 9h1.5a2.5 2.5 0 0 0 0-5H18", "M4 22h16", "M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22", "M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22", "M18 2H6v7a6 6 0 0 0 12 0V2Z")
+    val medal = icon("M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15", "M11 12 5.12 2.2", "m13 12 5.88-9.8", "M8 7h8", circle(12f, 17f, 5f))
+    val calendar = icon("M8 2v4", "M16 2v4", "M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", "M3 10h18")
+    val clock = icon(circle(12f, 12f, 10f), "M12 6v6l4 2")
+    val target = icon(circle(12f, 12f, 10f), circle(12f, 12f, 6f), circle(12f, 12f, 2f))
+    val bolt = icon("M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z")
+    val gauge = icon("m12 14 4-4", "M3.34 19a10 10 0 1 1 17.32 0")
+    val trend = icon("M22 7 13.5 15.5 8.5 10.5 2 17", "M16 7h6v6")
+    val shield = icon("M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z")
+    val pulse = icon("M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2")
+    val download = icon("M12 15V3", "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", "m7 10 5 5 5-5")
+    val upload = icon("M12 3v12", "m17 8-5-5-5 5", "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4")
+    val file = icon("M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", "M14 2v4a2 2 0 0 0 2 2h4")
+    val info = icon(circle(12f, 12f, 10f), "M12 16v-4", "M12 8h.01")
+    val trash = icon("M3 6h18", "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6", "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2")
+    val userPlus = icon("M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", circle(9f, 7f, 4f), "M19 8v6", "M22 11h-6")
+    val shoe = icon("M3 17h18a1 1 0 0 0 1-1v-.5a3 3 0 0 0-2.2-2.9L14 11l-2-5H8l-.5 2H4a1 1 0 0 0-1 1z", "M3 17v1a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-1", "M10 9h2", "M11 11.5h2")
+    val map = icon("M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z", "M15 5.764v15", "M9 3.236v15")
+    val sun = icon(circle(12f, 12f, 4f), "M12 2v2", "M12 20v2", "m4.93 4.93 1.41 1.41", "m17.66 17.66 1.41 1.41", "M2 12h2", "M20 12h2", "m6.34 17.66-1.41 1.41", "m19.07 4.93-1.41 1.41")
+    val cloud = icon("M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z")
+    val rain = icon("M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24", "M16 14v6", "M8 14v6", "M12 16v6")
+    val moon = icon("M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z")
+    val vibrate = icon("m2 8 2 2-2 2 2 2-2 2", "m22 8-2 2 2 2-2 2 2 2", "M9 5h6a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z")
+    val text = icon("M4 7V4h16v3", "M9 20h6", "M12 4v16")
+    val user = icon("M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", circle(12f, 7f, 4f))
+    val flag = icon("M4 22V4", "M4 4c3-2 6-2 8 0s5 2 8 0v10c-3 2-6 2-8 0s-5-2-8 0")
+    val list = icon("M3 6h.01", "M3 12h.01", "M3 18h.01", "M8 6h13", "M8 12h13", "M8 18h13")
     val mic = icon("M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z", "M19 10v2a7 7 0 0 1-14 0v-2", "M12 19v3")
+}
+
+// ---------- piezas de la arquitectura v01 (pestañas, anillos, filas con icono) ----------
+
+/** Icono dentro de un cuadrado redondeado: el «avatar» de cada fila de ajustes o dato. */
+@Composable
+fun IcoBox(icon: ImageVector, size: Dp = 38.dp, bg: Color = Z.c.surface2, tint: Color = Z.text) {
+    Box(Modifier.size(size).clip(RoundedCornerShape(size * 0.32f)).background(bg), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(size * 0.52f), tint = tint) }
+}
+
+/** Pestañas superiores subrayadas, como Progreso · Actividades de Strava. */
+@Composable
+fun TopTabs(options: List<Pair<String, String>>, sel: String, onSel: (String) -> Unit, modifier: Modifier = Modifier) {
+    val c = Z.c; val on = if (c.night) c.volt else c.ink
+    Column(modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth()) {
+            options.forEach { (k, l) ->
+                val act = k == sel
+                Column(Modifier.weight(1f).clickable(onClickLabel = l) { onSel(k) }.padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Txt(l, size = 15.sp, weight = if (act) FontWeight.SemiBold else FontWeight.Medium, color = if (act) Z.text else Z.muted, maxLines = 1)
+                    Box(Modifier.padding(top = 10.dp).fillMaxWidth(0.7f).height(3.dp).clip(RoundedCornerShape(2.dp)).background(if (act) on else Color.Transparent))
+                }
+            }
+        }
+        Divider()
+    }
+}
+
+/** Anillo de progreso (objetivo cumplido / objetivo). */
+@Composable
+fun Ring(frac: Double, size: Dp, stroke: Dp = 8.dp, color: Color = Z.c.volt, track: Color = if (Z.dark) Color(0x24F4F5F0) else Z.c.line, content: @Composable BoxScope.() -> Unit = {}) {
+    Box(Modifier.size(size), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.matchParentSize()) {
+            val s = stroke.toPx(); val o = Offset(s / 2, s / 2); val r = androidx.compose.ui.geometry.Size(this.size.width - s, this.size.height - s)
+            drawArc(track, -90f, 360f, false, o, r, style = Stroke(s))
+            val f = frac.coerceIn(0.0, 1.0).toFloat()
+            if (f > 0f) drawArc(color, -90f, 360f * f, false, o, r, style = Stroke(s, cap = StrokeCap.Round))
+        }
+        content()
+    }
+}
+
+/** Título de bloque con acción a la derecha («Ver todas»). */
+@Composable
+fun SectionHead(title: String, action: String? = null, icon: ImageVector? = null, onAction: (() -> Unit)? = null) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (icon != null) Icon(icon, null, Modifier.size(20.dp), tint = Z.text)
+        Txt(title, Modifier.weight(1f), size = 17.sp, weight = FontWeight.SemiBold, maxLines = 1)
+        if (action != null && onAction != null) Row(Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onAction).padding(start = 8.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Txt(action, size = 13.sp, weight = FontWeight.SemiBold, color = Z.text); Icon(Ico.chevron, null, Modifier.size(16.dp), tint = Z.text)
+        }
+    }
+}
+
+/** Fila con icono, título, una línea de apoyo y chevron (ajustes, accesos). */
+@Composable
+fun IconRow(icon: ImageVector, title: String, sub: String? = null, tint: Color = Z.text, end: (@Composable () -> Unit)? = null, onClick: (() -> Unit)? = null) {
+    Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier).padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        IcoBox(icon, tint = tint)
+        Column(Modifier.weight(1f)) { Txt(title, size = 15.sp, weight = FontWeight.SemiBold, color = tint, maxLines = 1); sub?.let { Sub(it, size = 12.sp, maxLines = 2) } }
+        if (end != null) end() else if (onClick != null) Icon(Ico.chevron, null, Modifier.size(20.dp), tint = Z.muted)
+    }
+}
+
+/** Dato pequeño con icono: valor grande y etiqueta debajo. */
+@Composable
+fun RowScope.IcoStat(icon: ImageVector, value: String, label: String, unit: String? = null) {
+    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Icon(icon, null, Modifier.size(18.dp), tint = Z.muted)
+        Num(value, 22.sp, unit = unit, unitSize = 11.sp)
+        Sub(label, size = 11.sp, maxLines = 1)
+    }
+}
+
+/** Icono del tiempo según el código WMO de Open-Meteo. */
+fun wxIcon(code: Int?): ImageVector = when (code ?: 0) {
+    0, 1 -> Ico.sun
+    in 51..67, in 80..82, in 95..99 -> Ico.rain
+    else -> Ico.cloud
 }
